@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedItem: String = "Chip Programming"
+    @State private var items = ["Chip Programming", "Logic IC Test", "Minipro status"]
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationSplitView {
+            List(selection: $selectedItem) {
+                ForEach(items, id: \.self) { item in
+                    Text(item)
+                }
+            }
+        } detail : {
+            Text("Detail View for \(selectedItem)")
+                .navigationTitle(selectedItem)
         }
-        .padding()
     }
 }
 
