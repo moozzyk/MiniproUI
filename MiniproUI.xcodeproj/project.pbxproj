@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5A75B9B42D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; };
+		5A75B9B52D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5A75B9B82D3CED2D00DF9FA7 /* minipro in Embed minipro */ = {isa = PBXBuildFile; fileRef = 5A75B9B72D3CED2D00DF9FA7 /* minipro */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		5A13786B2D3A0901006F0165 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -23,10 +29,37 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		5A75B9AF2D3CE06900DF9FA7 /* Embed minipro */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				5A75B9B82D3CED2D00DF9FA7 /* minipro in Embed minipro */,
+			);
+			name = "Embed minipro";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A75B9B62D3CEAE900DF9FA7 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5A75B9B52D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		5A1378592D3A0900006F0165 /* MiniproUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiniproUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A13786A2D3A0901006F0165 /* MiniproUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniproUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A1378742D3A0901006F0165 /* MiniproUIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniproUIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libusb-1.0.0.dylib"; sourceTree = "<group>"; };
+		5A75B9B72D3CED2D00DF9FA7 /* minipro */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = minipro; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A75B9B42D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,9 +109,11 @@
 		5A1378502D3A0900006F0165 = {
 			isa = PBXGroup;
 			children = (
+				5A75B9B72D3CED2D00DF9FA7 /* minipro */,
 				5A13785B2D3A0900006F0165 /* MiniproUI */,
 				5A13786D2D3A0901006F0165 /* MiniproUITests */,
 				5A1378772D3A0901006F0165 /* MiniproUIUITests */,
+				5A75B9B22D3CEAE800DF9FA7 /* Frameworks */,
 				5A13785A2D3A0900006F0165 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -92,6 +128,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		5A75B9B22D3CEAE800DF9FA7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -102,6 +146,8 @@
 				5A1378552D3A0900006F0165 /* Sources */,
 				5A1378562D3A0900006F0165 /* Frameworks */,
 				5A1378572D3A0900006F0165 /* Resources */,
+				5A75B9AF2D3CE06900DF9FA7 /* Embed minipro */,
+				5A75B9B62D3CEAE900DF9FA7 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -393,16 +439,23 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MiniproUI/MiniproUI.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MiniproUI/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moozzyk.MiniproUI;
@@ -418,16 +471,23 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MiniproUI/MiniproUI.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"MiniproUI/Preview Content\"";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.moozzyk.MiniproUI;
