@@ -19,8 +19,14 @@ struct ContentView: View {
                 }
             }
         } detail : {
-            Text("Detail View for \(selectedItem)")
-                .navigationTitle(selectedItem)
+            if selectedItem == "Minipro status" {
+                let result = invokeStatus()
+                Text(result.stdErr)
+                    .navigationTitle(selectedItem)
+            } else {
+                Text("Detail View for \(selectedItem)")
+                    .navigationTitle(selectedItem)
+            }
         }
     }
 }

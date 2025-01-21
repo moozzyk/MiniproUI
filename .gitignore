@@ -61,5 +61,7 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Misc
+.DS_Store
 minipro
 libusb-1.0.0.dylib
