@@ -13,16 +13,11 @@ struct InvocationResult {
     let stdErr: String
 }
 
-func toString(_ pipe: Pipe) -> String {
-    //    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-    let data = pipe.fileHandleForReading.availableData
-    return String(data: data, encoding: .utf8)!
-}
-
 func invokeStatus() -> InvocationResult {
     do {
         let result = try miniproInvoke(["-k"])
         print("\(result)")
+        print("Exit code: \(result.exitCode)")
         return result
     } catch let e {
         print("\(e)")
@@ -35,7 +30,7 @@ enum InvocationError: Error {
 }
 
 func miniproInvoke(_ args: [String]) throws -> InvocationResult {
-    guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro")
+    guard let executableUrl = Bundle.main.url(forAuxiliaryExecutable: "minipro")
     else {
         throw InvocationError.executableNotFound
     }
@@ -52,7 +47,8 @@ func miniproInvoke(_ args: [String]) throws -> InvocationResult {
     }
 
     let process = Process()
-    process.executableURL = URL(fileURLWithPath: executablePath)
+    process.executableURL = executableUrl
+    process.currentDirectoryURL = Bundle.main.resourceURL
     process.arguments = args
     process.standardOutput = stdoutPipe
     process.standardError = stderrPipe
