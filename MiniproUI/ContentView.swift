@@ -7,25 +7,27 @@
 
 import SwiftUI
 
+enum ViewType: String, Hashable, CaseIterable {
+    case epromProgramming = "Chip Programming"
+    case logicIcTest = "Logic IC Test"
+    case about = "Minipro about"
+}
+
 struct ContentView: View {
-    @State private var selectedItem: String = "Chip Programming"
-    @State private var items = ["Chip Programming", "Logic IC Test", "Minipro status"]
+    @State private var selectedItem: ViewType = .epromProgramming
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $selectedItem) {
-                ForEach(items, id: \.self) { item in
-                    Text(item)
-                }
+            List(ViewType.allCases, id: \.self, selection: $selectedItem) { item in
+                Text(item.rawValue)
             }
-        } detail : {
-            if selectedItem == "Minipro status" {
-                let result = invokeStatus()
-                Text(result.stdErr)
-                    .navigationTitle(selectedItem)
+        } detail: {
+            if selectedItem == .about {
+                MiniproAboutView()
+                    .navigationTitle(selectedItem.rawValue)
             } else {
-                Text("Detail View for \(selectedItem)")
-                    .navigationTitle(selectedItem)
+                Text("Detail View for \(selectedItem.rawValue)")
+                    .navigationTitle(selectedItem.rawValue)
             }
         }
     }
