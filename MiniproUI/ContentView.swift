@@ -10,7 +10,7 @@ import SwiftUI
 enum ViewType: String, Hashable, CaseIterable {
     case epromProgramming = "Chip Programming"
     case logicIcTest = "Logic IC Test"
-    case about = "Minipro about"
+    case programmerInfo = "Programmer Information"
 }
 
 struct ContentView: View {
@@ -22,7 +22,7 @@ struct ContentView: View {
                 Text(item.rawValue)
             }
         } detail: {
-            if selectedItem == .about {
+            if selectedItem == .programmerInfo {
                 MiniproAboutView()
                     .navigationTitle(selectedItem.rawValue)
             } else {
