@@ -20,12 +20,12 @@ enum InvocationError: Error {
 class MiniproInvoker {
     private static let queue = DispatchQueue(label: "MiniproInvokeQueue")
 
-    public static func invoke(arguments: [String]) throws ->  InvocationResult {
+    public static func invoke(arguments: [String]) throws -> InvocationResult {
         guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro")
         else {
             throw InvocationError.executableNotFound
         }
-        return try queue.sync{
+        return try queue.sync {
             var stdout = Data()
             var stderr = Data()
             let stdoutPipe = Pipe()
