@@ -15,6 +15,7 @@ enum ViewType: String, Hashable, CaseIterable {
 
 class MiniproModel: ObservableObject {
     @Published var programmerInfo: ProgrammerInfo?
+    @Published var supportedDevices: [String]?
 }
 
 struct ContentView: View {
@@ -26,7 +27,13 @@ struct ContentView: View {
             List(ViewType.allCases, id: \.self, selection: $selectedItem) { item in
                 Text(item.rawValue)
             }.task {
-                model.programmerInfo = try? MiniproAPI.getProgrammerInfo()
+                do {
+                    model.supportedDevices = try await MiniproAPI.getSupportedDevices()
+                    model.programmerInfo = try await MiniproAPI.getProgrammerInfo()
+                } catch {
+                    // TOODO: handle error
+                    print("Error: \(error)")
+                }
             }
         } detail: {
             if selectedItem == .programmerInfo {

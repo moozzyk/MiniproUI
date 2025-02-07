@@ -21,7 +21,7 @@ struct ProgrammerInfoView: View {
         }
         .padding()
         .task {
-            programmerInfo = try? MiniproAPI.getProgrammerInfo()
+            programmerInfo = try? await MiniproAPI.getProgrammerInfo()
         }
     }
 }
@@ -44,14 +44,15 @@ struct PropertyRow: View {
 }
 
 #Preview {
-    ProgrammerInfoView(programmerInfo: .constant(
-        ProgrammerInfo(
-            model: "T48",
-            firmwareVersion: "00.1.31 (0x11f)",
-            deviceCode: "46A16257",
-            serialNumber: "HSSCVO9LARFMOYKYOMVE5123",
-            dateManufactured: "2024-06-28 16:55",
-            usbSpeed: "480Mbps (USB 2.0)",
-            supplyVoltage: "5.11 V",
-            warnings: [])))
+    ProgrammerInfoView(
+        programmerInfo: .constant(
+            ProgrammerInfo(
+                model: "T48",
+                firmwareVersion: "00.1.31 (0x11f)",
+                deviceCode: "46A16257",
+                serialNumber: "HSSCVO9LARFMOYKYOMVE5123",
+                dateManufactured: "2024-06-28 16:55",
+                usbSpeed: "480Mbps (USB 2.0)",
+                supplyVoltage: "5.11 V",
+                warnings: [])))
 }

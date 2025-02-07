@@ -11,7 +11,7 @@ import Testing
 
 struct MiniproAPITests {
     @Test func testGetProgrammerInfo() async throws {
-        let result = try MiniproAPI.getProgrammerInfo()
+        let result = try await MiniproAPI.getProgrammerInfo()
         #expect(result.model == "T48")
         #expect(!result.firmwareVersion.isEmpty)
         #expect(!result.deviceCode.isEmpty)
@@ -19,5 +19,11 @@ struct MiniproAPITests {
         #expect(!result.dateManufactured.isEmpty)
         #expect(!result.usbSpeed.isEmpty)
         #expect(!result.supplyVoltage.isEmpty)
+    }
+
+    @Test func testGetSupportedDevices() async throws {
+        let result = try await MiniproAPI.getSupportedDevices()
+        #expect(result.count > 1000)
+        #expect(result.contains("AM29F040B@DIP32"))
     }
 }

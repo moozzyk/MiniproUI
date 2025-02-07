@@ -14,8 +14,13 @@ enum APIError: Error, Equatable {
 }
 
 class MiniproAPI {
-    static func getProgrammerInfo() throws -> ProgrammerInfo {
-        let result = try MiniproInvoker.invoke(arguments: ["-t"])
+    static func getProgrammerInfo() async throws -> ProgrammerInfo {
+        let result = try await MiniproInvoker.invoke(arguments: ["-t"])
         return try ProgrammerInfoProcessor.run(result)
+    }
+
+    static func getSupportedDevices() async throws -> [String] {
+        let result = try await MiniproInvoker.invoke(arguments: ["-l"])
+        return result.stdOut.components(separatedBy: .newlines)
     }
 }
