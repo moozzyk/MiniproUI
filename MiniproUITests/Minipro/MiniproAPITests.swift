@@ -25,5 +25,6 @@ struct MiniproAPITests {
         let result = try await MiniproAPI.getSupportedDevices()
         #expect(result.count > 1000)
         #expect(result.contains("AM29F040B@DIP32"))
+        #expect(result.count == Set(result).count)
     }
 }
