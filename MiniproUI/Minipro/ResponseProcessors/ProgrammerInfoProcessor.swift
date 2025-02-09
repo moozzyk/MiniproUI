@@ -26,17 +26,9 @@ class ProgrammerInfoProcessor {
     private static let dateManufactured = /Manufactured: (\d{4}-\d{2}-\d{2})(\d{2}:\d{2})/
     private static let usbSpeed = /USB speed: (.+)\n/
     private static let supplyVoltage = /Supply voltage: (.+)\n/
-    private static let prgrammerNotFound = "No programmer found"
-    private static let error = /[Ee]rror/
 
     public static func run(_ result: InvocationResult) throws -> ProgrammerInfo {
-        if result.stdErr.contains(prgrammerNotFound) {
-            throw APIError.programmerNotFound
-        }
-
-        if result.stdErr.contains(error) {
-           throw APIError.unknownError(result.stdErr.trimmingCharacters(in: .whitespacesAndNewlines))
-        }
+        try ensureNoError(invocationResult: result)
 
         let model = try? model.firstMatch(in: result.stdErr)?.1
         let firmwareVersion = try? firmwareVersion.firstMatch(in: result.stdErr)?.1
@@ -62,4 +54,3 @@ class ProgrammerInfoProcessor {
             warnings: [])
     }
 }
-
