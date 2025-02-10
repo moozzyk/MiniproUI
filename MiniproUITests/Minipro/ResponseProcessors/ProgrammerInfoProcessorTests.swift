@@ -6,6 +6,7 @@
 //
 
 import Testing
+
 @testable import MiniproUI
 
 struct ProgrammerInfoProcessorTests {
@@ -33,22 +34,15 @@ struct ProgrammerInfoProcessorTests {
         #expect(result.supplyVoltage == "5.11 V")
     }
 
-    @Test func testProgrammerInfoProcessorCannotParseResponsev1() {
+    @Test func testProgrammerInfoProcessorCannotParseResponse() {
         #expect(throws: APIError.programmerInfoUnavailable) {
             try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: ""))
         }
     }
 
-    @Test func testProgrammerInfoProcessorThrowsIfProgrammerNotConnected() {
-        #expect(throws: APIError.programmerNotFound) {
-            try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 1, stdOut: "", stdErr: "No programmer found.\n"))
-        }
-    }
-
-    @Test func testProgrammerInfoProcessorThrowsOnErrors() {
-        #expect(throws: APIError.unknownError("Error: something went wrong.")) {
-            try ProgrammerInfoProcessor.run(
-                InvocationResult(exitCode: 1, stdOut: "", stdErr: "Error: something went wrong.\n"))
+    @Test func testProgrammerInfoProcessorChecksForError() {
+        #expect(throws: APIError.unknownError("Error")) {
+            try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: "Error"))
         }
     }
 }

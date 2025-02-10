@@ -21,9 +21,6 @@ class MiniproAPI {
 
     static func getSupportedDevices() async throws -> [String] {
         let result = try await MiniproInvoker.invoke(arguments: ["-l"])
-        var seen: Set<String> = []
-        return result.stdOut
-            .components(separatedBy: .newlines)
-            .filter { seen.insert($0).inserted }
+        return try SupportedDevicesProcessor.run(result)
     }
 }
