@@ -8,7 +8,7 @@
 import Foundation
 
 func ensureNoError(invocationResult: InvocationResult) throws {
-    let error = /[Ee]rror/
+    let error = /[Ee]rror/  // TODO: Handle: Out of memory
     let prgrammerNotFound = "No programmer found"
     let stdErr = invocationResult.stdErr
 

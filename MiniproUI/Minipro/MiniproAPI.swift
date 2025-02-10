@@ -10,6 +10,7 @@ import Foundation
 enum APIError: Error, Equatable {
     case programmerNotFound
     case programmerInfoUnavailable
+    case deviceNotFound(String)
     case unknownError(String)
 }
 
@@ -22,5 +23,10 @@ class MiniproAPI {
     static func getSupportedDevices() async throws -> [String] {
         let result = try await MiniproInvoker.invoke(arguments: ["-l"])
         return try SupportedDevicesProcessor.run(result)
+    }
+
+    static func getDeviceDetails(device: String) async throws -> [(String, String)] {
+        let result = try await MiniproInvoker.invoke(arguments: ["-d", device])
+        return try DeviceDetailsProcessor.run(result)
     }
 }

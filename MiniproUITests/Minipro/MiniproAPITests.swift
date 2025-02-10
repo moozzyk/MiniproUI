@@ -28,8 +28,8 @@ struct MiniproAPITests {
         #expect(result.count == Set(result).count)
     }
 
-//    @Test func testGetDevicesDetials() async throws {
-//        let result = try await MiniproAPI.getDeviceDetails(device: "AM29F040B@DIP32")
-//        #expect(result.count > 10)
-//    }
+    @Test func testGetDevicesDetials() async throws {
+        let result = try await MiniproAPI.getDeviceDetails(device: "AUTO_EMMC_TO_SD(4Bits)@SD_ADP")
+        #expect(result.count >= 4)
+    }
 }
