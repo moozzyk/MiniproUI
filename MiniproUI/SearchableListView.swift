@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct SearchableListView: View {
-    @Binding var  items: [String]
+    @Binding var items: [String]
     @State var searchText: String = ""
+    @State var selectedItem: String?
 
     var filteredItems: [String] {
         if searchText.isEmpty {
@@ -21,14 +22,33 @@ struct SearchableListView: View {
 
     var body: some View {
         SearchBar(searchText: $searchText)
-        List{
-            ForEach(filteredItems, id: \.self) { item in
-                Text(item)
+        List {
+            ForEach(filteredItems.prefix(500), id: \.self) { item in
+                SelectableRow(item: item, selectedItem: $selectedItem)
             }
         }
     }
 }
 
+struct SelectableRow: View {
+    let item: String
+    @Binding var selectedItem: String?
+
+    var body: some View {
+        HStack {
+            Text(item)
+            Spacer()
+            if item == selectedItem {
+                Image(systemName: "checkmark")
+                    .foregroundColor(.accentColor)
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            selectedItem = item
+        }
+    }
+}
 
 struct SearchBar: View {
     @Binding var searchText: String
