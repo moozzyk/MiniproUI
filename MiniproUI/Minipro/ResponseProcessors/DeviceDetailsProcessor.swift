@@ -7,26 +7,42 @@
 
 import Foundation
 
+struct DeviceDetails {
+    let deviceInfo: [(String, String)]
+    let programmingInfo: [(String, String)]
+    let isLogicChip: Bool
+}
+
 class DeviceDetailsProcessor {
     private static let deviceNotFound = /Device (.*) not found!/
-    private static let keys = [
+    private static let deviceInfoKeys = [
         "Name", "Available on", "Memory", "Package", "ICSP", "VCC voltage", "Vector count", "Protocol",
         "Read buffer size", "Write buffer size",
     ]
+    private static let programmingInfoKeys = [
+        "VPP programming voltage", "VDD write voltage", "VCC verify voltage", "Pulse delay",
+    ]
 
-    public static func run(_ result: InvocationResult) throws -> [(String, String)] {
+    public static func run(_ result: InvocationResult) throws -> DeviceDetails {
         try ensureNoError(invocationResult: result)
         let deviceNotFountMatch = try? deviceNotFound.firstMatch(in: result.stdErr)
         guard deviceNotFountMatch == nil else {
             throw APIError.deviceNotFound(String(deviceNotFountMatch!.1))
         }
 
-        var deviceDetails = [(String, String)]()
         let resultLines = result.stdErr.split(separator: "\n")
+        let deviceInfo = extractInfo(resultLines: resultLines, keys: deviceInfoKeys)
+        let programmingInfo = extractInfo(resultLines: resultLines, keys: programmingInfoKeys)
+        let isLogicChip = deviceInfo.last?.0 == "Vector count"
+        return DeviceDetails(deviceInfo: deviceInfo, programmingInfo: programmingInfo, isLogicChip: isLogicChip)
+    }
+
+    private static func extractInfo(resultLines: [Substring], keys: [String]) -> [(String, String)] {
+        var info = [(String, String)]()
         keys.forEach { key in
             resultLines.forEach { line in
                 if line.starts(with: key) {
-                    deviceDetails.append(
+                    info.append(
                         (
                             key,
                             line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -34,7 +50,6 @@ class DeviceDetailsProcessor {
                 }
             }
         }
-
-        return deviceDetails
+        return info
     }
 }

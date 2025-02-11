@@ -25,7 +25,7 @@ class MiniproAPI {
         return try SupportedDevicesProcessor.run(result)
     }
 
-    static func getDeviceDetails(device: String) async throws -> [(String, String)] {
+    static func getDeviceDetails(device: String) async throws -> DeviceDetails {
         let result = try await MiniproInvoker.invoke(arguments: ["-d", device])
         return try DeviceDetailsProcessor.run(result)
     }
