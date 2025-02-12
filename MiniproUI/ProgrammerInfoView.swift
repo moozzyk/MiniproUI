@@ -34,7 +34,6 @@ struct PropertyRow: View {
         HStack {
             Text(title)
                 .fontWeight(.semibold)
-                // Give the label a fixed width to align all rows
                 .frame(width: 150, alignment: .leading)
             Text(value)
                 .frame(maxWidth: .infinity, alignment: .leading)

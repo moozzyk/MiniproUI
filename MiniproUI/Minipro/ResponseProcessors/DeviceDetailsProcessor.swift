@@ -7,9 +7,14 @@
 
 import Foundation
 
-struct DeviceDetails {
-    let deviceInfo: [(String, String)]
-    let programmingInfo: [(String, String)]
+struct KeyValuePair: Equatable {
+    let key: String
+    let value: String
+}
+
+struct DeviceDetails: Equatable {
+    let deviceInfo: [KeyValuePair]
+    let programmingInfo: [KeyValuePair]
     let isLogicChip: Bool
 }
 
@@ -33,20 +38,16 @@ class DeviceDetailsProcessor {
         let resultLines = result.stdErr.split(separator: "\n")
         let deviceInfo = extractInfo(resultLines: resultLines, keys: deviceInfoKeys)
         let programmingInfo = extractInfo(resultLines: resultLines, keys: programmingInfoKeys)
-        let isLogicChip = deviceInfo.last?.0 == "Vector count"
+        let isLogicChip = deviceInfo.last?.key == "Vector count"
         return DeviceDetails(deviceInfo: deviceInfo, programmingInfo: programmingInfo, isLogicChip: isLogicChip)
     }
 
-    private static func extractInfo(resultLines: [Substring], keys: [String]) -> [(String, String)] {
-        var info = [(String, String)]()
+    private static func extractInfo(resultLines: [Substring], keys: [String]) -> [KeyValuePair] {
+        var info = [KeyValuePair]()
         keys.forEach { key in
             resultLines.forEach { line in
                 if line.starts(with: key) {
-                    info.append(
-                        (
-                            key,
-                            line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)
-                        ))
+                    info.append(KeyValuePair(key: key, value: line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)))
                 }
             }
         }

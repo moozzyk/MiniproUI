@@ -27,10 +27,10 @@ struct DeviceDetailsProcessorTest {
             """,
             DeviceDetails(
                 deviceInfo: [
-                    ("Name", "7404"),
-                    ("Package", "DIP14"),
-                    ("VCC voltage", "2.35V"),
-                    ("Vector count", "2"),
+                    KeyValuePair(key: "Name", value: "7404"),
+                    KeyValuePair(key: "Package", value: "DIP14"),
+                    KeyValuePair(key: "VCC voltage", value: "2.35V"),
+                    KeyValuePair(key: "Vector count", value: "2"),
                 ], programmingInfo: [], isLogicChip: true)
         ),
         (
@@ -53,14 +53,14 @@ struct DeviceDetailsProcessorTest {
             """,
             DeviceDetails(
                 deviceInfo: [
-                    ("Name", "AM29F040B@DIP32"),
-                    ("Available on", "TL866A/CS"),
-                    ("Memory", "524288 Bytes"),
-                    ("Package", "DIP32"),
-                    ("ICSP", "-"),
-                    ("Protocol", "0x06"),
-                    ("Read buffer size", "4096 Bytes"),
-                    ("Write buffer size", "256 Bytes"),
+                    KeyValuePair(key: "Name", value: "AM29F040B@DIP32"),
+                    KeyValuePair(key: "Available on", value: "TL866A/CS"),
+                    KeyValuePair(key: "Memory", value: "524288 Bytes"),
+                    KeyValuePair(key: "Package", value: "DIP32"),
+                    KeyValuePair(key: "ICSP", value: "-"),
+                    KeyValuePair(key: "Protocol", value: "0x06"),
+                    KeyValuePair(key: "Read buffer size", value: "4096 Bytes"),
+                    KeyValuePair(key: "Write buffer size", value: "256 Bytes"),
                 ], programmingInfo: [], isLogicChip: false)
         ),
         (
@@ -83,14 +83,14 @@ struct DeviceDetailsProcessorTest {
             """,
             DeviceDetails(
                 deviceInfo: [
-                    ("Name", "JS28F640P30TF@TSOP56"),
-                    ("Available on", "TL866A/CS"),
-                    ("Memory", "4194304 Words + 272 Bytes"),
-                    ("Package", "Adapter011.JPG"),
-                    ("ICSP", "-"),
-                    ("Protocol", "0x12"),
-                    ("Read buffer size", "32768 Bytes"),
-                    ("Write buffer size", "2048 Bytes"),
+                    KeyValuePair(key: "Name", value: "JS28F640P30TF@TSOP56"),
+                    KeyValuePair(key: "Available on", value: "TL866A/CS"),
+                    KeyValuePair(key: "Memory", value: "4194304 Words + 272 Bytes"),
+                    KeyValuePair(key: "Package", value: "Adapter011.JPG"),
+                    KeyValuePair(key: "ICSP", value: "-"),
+                    KeyValuePair(key: "Protocol", value: "0x12"),
+                    KeyValuePair(key: "Read buffer size", value: "32768 Bytes"),
+                    KeyValuePair(key: "Write buffer size", value: "2048 Bytes"),
                 ], programmingInfo: [], isLogicChip: false)
         ),
         (
@@ -118,44 +118,31 @@ struct DeviceDetailsProcessorTest {
             """,
             DeviceDetails(
                 deviceInfo: [
-                    ("Name", "AT27LV512R@PLCC32"),
-                    ("Available on", "TL866A/CS"),
-                    ("Memory", "65536 Bytes"),
-                    ("Package", "DIP63"),
-                    ("ICSP", "-"),
-                    ("Protocol", "0x0a"),
-                    ("Read buffer size", "1024 Bytes"),
-                    ("Write buffer size", "128 Bytes"),
+                    KeyValuePair(key: "Name", value: "AT27LV512R@PLCC32"),
+                    KeyValuePair(key: "Available on", value: "TL866A/CS"),
+                    KeyValuePair(key: "Memory", value: "65536 Bytes"),
+                    KeyValuePair(key: "Package", value: "DIP63"),
+                    KeyValuePair(key: "ICSP", value: "-"),
+                    KeyValuePair(key: "Protocol", value: "0x0a"),
+                    KeyValuePair(key: "Read buffer size", value: "1024 Bytes"),
+                    KeyValuePair(key: "Write buffer size", value: "128 Bytes"),
                 ],
                 programmingInfo: [
-                    ("VPP programming voltage", "9V"),
-                    ("VDD write voltage", "2V"),
-                    ("VCC verify voltage", "-V"),
-                    ("Pulse delay", "100us"),
+                    KeyValuePair(key: "VPP programming voltage", value: "9V"),
+                    KeyValuePair(key: "VDD write voltage", value: "2V"),
+                    KeyValuePair(key: "VCC verify voltage", value: "-V"),
+                    KeyValuePair(key: "Pulse delay", value: "100us"),
                 ], isLogicChip: false)
         ),
 
     ]
-
-    func deviceDetailsEqual(_ device1: DeviceDetails, _ device2: DeviceDetails) -> Bool {
-        let areEqual: ([(String, String)], [(String, String)]) -> Bool = { (lhs, rhs) in
-            lhs.count == rhs.count
-                && zip(lhs, rhs).allSatisfy { (lhs, rhs) in
-                    lhs == rhs
-                }
-        }
-
-        return areEqual(device1.deviceInfo, device2.deviceInfo)
-            && areEqual(device1.programmingInfo, device2.programmingInfo)
-            && device1.isLogicChip == device2.isLogicChip
-    }
 
     @Test(arguments: testCases)
     func testDeviceDetaislProcessorForIC(testCase: (String, DeviceDetails)) async throws {
         let (input, expectedDeviceDetails) = testCase
         let result = InvocationResult(exitCode: 0, stdOut: "", stdErr: input)
         let deviceDetails = try DeviceDetailsProcessor.run(result)
-        #expect(deviceDetailsEqual(deviceDetails, expectedDeviceDetails))
+        #expect(deviceDetails == expectedDeviceDetails)
     }
 
     @Test func testDeviceDetailsProcessorThrowsForUnknownDevice() {
