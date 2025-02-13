@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct KeyValuePair: Equatable {
+struct KeyValuePair: Equatable, Hashable {
     let key: String
     let value: String
 }
 
-struct DeviceDetails: Equatable {
+struct DeviceDetails: Equatable, Hashable {
     let deviceInfo: [KeyValuePair]
     let programmingInfo: [KeyValuePair]
     let isLogicChip: Bool
@@ -47,7 +47,10 @@ class DeviceDetailsProcessor {
         keys.forEach { key in
             resultLines.forEach { line in
                 if line.starts(with: key) {
-                    info.append(KeyValuePair(key: key, value: line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)))
+                    info.append(
+                        KeyValuePair(
+                            key: key,
+                            value: line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)))
                 }
             }
         }

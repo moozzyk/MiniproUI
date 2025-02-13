@@ -9,10 +9,12 @@ import SwiftUI
 
 struct LogicICTestView: View {
     @Binding var supportedDevices: [String]
+    @State private var selectedDevice: String? = nil
 
     var body: some View {
-        VStack {
-            SearchableListView(items: $supportedDevices)
+        HStack {
+            SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice)
+            DeviceDetailsView(device: $selectedDevice)
         }.task {
             supportedDevices = (try? await MiniproAPI.getSupportedDevices()) ?? []
         }

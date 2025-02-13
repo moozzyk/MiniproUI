@@ -9,8 +9,8 @@ import SwiftUI
 
 struct SearchableListView: View {
     @Binding var items: [String]
+    @Binding var selectedItem: String?
     @State var searchText: String = ""
-    @State var selectedItem: String?
 
     var filteredItems: [String] {
         if searchText.isEmpty {
@@ -21,10 +21,12 @@ struct SearchableListView: View {
     }
 
     var body: some View {
-        SearchBar(searchText: $searchText)
-        List {
-            ForEach(filteredItems.prefix(500), id: \.self) { item in
-                SelectableRow(item: item, selectedItem: $selectedItem)
+        VStack {
+            SearchBar(searchText: $searchText)
+            List {
+                ForEach(filteredItems.prefix(500), id: \.self) { item in
+                    SelectableRow(item: item, selectedItem: $selectedItem)
+                }
             }
         }
     }
@@ -76,5 +78,5 @@ struct SearchBar: View {
 }
 
 #Preview {
-    SearchableListView(items: .constant(["apple", "orange", "banana"]))
+    SearchableListView(items: .constant(["apple", "orange", "banana"]), selectedItem: .constant(nil))
 }
