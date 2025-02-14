@@ -164,7 +164,7 @@ struct DeviceDetailsProcessorTest {
         }
     }
 
-    @Test func testDeviceDetailsProcessorChecksForError() {
+    @Test func testDeviceDetailsProcessorChecksForErrors() {
         #expect(throws: APIError.unknownError("Error")) {
             try DeviceDetailsProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: "Error"))
         }

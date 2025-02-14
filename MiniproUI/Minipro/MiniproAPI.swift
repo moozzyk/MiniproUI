@@ -30,8 +30,8 @@ class MiniproAPI {
         return try DeviceDetailsProcessor.run(result)
     }
 
-    static func testLogicIC(device: String) async throws -> String {
+    static func testLogicIC(device: String) async throws -> LogicICTestResult {
         let result = try await MiniproInvoker.invoke(arguments: ["-T", "-p", device])
-        return result.stdErr
+        return try LogicICTestProcessor.run(result, device: device)
     }
 }

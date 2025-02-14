@@ -40,7 +40,7 @@ struct ProgrammerInfoProcessorTests {
         }
     }
 
-    @Test func testProgrammerInfoProcessorChecksForError() {
+    @Test func testProgrammerInfoProcessorChecksForErrors() {
         #expect(throws: APIError.unknownError("Error")) {
             try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: "Error"))
         }
