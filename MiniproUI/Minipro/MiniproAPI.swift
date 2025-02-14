@@ -29,4 +29,9 @@ class MiniproAPI {
         let result = try await MiniproInvoker.invoke(arguments: ["-d", device])
         return try DeviceDetailsProcessor.run(result)
     }
+
+    static func testLogicIC(device: String) async throws -> String {
+        let result = try await MiniproInvoker.invoke(arguments: ["-T", "-p", device])
+        return result.stdErr
+    }
 }

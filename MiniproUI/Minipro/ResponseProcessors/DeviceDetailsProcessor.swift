@@ -19,7 +19,6 @@ struct DeviceDetails: Equatable, Hashable {
 }
 
 class DeviceDetailsProcessor {
-    private static let deviceNotFound = /Device (.*) not found!/
     private static let deviceInfoKeys = [
         "Name", "Available on", "Memory", "Package", "ICSP", "VCC voltage", "Vector count", "Protocol",
         "Read buffer size", "Write buffer size",
@@ -30,10 +29,6 @@ class DeviceDetailsProcessor {
 
     public static func run(_ result: InvocationResult) throws -> DeviceDetails {
         try ensureNoError(invocationResult: result)
-        let deviceNotFountMatch = try? deviceNotFound.firstMatch(in: result.stdErr)
-        guard deviceNotFountMatch == nil else {
-            throw APIError.deviceNotFound(String(deviceNotFountMatch!.1))
-        }
 
         let resultLines = result.stdErr.split(separator: "\n")
         let deviceInfo = extractInfo(resultLines: resultLines, keys: deviceInfoKeys)

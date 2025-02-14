@@ -33,4 +33,9 @@ struct MiniproAPITests {
         #expect(deviceDetails.deviceInfo.count >= 4)
         #expect(deviceDetails.programmingInfo.count > 0)
     }
+
+    @Test func testTestLogicIC() async throws {
+        let icTestResult = try await MiniproAPI.testLogicIC(device: "7404")
+        print(icTestResult)
+    }
 }
