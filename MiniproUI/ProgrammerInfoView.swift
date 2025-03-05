@@ -10,16 +10,65 @@ import SwiftUI
 struct ProgrammerInfoView: View {
     @Binding var programmerInfo: ProgrammerInfo?
     var body: some View {
-        VStack(alignment: .leading) {
-            PropertyRow(title: "Model ", value: programmerInfo?.model ?? "Unknown")
-            PropertyRow(title: "Firmware Version ", value: programmerInfo?.firmwareVersion ?? "Unknown")
-            PropertyRow(title: "Device Code ", value: programmerInfo?.deviceCode ?? "Unknown")
-            PropertyRow(title: "Serial Number ", value: programmerInfo?.serialNumber ?? "Unknown")
-            PropertyRow(title: "Manufactured Date", value: programmerInfo?.dateManufactured ?? "Unknown")
-            PropertyRow(title: "USB Speed", value: programmerInfo?.usbSpeed ?? "Unknown")
-            PropertyRow(title: "Supply Voltage", value: programmerInfo?.supplyVoltage ?? "Unknown")
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center) {
+                Image(systemName: "cpu.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                    .padding(.trailing, 8)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Minipro " + (programmerInfo?.model ?? "Unknown"))
+                        .font(.title)
+                        .fontWeight(.semibold)
+                    if programmerInfo?.model != nil {
+                        Text(programmerInfo?.firmwareVersion ?? "")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .padding([.top, .horizontal])
+
+            Divider()
+
+            Form {
+                if programmerInfo?.model == nil {
+                    HStack {
+                        Spacer()
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .foregroundColor(.red)
+                        Text("No programmer connected.")
+                            .padding()
+                        Spacer()
+                    }
+                } else {
+                    Section {
+                        PropertyRow(label: "Model ", value: programmerInfo?.model ?? "Unknown")
+                        PropertyRow(label: "Firmware Version ", value: programmerInfo?.firmwareVersion ?? "Unknown")
+                        PropertyRow(label: "Device Code ", value: programmerInfo?.deviceCode ?? "Unknown")
+                        PropertyRow(label: "Serial Number ", value: programmerInfo?.serialNumber ?? "Unknown")
+                        PropertyRow(label: "Manufactured Date", value: programmerInfo?.dateManufactured ?? "Unknown")
+                        PropertyRow(label: "USB Speed", value: programmerInfo?.usbSpeed ?? "Unknown")
+                        PropertyRow(label: "Supply Voltage", value: programmerInfo?.supplyVoltage ?? "Unknown")
+                    }
+                }
+
+                if programmerInfo?.warnings.count ?? 0 > 0 {
+                    Section(
+                        header: HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.yellow)
+                            Text("Warnings")
+                        }
+                    ) {
+                        Text("Warning")
+                    }
+                }
+            }
+            .formStyle(.grouped)
         }
-        .padding()
+        .frame(minWidth: 400, minHeight: 500)
         .task {
             programmerInfo = try? await MiniproAPI.getProgrammerInfo()
         }
@@ -27,18 +76,30 @@ struct ProgrammerInfoView: View {
 }
 
 struct PropertyRow: View {
-    let title: String
+    let label: String
     let value: String
 
     var body: some View {
         HStack {
-            Text(title)
-                .fontWeight(.semibold)
-                .frame(width: 150, alignment: .leading)
+            Text(label)
+            Spacer()
             Text(value)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(.secondary)
         }
-        .padding(.vertical, 4)
+    }
+}
+
+struct InfoRow: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(label)
+            Spacer()
+            Text(value)
+                .foregroundColor(.secondary)
+        }
     }
 }
 
