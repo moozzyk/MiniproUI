@@ -62,7 +62,9 @@ struct ProgrammerInfoView: View {
                             Text("Warnings")
                         }
                     ) {
-                        Text("Warning")
+                        ForEach (programmerInfo?.warnings ?? [], id: \.self) {
+                            Text($0)
+                        }
                     }
                 }
             }
@@ -89,20 +91,6 @@ struct PropertyRow: View {
     }
 }
 
-struct InfoRow: View {
-    let label: String
-    let value: String
-
-    var body: some View {
-        HStack {
-            Text(label)
-            Spacer()
-            Text(value)
-                .foregroundColor(.secondary)
-        }
-    }
-}
-
 #Preview {
     ProgrammerInfoView(
         programmerInfo: .constant(
@@ -114,5 +102,5 @@ struct InfoRow: View {
                 dateManufactured: "2024-06-28 16:55",
                 usbSpeed: "480Mbps (USB 2.0)",
                 supplyVoltage: "5.11 V",
-                warnings: [])))
+                warnings: ["T48 support is experimental"])))
 }

@@ -27,6 +27,27 @@ class ProgrammerInfoProcessor {
     private static let usbSpeed = /USB speed: (.+)\n/
     private static let supplyVoltage = /Supply voltage: (.+)\n/
 
+    private static func findWarnings(stdErr: String) -> [String] {
+        var warnings: [String] = []
+        let lines = stdErr.split(separator: "\n")
+        for (index, line) in lines.enumerated() {
+            if let range = line.range(of: "Warning: ") {
+                let warning = line[range.upperBound...]
+                if warning.starts(with: "Firmware is") {
+                    warnings.append("\(warning)\(sanitizeVersionWarningLine(line: String(lines[index + 1]))),\(sanitizeVersionWarningLine(line: String(lines[index + 2])))"
+                    )
+                } else {
+                    warnings.append(String(warning))
+                }
+            }
+        }
+        return warnings
+    }
+
+    private static func sanitizeVersionWarningLine(line: String) -> String {
+        return line.replacingOccurrences(of: "[\\s]+", with: " ", options: .regularExpression, range: nil)
+    }
+
     public static func run(_ result: InvocationResult) throws -> ProgrammerInfo {
         try ensureNoError(invocationResult: result)
 
@@ -51,6 +72,6 @@ class ProgrammerInfoProcessor {
             dateManufactured: String(dateManufactured ?? "N/A"),
             usbSpeed: String(usbSpeed ?? "N/A"),
             supplyVoltage: String(supplyVoltage ?? "N/A"),
-            warnings: [])
+            warnings: findWarnings(stdErr: result.stdErr))
     }
 }

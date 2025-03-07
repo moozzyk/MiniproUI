@@ -17,6 +17,9 @@ struct ProgrammerInfoProcessorTests {
                 """
                 Found T48 00.1.31 (0x11f)
                 Warning: T48 support is experimental!
+                Warning: Firmware is out of date.
+                  Expected  01.1.31 (0x11f)
+                  Found     00.1.03 (0x103)
                 Device code: 46A16257
                 Serial code: HSSCVO9LARFMOYKYOMVE5123
                 Manufactured: 2024-06-2816:55
@@ -32,6 +35,11 @@ struct ProgrammerInfoProcessorTests {
         #expect(result.dateManufactured == "2024-06-28 16:55")
         #expect(result.usbSpeed == "480Mbps (USB 2.0)")
         #expect(result.supplyVoltage == "5.11 V")
+        #expect(
+            result.warnings == [
+                "T48 support is experimental!",
+                "Firmware is out of date. Expected 01.1.31 (0x11f), Found 00.1.03 (0x103)",
+            ])
     }
 
     @Test func testProgrammerInfoProcessorCannotParseResponse() {
