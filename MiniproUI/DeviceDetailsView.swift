@@ -10,6 +10,7 @@ import SwiftUI
 struct DeviceDetailsView: View {
     @Binding var device: String?
     @State var deviceDetails: DeviceDetails?
+    @State var deviceDisplayName: String?
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -18,6 +19,14 @@ struct DeviceDetailsView: View {
                     ForEach((deviceDetails?.deviceInfo) ?? [], id: \.self) { info in
                         PropertyRow(label: info.key, value: info.value)
                     }
+                    if !(deviceDetails?.isLogicChip ?? true) {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.yellow)
+                            Text("\(deviceDisplayName ?? "") is not a logic chip")
+                                .fontWeight(.medium)
+                        }
+                    }
                 }
             }.formStyle(.grouped)
         }.onChange(of: device) { (_, newDevice) in
@@ -25,6 +34,7 @@ struct DeviceDetailsView: View {
                 if let device = newDevice {
                     deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device)
                 }
+                deviceDisplayName = newDevice
             }
         }
     }
