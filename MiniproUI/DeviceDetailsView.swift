@@ -13,11 +13,13 @@ struct DeviceDetailsView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Device Details")
-
-            ForEach((deviceDetails?.deviceInfo) ?? [], id: \.self) { info in
-                Text("\(info.key): \(info.value)")
-            }
+            Form {
+                Section (header: Text("IC Details")) {
+                    ForEach((deviceDetails?.deviceInfo) ?? [], id: \.self) { info in
+                        PropertyRow(label: info.key, value: info.value)
+                    }
+                }
+            }.formStyle(.grouped)
         }.onChange(of: device) { (_, newDevice) in
             Task {
                 if let device = newDevice {

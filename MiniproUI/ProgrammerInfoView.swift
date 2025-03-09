@@ -34,14 +34,7 @@ struct ProgrammerInfoView: View {
 
             Form {
                 if programmerInfo?.model == nil {
-                    HStack {
-                        Spacer()
-                        Image(systemName: "exclamationmark.circle.fill")
-                            .foregroundColor(.red)
-                        Text("No programmer connected.")
-                            .padding()
-                        Spacer()
-                    }
+                    ProgrammerNotConnected()
                 } else {
                     Section {
                         PropertyRow(label: "Model ", value: programmerInfo?.model ?? "Unknown")
@@ -77,19 +70,7 @@ struct ProgrammerInfoView: View {
     }
 }
 
-struct PropertyRow: View {
-    let label: String
-    let value: String
 
-    var body: some View {
-        HStack {
-            Text(label)
-            Spacer()
-            Text(value)
-                .foregroundColor(.secondary)
-        }
-    }
-}
 
 #Preview {
     ProgrammerInfoView(

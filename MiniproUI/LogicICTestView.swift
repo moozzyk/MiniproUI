@@ -12,9 +12,36 @@ struct LogicICTestView: View {
     @State private var selectedDevice: String? = nil
 
     var body: some View {
-        HStack {
-            SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice)
-            DeviceDetailsView(device: $selectedDevice)
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center) {
+                Image(systemName: "flask.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                    .padding(.trailing, 8)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Logic IC " + (selectedDevice ?? "None"))
+                        .font(.title)
+                        .fontWeight(.semibold)
+                }
+            }
+            .padding([.top, .horizontal])
+            Divider()
+            if supportedDevices.isEmpty {
+                Form {
+                    ProgrammerNotConnected()
+                }.formStyle(.grouped)
+            } else {
+                HStack {
+                    SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice)
+                        .frame(maxWidth: 300)
+                        .padding(16)
+                    DeviceDetailsView(device: $selectedDevice)
+                        .frame(maxWidth: 350)
+                    Spacer()
+                }
+            }
         }.task {
             supportedDevices = (try? await MiniproAPI.getSupportedDevices()) ?? []
         }

@@ -22,32 +22,16 @@ struct SearchableListView: View {
 
     var body: some View {
         VStack {
-            SearchBar(searchText: $searchText)
-            List {
-                ForEach(filteredItems.prefix(500), id: \.self) { item in
-                    SelectableRow(item: item, selectedItem: $selectedItem)
-                }
+            HStack {
+                Text("Select IC").font(.headline)
+                    .padding(.leading, 8)
+                Spacer()
+                SearchBar(searchText: $searchText)
+                    .padding(.leading, 32)
             }
-        }
-    }
-}
-
-struct SelectableRow: View {
-    let item: String
-    @Binding var selectedItem: String?
-
-    var body: some View {
-        HStack {
-            Text(item)
-            Spacer()
-            if item == selectedItem {
-                Image(systemName: "checkmark")
-                    .foregroundColor(.accentColor)
+            List(filteredItems, id: \.self, selection: $selectedItem) { item in
+                Text("  " + item)
             }
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            selectedItem = item
         }
     }
 }
