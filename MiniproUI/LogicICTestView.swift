@@ -10,6 +10,7 @@ import SwiftUI
 struct LogicICTestView: View {
     @Binding var supportedDevices: [String]
     @State private var selectedDevice: String? = nil
+    @State private var deviceDetails: DeviceDetails? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -37,13 +38,19 @@ struct LogicICTestView: View {
                     SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice)
                         .frame(maxWidth: 300)
                         .padding(16)
-                    DeviceDetailsView(device: $selectedDevice)
+                    DeviceDetailsView(deviceDetails: $deviceDetails)
                         .frame(maxWidth: 350)
                     Spacer()
                 }
             }
         }.task {
             supportedDevices = (try? await MiniproAPI.getSupportedDevices()) ?? []
+        }.onChange(of: selectedDevice) {
+            Task {
+                if let device = selectedDevice {
+                    deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device)
+                }
+            }
         }
     }
 }
