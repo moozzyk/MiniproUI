@@ -26,6 +26,7 @@ struct DeviceDetailsProcessorTest {
             Vector count:     2
             """,
             DeviceDetails(
+                name: "7404",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "7404"),
                     KeyValuePair(key: "Package", value: "DIP14"),
@@ -52,6 +53,7 @@ struct DeviceDetailsProcessorTest {
             Write buffer size: 256 Bytes
             """,
             DeviceDetails(
+                name: "AM29F040B@DIP32",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "AM29F040B@DIP32"),
                     KeyValuePair(key: "Available on", value: "TL866A/CS"),
@@ -82,6 +84,7 @@ struct DeviceDetailsProcessorTest {
             Write buffer size: 2048 Bytes
             """,
             DeviceDetails(
+                name: "JS28F640P30TF@TSOP56",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "JS28F640P30TF@TSOP56"),
                     KeyValuePair(key: "Available on", value: "TL866A/CS"),
@@ -117,6 +120,7 @@ struct DeviceDetailsProcessorTest {
             Pulse delay: 100us
             """,
             DeviceDetails(
+                name: "AT27LV512R@PLCC32",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "AT27LV512R@PLCC32"),
                     KeyValuePair(key: "Available on", value: "TL866A/CS"),

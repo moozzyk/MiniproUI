@@ -13,16 +13,18 @@ struct DeviceDetailsView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Form {
-                Section (header: Text("IC Details")) {
-                    ForEach((deviceDetails?.deviceInfo) ?? [], id: \.self) { info in
-                        PropertyRow(label: info.key, value: info.value)
-                    }
-                    if !(deviceDetails?.isLogicChip ?? true) {
-                        HStack {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.yellow)
-                            Text("Not a logic chip")
-                                .fontWeight(.medium)
+                if let deviceDetails = deviceDetails {
+                    Section(header: Text("\(deviceDetails.name) Details")) {
+                        ForEach(deviceDetails.deviceInfo, id: \.self) { info in
+                            PropertyRow(label: info.key, value: info.value)
+                        }
+                        if !(deviceDetails.isLogicChip) {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.yellow)
+                                Text("\(deviceDetails.name) is not a logic chip")
+                                    .fontWeight(.medium)
+                            }
                         }
                     }
                 }
@@ -32,5 +34,6 @@ struct DeviceDetailsView: View {
 }
 
 #Preview {
-    DeviceDetailsView(deviceDetails: .constant(DeviceDetails(deviceInfo: [], programmingInfo: [], isLogicChip: true)))
+    DeviceDetailsView(
+        deviceDetails: .constant(DeviceDetails(name: "7400", deviceInfo: [], programmingInfo: [], isLogicChip: true)))
 }

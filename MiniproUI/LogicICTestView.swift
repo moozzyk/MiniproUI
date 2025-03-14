@@ -22,7 +22,7 @@ struct LogicICTestView: View {
                     .padding(.trailing, 8)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Logic IC " + (selectedDevice ?? "None"))
+                    Text("Logic IC " + (deviceDetails?.name ?? "None"))
                         .font(.title)
                         .fontWeight(.semibold)
                 }

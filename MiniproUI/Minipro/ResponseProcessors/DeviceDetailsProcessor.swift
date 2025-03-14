@@ -13,6 +13,7 @@ struct KeyValuePair: Equatable, Hashable {
 }
 
 struct DeviceDetails: Equatable, Hashable {
+    let name: String
     let deviceInfo: [KeyValuePair]
     let programmingInfo: [KeyValuePair]
     let isLogicChip: Bool
@@ -31,10 +32,12 @@ class DeviceDetailsProcessor {
         try ensureNoError(invocationResult: result)
 
         let resultLines = result.stdErr.split(separator: "\n")
+        let name = extractInfo(resultLines: resultLines, keys: ["Name"]).first?.value ?? "(None)"
         let deviceInfo = extractInfo(resultLines: resultLines, keys: deviceInfoKeys)
         let programmingInfo = extractInfo(resultLines: resultLines, keys: programmingInfoKeys)
         let isLogicChip = deviceInfo.last?.key == "Vector count"
-        return DeviceDetails(deviceInfo: deviceInfo, programmingInfo: programmingInfo, isLogicChip: isLogicChip)
+        return DeviceDetails(
+            name: name, deviceInfo: deviceInfo, programmingInfo: programmingInfo, isLogicChip: isLogicChip)
     }
 
     private static func extractInfo(resultLines: [Substring], keys: [String]) -> [KeyValuePair] {
