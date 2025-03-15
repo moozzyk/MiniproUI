@@ -38,9 +38,18 @@ struct LogicICTestView: View {
                     SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice)
                         .frame(maxWidth: 300)
                         .padding(16)
-                    DeviceDetailsView(deviceDetails: $deviceDetails)
-                        .frame(maxWidth: 350)
-                    Spacer()
+                    VStack {
+                        if deviceDetails != nil {
+                            DeviceDetailsView(deviceDetails: $deviceDetails)
+                            HStack {
+                                Spacer()
+                                Button("Test") {
+
+                                }.padding(.trailing, 20)
+                            }
+                            Spacer()
+                        }
+                    }.frame(width: 350)
                 }
             }
         }.task {
