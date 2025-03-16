@@ -11,6 +11,7 @@ struct LogicICTestView: View {
     @Binding var supportedDevices: [String]
     @State private var selectedDevice: String? = nil
     @State private var deviceDetails: DeviceDetails? = nil
+    @State private var logicICTestResult: LogicICTestResult? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -44,7 +45,9 @@ struct LogicICTestView: View {
                             HStack {
                                 Spacer()
                                 Button("Test") {
-
+                                    Task {
+                                        logicICTestResult = try? await MiniproAPI.testLogicIC(device: deviceDetails!.name)
+                                    }
                                 }.padding(.trailing, 20)
                             }
                             Spacer()
