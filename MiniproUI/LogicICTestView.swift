@@ -53,6 +53,7 @@ struct LogicICTestView: View {
                             Spacer()
                         }
                     }.frame(width: 350)
+                    LogicICTestResultView(logicICTestResult: $logicICTestResult)
                 }
             }
         }.task {

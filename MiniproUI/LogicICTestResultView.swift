@@ -12,19 +12,21 @@ struct LogicICTestResultView: View {
 
     var body: some View {
         if let testResult = logicICTestResult {
-            VStack {
-                Grid {
-                    GridRow {
-                        Text("")
-                        ForEach(0..<testResult.testVectors[0].count, id: \.self) { idx in
-                            Text("\(idx + 1)")
-                        }
-                    }
-                    ForEach(0..<testResult.testVectors.count, id: \.self) { idx in
-                        Divider()
+            ScrollView([.horizontal, .vertical]){
+                VStack {
+                    Grid {
                         GridRow {
-                            Text("\(idx + 1)")
-                            TestVectorView(testVector: testResult.testVectors[idx])
+                            Text("")
+                            ForEach(0..<testResult.testVectors[0].count, id: \.self) { idx in
+                                Text("\(idx + 1)")
+                            }
+                        }
+                        ForEach(0..<testResult.testVectors.count, id: \.self) { idx in
+                            Divider()
+                            GridRow {
+                                Text("\(idx + 1)")
+                                TestVectorView(testVector: testResult.testVectors[idx])
+                            }
                         }
                     }
                 }
