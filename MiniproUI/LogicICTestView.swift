@@ -46,9 +46,12 @@ struct LogicICTestView: View {
                                 Spacer()
                                 Button("Test") {
                                     Task {
-                                        logicICTestResult = try? await MiniproAPI.testLogicIC(device: deviceDetails!.name)
+                                        logicICTestResult = try? await MiniproAPI.testLogicIC(
+                                            device: deviceDetails!.name)
                                     }
-                                }.padding(.trailing, 20)
+                                }
+                                .padding(.trailing, 20)
+                                .disabled(!(deviceDetails?.isLogicChip ?? true))
                             }
                             Spacer()
                         }
@@ -63,6 +66,7 @@ struct LogicICTestView: View {
                 if let device = selectedDevice {
                     deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device)
                 }
+                logicICTestResult = nil
             }
         }
     }
