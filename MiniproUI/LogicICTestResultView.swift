@@ -7,54 +7,13 @@
 
 import SwiftUI
 
-struct LogicICTestResultView: View {
-    @Binding var logicICTestResult: LogicICTestResult?
-
-    var body: some View {
-        if let testResult = logicICTestResult {
-            ScrollView([.horizontal, .vertical]) {
-                VStack {
-                    Grid {
-                        GridRow {
-                            HStack {
-                                Text(" ")
-                                Divider()
-                            }
-                            ForEach(0..<testResult.testVectors[0].count, id: \.self) { idx in
-                                Text("\(idx + 1)")
-                                    .frame(width: 20, alignment: .leading)
-                            }
-                        }
-                        ForEach(0..<testResult.testVectors.count, id: \.self) { idx in
-                            Divider()
-                            GridRow {
-                                HStack {
-                                    Text("\(idx + 1)")
-                                    Divider()
-                                }
-                                TestVectorView(testVector: testResult.testVectors[idx])
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            Text("Click the \"Test\" button to start the test")
-        }
-    }
+struct RowData: Identifiable {
+    let id: Int
+    let values: [String]
 }
 
-struct TestVectorView: View {
-    let testVector: [String]
-
-    var body: some View {
-        ForEach(testVector, id: \.self) { result in
-            Text(result)
-                .frame(width: 20, alignment: .leading)
-                .foregroundColor(getResultColor(result))
-                .fontWeight(.bold)
-        }
-    }
+struct LogicICTestResultView: View {
+    @Binding var logicICTestResult: LogicICTestResult?
 
     func getResultColor(_ result: String) -> Color {
         if result == "H" || result == "L" || result == "Z" {
@@ -66,6 +25,27 @@ struct TestVectorView: View {
         return .primary
     }
 
+    var body: some View {
+        if let testResult = logicICTestResult {
+            let rows = testResult.testVectors.enumerated().map { idx, value in RowData(id: idx, values: value) }
+            let numColumns = testResult.testVectors.first?.count ?? 0
+            Table(rows) {
+                TableColumnForEach(0..<numColumns, id: \.self) { idx in
+                    TableColumn(Text(String(format: "%2d", idx + 1))) { (row: RowData) in
+                        Text(row.values[idx])
+                            .frame(width: 20, alignment: .leading)
+                            .padding(.leading, 5)
+                            .foregroundColor(getResultColor(row.values[idx]))
+                            .fontWeight(.bold)
+                    }.width(ideal: 20, max: 20)
+                }
+            }
+            .frame(maxWidth: CGFloat(rows[0].values.count * 38), maxHeight: CGFloat(28 + (rows.count) * 25))
+            .padding(20)
+            .tableStyle(.bordered)
+
+        }
+    }
 }
 
 #Preview {

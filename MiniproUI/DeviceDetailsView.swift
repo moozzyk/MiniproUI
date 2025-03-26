@@ -28,17 +28,18 @@ struct DeviceDetailsView: View {
                         }
                     }
                 }
-            }.formStyle(.grouped)
-                .frame(height: computeHeight())
+            }
+            .formStyle(.grouped)
+            .frame(height: computeHeight())
         }
     }
 
     private func computeHeight() -> CGFloat {
         if let deviceDetails = deviceDetails {
             if !deviceDetails.isLogicChip {
-                return 380
+                return 400
             }
-            return 195
+            return 220
         }
         return 0
     }

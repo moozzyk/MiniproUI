@@ -42,21 +42,20 @@ struct LogicICTestView: View {
                     VStack {
                         if deviceDetails != nil {
                             DeviceDetailsView(deviceDetails: $deviceDetails)
-                            HStack {
-                                Spacer()
-                                Button("Test") {
-                                    Task {
-                                        logicICTestResult = try? await MiniproAPI.testLogicIC(
-                                            device: deviceDetails!.name)
-                                    }
+                            Button("Test") {
+                                Task {
+                                    logicICTestResult = try? await MiniproAPI.testLogicIC(
+                                        device: deviceDetails!.name)
                                 }
-                                .padding(.trailing, 20)
-                                .disabled(!(deviceDetails?.isLogicChip ?? true))
                             }
-                            Spacer()
+                            .disabled(!(deviceDetails?.isLogicChip ?? true))
+                            if logicICTestResult == nil {
+                                Spacer()
+                            }
                         }
-                    }.frame(width: 350)
-                    LogicICTestResultView(logicICTestResult: $logicICTestResult)
+                        LogicICTestResultView(logicICTestResult: $logicICTestResult)
+                        Spacer()
+                    }
                 }
             }
         }.task {
