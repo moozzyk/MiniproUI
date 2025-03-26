@@ -29,21 +29,60 @@ struct LogicICTestResultView: View {
         if let testResult = logicICTestResult {
             let rows = testResult.testVectors.enumerated().map { idx, value in RowData(id: idx, values: value) }
             let numColumns = testResult.testVectors.first?.count ?? 0
-            Table(rows) {
-                TableColumnForEach(0..<numColumns, id: \.self) { idx in
-                    TableColumn(Text(String(format: "%2d", idx + 1))) { (row: RowData) in
-                        Text(row.values[idx])
-                            .frame(width: 20, alignment: .leading)
-                            .padding(.leading, 5)
-                            .foregroundColor(getResultColor(row.values[idx]))
-                            .fontWeight(.bold)
-                    }.width(ideal: 20, max: 20)
+            VStack {
+                Form {
+                    if testResult.isSuccess {
+                        TestSucceeded()
+                    } else {
+                        TestFailed()
+                    }
                 }
-            }
-            .frame(maxWidth: CGFloat(rows[0].values.count * 38), maxHeight: CGFloat(28 + (rows.count) * 25))
-            .padding(20)
-            .tableStyle(.bordered)
+                .formStyle(.grouped)
+                .frame(maxHeight: 76)
+                .background(.red)
 
+                Table(rows) {
+                    TableColumnForEach(0..<numColumns, id: \.self) { idx in
+                        TableColumn(Text(String(format: "%2d", idx + 1))) { (row: RowData) in
+                            Text(row.values[idx])
+                                .frame(width: 20, alignment: .leading)
+                                .padding(.leading, 5)
+                                .foregroundColor(getResultColor(row.values[idx]))
+                                .fontWeight(.bold)
+                        }.width(ideal: 20, max: 20)
+                    }
+                }
+                .frame(maxWidth: CGFloat(rows[0].values.count * 38), maxHeight: CGFloat(28 + (rows.count) * 25))
+                .padding([.leading, .trailing], 22)
+                .padding(.bottom, 10)
+                .padding(.top, 0)
+                .tableStyle(.bordered)
+            }
+
+        }
+    }
+}
+
+struct TestSucceeded: View {
+    var body: some View {
+        HStack {
+            Spacer()
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.green)
+            Text("Test Succeeded")
+            Spacer()
+        }
+    }
+}
+
+struct TestFailed: View {
+    var body: some View {
+        HStack {
+            Spacer()
+            Image(systemName: "exclamationmark.circle.fill")
+                .foregroundColor(.red)
+            Text("Test Failed")
+            Spacer()
         }
     }
 }
