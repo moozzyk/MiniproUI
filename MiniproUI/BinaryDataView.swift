@@ -12,30 +12,35 @@ struct BinaryDataView: View {
     let bytesPerLine: Int = 16
 
     var body: some View {
-        ScrollView(.vertical) {
-            LazyVStack(alignment: .leading, spacing: 2) {
-                if let data = data {
-                    ForEach(0..<numberOfLines(for: data), id: \.self) { line in
-                        let startIndex = line * bytesPerLine
-                        let endIndex = min(startIndex + bytesPerLine, data.count)
-                        let lineData = data.subdata(in: startIndex..<endIndex)
+        VStack {
+            if let data = data {
+                ScrollView(.vertical) {
+                    LazyVStack(alignment: .leading, spacing: 2) {
+                        ForEach(0..<numberOfLines(for: data), id: \.self) { line in
+                            let startIndex = line * bytesPerLine
+                            let endIndex = min(startIndex + bytesPerLine, data.count)
+                            let lineData = data.subdata(in: startIndex..<endIndex)
 
-                        HStack(spacing: 8) {
-                            Text(String(format: "0x%08X", startIndex))
-                                .font(.system(.body, design: .monospaced))
-                                .frame(width: 88, alignment: .leading)
+                            HStack(spacing: 8) {
+                                Text(String(format: "0x%08X", startIndex))
+                                    .font(.system(.body, design: .monospaced))
+                                    .frame(width: 88, alignment: .leading)
 
-                            Text(hexString(for: lineData))
-                                .font(.system(.body, design: .monospaced))
+                                Text(hexString(for: lineData))
+                                    .font(.system(.body, design: .monospaced))
 
-                            Text(asciiString(for: lineData))
-                                .font(.system(.body, design: .monospaced))
+                                Text(asciiString(for: lineData))
+                                    .font(.system(.body, design: .monospaced))
+                            }
                         }
                     }
                 }
+                .padding()
+            } else {
+                Text("No data loaded.")
             }
-            .padding()
         }
+        .frame(maxWidth: 658, maxHeight: 600)
         .border(Color.gray)
     }
 

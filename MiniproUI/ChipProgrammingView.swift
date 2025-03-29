@@ -35,7 +35,6 @@ struct ChipProgrammingView: View {
             Divider()
             VStack {
                 BinaryDataView(data: $buffer)
-                    .frame(maxWidth: 658, maxHeight: 600)
                 Button("Open File") {
                     let openPanel = NSOpenPanel()
                     openPanel.allowsMultipleSelection = false
