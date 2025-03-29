@@ -38,7 +38,7 @@ struct ContentView: View {
                 LogicICTestView(supportedDevices: $model.supportedDevices)
                     .navigationTitle(selectedItem.rawValue)
             } else {
-                Text("Detail View for \(selectedItem.rawValue)")
+                ChipProgrammingView(supportedDevices: $model.supportedDevices)
                     .navigationTitle(selectedItem.rawValue)
             }
         }
