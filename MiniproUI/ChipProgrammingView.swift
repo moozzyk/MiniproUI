@@ -35,23 +35,34 @@ struct ChipProgrammingView: View {
             Divider()
             VStack {
                 BinaryDataView(data: $buffer)
-                Button("Open File") {
-                    let openPanel = NSOpenPanel()
-                    openPanel.allowsMultipleSelection = false
-                    if openPanel.runModal() == .OK {
-                        do {
-                            buffer = try Data(contentsOf: openPanel.url!)
-                        } catch {
-                            errorMessage = .init(message: error.localizedDescription)
-                        }
-                    }
-                }.alert(item: $errorMessage) {
-                    Alert(
-                        title: Text("Error opening file"), message: Text($0.message),
-                        dismissButton: .default(Text("OK")))
+                HStack{
+                    OpenFileButton(buffer: $buffer)
                 }
             }
             Spacer()
+        }
+    }
+}
+
+struct OpenFileButton: View {
+    @Binding var buffer: Data?
+    @State private var errorMessage: DialogErrorMessage?
+
+    var body: some View {
+        Button("Open File") {
+            let openPanel = NSOpenPanel()
+            openPanel.allowsMultipleSelection = false
+            if openPanel.runModal() == .OK {
+                do {
+                    buffer = try Data(contentsOf: openPanel.url!)
+                } catch {
+                    errorMessage = .init(message: error.localizedDescription)
+                }
+            }
+        }.alert(item: $errorMessage) {
+            Alert(
+                title: Text("Error opening file"), message: Text($0.message),
+                dismissButton: .default(Text("OK")))
         }
     }
 }
