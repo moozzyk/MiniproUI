@@ -8,36 +8,38 @@
 import SwiftUI
 
 struct BinaryDataView: View {
-    let data: Data
+    @Binding var data: Data?
     let bytesPerLine: Int = 16
 
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 2) {
-                ForEach(0..<numberOfLines(), id: \.self) { line in
-                    let startIndex = line * bytesPerLine
-                    let endIndex = min(startIndex + bytesPerLine, data.count)
-                    let lineData = data.subdata(in: startIndex..<endIndex)
+                if let data = data {
+                    ForEach(0..<numberOfLines(for: data), id: \.self) { line in
+                        let startIndex = line * bytesPerLine
+                        let endIndex = min(startIndex + bytesPerLine, data.count)
+                        let lineData = data.subdata(in: startIndex..<endIndex)
 
-                    HStack(spacing: 8) {
-                        Text(String(format: "0x%08X", startIndex))
-                            .font(.system(.body, design: .monospaced))
-                            .frame(width: 88, alignment: .leading)
+                        HStack(spacing: 8) {
+                            Text(String(format: "0x%08X", startIndex))
+                                .font(.system(.body, design: .monospaced))
+                                .frame(width: 88, alignment: .leading)
 
-                        Text(hexString(for: lineData))
-                            .font(.system(.body, design: .monospaced))
+                            Text(hexString(for: lineData))
+                                .font(.system(.body, design: .monospaced))
 
-                        Text(asciiString(for: lineData))
-                            .font(.system(.body, design: .monospaced))
+                            Text(asciiString(for: lineData))
+                                .font(.system(.body, design: .monospaced))
+                        }
                     }
                 }
             }
-            .border(Color.gray)
             .padding()
         }
+        .border(Color.gray)
     }
 
-    func numberOfLines() -> Int {
+    func numberOfLines(for data: Data) -> Int {
         return (data.count + bytesPerLine - 1) / bytesPerLine
     }
 
@@ -65,7 +67,6 @@ struct BinaryDataView: View {
 
 struct BinaryDataView_Previews: PreviewProvider {
     static var previews: some View {
-        BinaryDataView(data: "Hello, world! This is a test.".data(using: .utf8)!)
+        BinaryDataView(data: .constant("Hello, world! This is a test.".data(using: .utf8)!))
     }
 }
-

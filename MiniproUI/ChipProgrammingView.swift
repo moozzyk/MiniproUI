@@ -7,8 +7,15 @@
 
 import SwiftUI
 
+struct DialogErrorMessage: Identifiable {
+    var id: String { message }
+    let message: String
+}
+
 struct ChipProgrammingView: View {
     @Binding var supportedDevices: [String]
+    @State private var buffer: Data?
+    @State private var errorMessage: DialogErrorMessage?
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center) {
@@ -19,19 +26,32 @@ struct ChipProgrammingView: View {
                     .padding(.trailing, 8)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Chip " +  "None")
+                    Text("Chip " + "None")
                         .font(.title)
                         .fontWeight(.semibold)
                 }
             }
             .padding([.top, .horizontal])
-            HStack {
-                Spacer()
-                BinaryDataView(data: Data("This is an example text".utf8))
-                    .frame(width: 600)
-                Spacer()
-            }
             Divider()
+            VStack {
+                BinaryDataView(data: $buffer)
+                    .frame(maxWidth: 658, maxHeight: 600)
+                Button("Open File") {
+                    let openPanel = NSOpenPanel()
+                    openPanel.allowsMultipleSelection = false
+                    if openPanel.runModal() == .OK {
+                        do {
+                            buffer = try Data(contentsOf: openPanel.url!)
+                        } catch {
+                            errorMessage = .init(message: error.localizedDescription)
+                        }
+                    }
+                }.alert(item: $errorMessage) {
+                    Alert(
+                        title: Text("Error opening file"), message: Text($0.message),
+                        dismissButton: .default(Text("OK")))
+                }
+            }
             Spacer()
         }
     }
