@@ -35,8 +35,9 @@ struct ChipProgrammingView: View {
             Divider()
             VStack {
                 BinaryDataView(data: $buffer)
-                HStack{
+                HStack {
                     OpenFileButton(buffer: $buffer)
+                    SaveFileButton(buffer: $buffer)
                 }
             }
             Spacer()
@@ -62,6 +63,32 @@ struct OpenFileButton: View {
         }.alert(item: $errorMessage) {
             Alert(
                 title: Text("Error opening file"), message: Text($0.message),
+                dismissButton: .default(Text("OK")))
+        }
+    }
+}
+
+struct SaveFileButton: View {
+    @Binding var buffer: Data?
+    @State private var errorMessage: DialogErrorMessage?
+
+    var body: some View {
+        Button("Save As") {
+            let savePanel = NSSavePanel()
+            savePanel.canCreateDirectories = true
+            savePanel.isExtensionHidden = false
+            if savePanel.runModal() == .OK {
+                do {
+                    try buffer?.write(to: savePanel.url!)
+                } catch {
+                    errorMessage = .init(message: error.localizedDescription)
+                }
+            }
+        }
+        .disabled(buffer == nil)
+        .alert(item: $errorMessage) {
+            Alert(
+                title: Text("Error saving file"), message: Text($0.message),
                 dismissButton: .default(Text("OK")))
         }
     }
