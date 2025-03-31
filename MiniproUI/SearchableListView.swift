@@ -31,7 +31,8 @@ struct SearchableListView: View {
             }
             List(filteredItems, id: \.self, selection: $selectedItem) { item in
                 Text("  " + item)
-            }
+            }.frame(maxHeight: CGFloat(44 + (filteredItems.count - 1) * 24))
+            Spacer()
         }
     }
 }
