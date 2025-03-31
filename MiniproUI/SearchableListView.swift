@@ -40,23 +40,21 @@ struct SearchBar: View {
     @Binding var searchText: String
 
     var body: some View {
-        HStack {
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .frame(height: 28)
-                    .foregroundColor(.red)
-                HStack {
-                    Spacer()
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
-                    TextField("Search", text: $searchText)
-                        .frame(height: 30)
-                        .textFieldStyle(.plain)
-                        .cornerRadius(6)
-                }
-                .background(.white)
-                .cornerRadius(6)
+        ZStack {
+            RoundedRectangle(cornerRadius: 6)
+                .frame(height: 28)
+                .foregroundColor(.red)
+            HStack {
+                Spacer()
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
+                TextField("Search", text: $searchText)
+                    .frame(height: 30)
+                    .textFieldStyle(.plain)
+                    .cornerRadius(6)
             }
+            .background(.white)
+            .cornerRadius(6)
         }
     }
 }
