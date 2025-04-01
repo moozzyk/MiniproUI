@@ -22,7 +22,7 @@ struct ChipProgrammingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center) {
-                Image(systemName: "flask.fill")
+                Image(systemName: "memorychip.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 50, height: 50)
