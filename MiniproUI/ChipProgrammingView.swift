@@ -17,6 +17,8 @@ struct ChipProgrammingView: View {
     @State private var selectedDevice: String?
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
+    @State private var deviceDetails: DeviceDetails? = nil
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center) {
@@ -41,14 +43,36 @@ struct ChipProgrammingView: View {
                         OpenFileButton(buffer: $buffer)
                         SaveFileButton(buffer: $buffer)
                     }
+                    Spacer()
                 }
                 VStack {
-                    Button(" << ") {}
-                    Button(" >> ") {}
+                    Button("  <<  ") {}
+                    Button("  >>  ") {}
                 }
-                SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true)
+                ZStack {
+                    VStack {
+                        if deviceDetails != nil {
+                            DeviceDetailsView(deviceDetails: $deviceDetails)
+                                .padding(.top, 32)
+                            Spacer()
+                        }
+                    }
+                    VStack {
+                        SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true)
+                            .frame(maxWidth: 658, maxHeight: 600)
+                            .padding([.trailing])
+                        Spacer()
+                    }
+                }
             }
             Spacer()
+        }
+        .onChange(of: selectedDevice) {
+            Task {
+                if let device = selectedDevice {
+                    deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device)
+                }
+            }
         }
     }
 }
