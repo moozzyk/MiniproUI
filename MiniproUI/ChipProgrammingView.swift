@@ -14,6 +14,7 @@ struct DialogErrorMessage: Identifiable {
 
 struct ChipProgrammingView: View {
     @Binding var supportedDevices: [String]
+    @State private var selectedDevice: String?
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
     var body: some View {
@@ -33,12 +34,19 @@ struct ChipProgrammingView: View {
             }
             .padding([.top, .horizontal])
             Divider()
-            VStack {
-                BinaryDataView(data: $buffer)
-                HStack {
-                    OpenFileButton(buffer: $buffer)
-                    SaveFileButton(buffer: $buffer)
+            HStack {
+                VStack {
+                    BinaryDataView(data: $buffer)
+                    HStack {
+                        OpenFileButton(buffer: $buffer)
+                        SaveFileButton(buffer: $buffer)
+                    }
                 }
+                VStack {
+                    Button(" << ") {}
+                    Button(" >> ") {}
+                }
+                SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true)
             }
             Spacer()
         }

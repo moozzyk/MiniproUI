@@ -11,6 +11,8 @@ struct SearchableListView: View {
     @Binding var items: [String]
     @Binding var selectedItem: String?
     @State var searchText: String = ""
+    @State var shouldShowList = true
+    let isCollapsible: Bool
 
     var filteredItems: [String] {
         if searchText.isEmpty {
@@ -29,10 +31,24 @@ struct SearchableListView: View {
                 SearchBar(searchText: $searchText)
                     .padding(.leading, 32)
             }
-            List(filteredItems, id: \.self, selection: $selectedItem) { item in
-                Text("  " + item)
-            }.frame(maxHeight: CGFloat(44 + (filteredItems.count - 1) * 24))
+            if shouldShowList && filteredItems.count > 0 {
+                List(filteredItems, id: \.self, selection: $selectedItem) { item in
+                    Text("  " + item)
+                }
+                .frame(maxHeight: CGFloat(44 + (filteredItems.count - 1) * 24))
+            }
             Spacer()
+        }.onChange(of: selectedItem) {
+            if isCollapsible {
+                if let selectedItem = selectedItem {
+                    searchText = selectedItem
+                    shouldShowList = false
+                }
+            }
+        }.onChange(of: searchText) {
+            if isCollapsible {
+                shouldShowList = shouldShowList || searchText != selectedItem
+            }
         }
     }
 }
@@ -61,5 +77,5 @@ struct SearchBar: View {
 }
 
 #Preview {
-    SearchableListView(items: .constant(["apple", "orange", "banana"]), selectedItem: .constant(nil))
+    SearchableListView(items: .constant(["apple", "orange", "banana"]), selectedItem: .constant(nil), isCollapsible: false)
 }

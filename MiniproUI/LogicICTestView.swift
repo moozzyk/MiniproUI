@@ -36,7 +36,7 @@ struct LogicICTestView: View {
                 }.formStyle(.grouped)
             } else {
                 HStack {
-                    SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice)
+                    SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: false)
                         .frame(maxWidth: 300)
                         .padding(20)
                     VStack {
