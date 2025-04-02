@@ -52,7 +52,7 @@ struct ChipProgrammingView: View {
                 ZStack {
                     VStack {
                         if deviceDetails != nil {
-                            DeviceDetailsView(deviceDetails: $deviceDetails)
+                            DeviceDetailsView(expectLogicChip: false,deviceDetails: $deviceDetails)
                                 .padding(.top, 32)
                             Spacer()
                         }

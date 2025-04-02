@@ -41,7 +41,7 @@ struct LogicICTestView: View {
                         .padding(20)
                     VStack {
                         if deviceDetails != nil {
-                            DeviceDetailsView(deviceDetails: $deviceDetails)
+                            DeviceDetailsView(expectLogicChip: true, deviceDetails: $deviceDetails)
                             Button("Test") {
                                 Task {
                                     logicICTestResult = try? await MiniproAPI.testLogicIC(

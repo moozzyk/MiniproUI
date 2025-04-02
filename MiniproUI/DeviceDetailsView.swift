@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct DeviceDetailsView: View {
+    let expectLogicChip: Bool
     @Binding var deviceDetails: DeviceDetails?
 
     var body: some View {
@@ -18,12 +19,14 @@ struct DeviceDetailsView: View {
                         ForEach(deviceDetails.deviceInfo, id: \.self) { info in
                             PropertyRow(label: info.key, value: info.value)
                         }
-                        if !(deviceDetails.isLogicChip) {
+                        if expectLogicChip != deviceDetails.isLogicChip {
                             HStack {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .foregroundColor(.yellow)
-                                Text("\(deviceDetails.name) is not a logic chip")
-                                    .fontWeight(.medium)
+                                Text(
+                                    "\(deviceDetails.name) is not a \(expectLogicChip ? "logic" : "programmable") chip"
+                                )
+                                .fontWeight(.medium)
                             }
                         }
                     }
@@ -47,5 +50,6 @@ struct DeviceDetailsView: View {
 
 #Preview {
     DeviceDetailsView(
+        expectLogicChip: true,
         deviceDetails: .constant(DeviceDetails(name: "7400", deviceInfo: [], programmingInfo: [], isLogicChip: true)))
 }
