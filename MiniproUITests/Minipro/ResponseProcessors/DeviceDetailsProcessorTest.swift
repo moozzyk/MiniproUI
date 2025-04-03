@@ -8,6 +8,7 @@
 import Testing
 
 @testable import MiniproUI
+import Foundation
 
 struct DeviceDetailsProcessorTest {
     private static let testCases: [(String, DeviceDetails)] = [
@@ -144,7 +145,7 @@ struct DeviceDetailsProcessorTest {
     @Test(arguments: testCases)
     func testDeviceDetaislProcessorForIC(testCase: (String, DeviceDetails)) async throws {
         let (input, expectedDeviceDetails) = testCase
-        let result = InvocationResult(exitCode: 0, stdOut: "", stdErr: input)
+        let result = InvocationResult(exitCode: 0, stdOut: Data(), stdErr: input)
         let deviceDetails = try DeviceDetailsProcessor.run(result)
         #expect(deviceDetails == expectedDeviceDetails)
     }
@@ -153,7 +154,7 @@ struct DeviceDetailsProcessorTest {
         #expect(throws: APIError.deviceNotFound("AT45DB161D[Page512]")) {
             try DeviceDetailsProcessor.run(
                 InvocationResult(
-                    exitCode: 0, stdOut: "",
+                    exitCode: 0, stdOut: Data(),
                     stdErr:
                         """
                         Found T48 00.1.31 (0x11f)
@@ -170,7 +171,7 @@ struct DeviceDetailsProcessorTest {
 
     @Test func testDeviceDetailsProcessorChecksForErrors() {
         #expect(throws: APIError.unknownError("Error")) {
-            try DeviceDetailsProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: "Error"))
+            try DeviceDetailsProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"))
         }
     }
 }

@@ -19,7 +19,7 @@ class LogicICTestProcessor {
 
     public static func run(_ result: InvocationResult, device: String) throws -> LogicICTestResult {
         try ensureNoError(invocationResult: result)
-        let lines = result.stdOut.split(separator: "\n")
+        let lines = result.stdOutString.split(separator: "\n")
         guard lines.count > 0 else {
             throw APIError.unknownError("Unexpected response format.")
         }

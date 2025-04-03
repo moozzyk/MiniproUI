@@ -8,12 +8,13 @@
 import Testing
 
 @testable import MiniproUI
+import Foundation
 
 struct SupportedDevicesTests {
 
     @Test func testSupportedDevicesHappyPath() async throws {
         let miniproResult = InvocationResult(
-            exitCode: 0, stdOut: "4069\n4011\n4012\n4013\n4015\n4016\n40161\n40162\n40163\n4017\n40174\n40175",
+            exitCode: 0, stdOut: Data("4069\n4011\n4012\n4013\n4015\n4016\n40161\n40162\n40163\n4017\n40174\n40175".utf8),
             stdErr: "")
         let supportedDevices = try SupportedDevicesProcessor.run(miniproResult)
         #expect(
@@ -24,7 +25,7 @@ struct SupportedDevicesTests {
 
     @Test func testSupportedDevicesRemovesDuplicates() async throws {
         let miniproResult = InvocationResult(
-            exitCode: 0, stdOut: "4069\n4011\n4069\n4069\n4015\n4011",
+            exitCode: 0, stdOut: Data("4069\n4011\n4069\n4069\n4015\n4011".utf8),
             stdErr: "")
         let supportedDevices = try SupportedDevicesProcessor.run(miniproResult)
         #expect(
@@ -33,7 +34,7 @@ struct SupportedDevicesTests {
 
     @Test func testSupportedDeviceChecksForErrors() {
         #expect(throws: APIError.unknownError("Error")) {
-            try SupportedDevicesProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: "Error"))
+            try SupportedDevicesProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"))
         }
     }
 }

@@ -9,8 +9,12 @@ import Foundation
 
 struct InvocationResult {
     let exitCode: Int32
-    let stdOut: String
+    let stdOut: Data
     let stdErr: String
+
+    var stdOutString: String {
+        String(data: stdOut, encoding: .utf8) ?? ""
+    }
 }
 
 enum InvocationError: Error {
@@ -54,7 +58,7 @@ class MiniproInvoker {
                         returning:
                             InvocationResult(
                                 exitCode: process.terminationStatus,
-                                stdOut: String(data: stdout, encoding: .utf8) ?? "",
+                                stdOut: stdout,
                                 stdErr: String(data: stderr, encoding: .utf8) ?? ""
                             ))
                 } catch {

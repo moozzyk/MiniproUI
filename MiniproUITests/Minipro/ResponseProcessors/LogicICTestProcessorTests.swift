@@ -5,6 +5,7 @@
 //  Created by Pawel Kadluczka on 2/13/25.
 //
 
+import Foundation
 import Testing
 
 @testable import MiniproUI
@@ -15,13 +16,14 @@ struct LogicICTestProcessorTests {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
-                """
-                      1  2  3  4  5  6  7  8  9  10 11 12 13 14 
-                0000: \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0mG  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mV  \u{1B}[0m
-                0001: \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0mG  \u{1B}[0mH  \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mV  \u{1B}[0m
-                0002: \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mH  \u{1B}[0mG  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mV  \u{1B}[0m
-                0003: \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mL  \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mL  \u{1B}[0mG  \u{1B}[0mL  \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mL  \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mV  \u{1B}[0m
-                """,
+                Data(
+                    """
+                          1  2  3  4  5  6  7  8  9  10 11 12 13 14 
+                    0000: \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0mG  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m0  \u{1B}[0mV  \u{1B}[0m
+                    0001: \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0mG  \u{1B}[0mH  \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0m1  \u{1B}[0m0  \u{1B}[0mV  \u{1B}[0m
+                    0002: \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mH  \u{1B}[0mG  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0m1  \u{1B}[0mV  \u{1B}[0m
+                    0003: \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mL  \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mL  \u{1B}[0mG  \u{1B}[0mL  \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mL  \u{1B}[0m1  \u{1B}[0m1  \u{1B}[0mV  \u{1B}[0m
+                    """.utf8),
             stdErr:
                 """
                 Found T48 00.1.31 (0x11f)
@@ -53,12 +55,12 @@ struct LogicICTestProcessorTests {
     @Test func testLogicICTestProcessorErrorResponse() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
-            stdOut:
+            stdOut: Data(
                 """
                       1  2  3  4  5  6  7  8  9  10 11 12 13 14 
                 0000: \u{1B}[0m0  \u{1B}[0;91mH- \u{1B}[0m0  \u{1B}[0;91mH- \u{1B}[0m0  \u{1B}[0mH  \u{1B}[0mG  \u{1B}[0mH  \u{1B}[0m0  \u{1B}[0;91mH- \u{1B}[0m0  \u{1B}[0;91mH- \u{1B}[0m0  \u{1B}[0mV  \u{1B}[0m
                 0001: \u{1B}[0m1  \u{1B}[0;91mL- \u{1B}[0m1  \u{1B}[0;91mL- \u{1B}[0m1  \u{1B}[0;91mL- \u{1B}[0mG  \u{1B}[0;91mL- \u{1B}[0m1  \u{1B}[0;91mL- \u{1B}[0m1  \u{1B}[0;91mL- \u{1B}[0m1  \u{1B}[0mV  \u{1B}[0m
-                """,
+                """.utf8),
             stdErr:
                 """
                 Found T48 00.1.31 (0x11f)
@@ -87,7 +89,7 @@ struct LogicICTestProcessorTests {
 
     @Test func testLogicICTestProcessorChecksForErrors() {
         #expect(throws: APIError.unknownError("Error")) {
-            try LogicICTestProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: "Error"), device: "7400")
+            try LogicICTestProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"), device: "7400")
         }
     }
 }

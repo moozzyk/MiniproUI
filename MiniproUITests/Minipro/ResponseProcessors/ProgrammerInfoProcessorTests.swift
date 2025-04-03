@@ -8,11 +8,12 @@
 import Testing
 
 @testable import MiniproUI
+import Foundation
 
 struct ProgrammerInfoProcessorTests {
     @Test func testProgrammerInfoProcessorHappyPath() throws {
         let miniproResult = InvocationResult(
-            exitCode: 0, stdOut: "",
+            exitCode: 0, stdOut: Data(),
             stdErr:
                 """
                 Found T48 00.1.31 (0x11f)
@@ -44,13 +45,13 @@ struct ProgrammerInfoProcessorTests {
 
     @Test func testProgrammerInfoProcessorCannotParseResponse() {
         #expect(throws: APIError.programmerInfoUnavailable) {
-            try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: ""))
+            try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: ""))
         }
     }
 
     @Test func testProgrammerInfoProcessorChecksForErrors() {
         #expect(throws: APIError.unknownError("Error")) {
-            try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: "", stdErr: "Error"))
+            try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"))
         }
     }
 }
