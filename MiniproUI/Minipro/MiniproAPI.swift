@@ -11,6 +11,9 @@ enum APIError: Error, Equatable {
     case programmerNotFound
     case programmerInfoUnavailable
     case deviceNotFound(String)
+    case readError(String)
+    case unsupportedChip
+    case invalidChip(String)
     case unknownError(String)
 }
 
@@ -38,5 +41,10 @@ class MiniproAPI {
     static func testLogicIC(device: String) async throws -> LogicICTestResult {
         let result = try await MiniproInvoker.invoke(arguments: ["-T", "-p", device])
         return try LogicICTestProcessor.run(result, device: device)
+    }
+
+    static func read(device: String) async throws -> Data {
+        let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-r", "-"])
+        return try ReadProcessor.run(result)
     }
 }
