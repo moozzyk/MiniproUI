@@ -24,7 +24,7 @@ class ReadProcessor {
         }
 
         if result.exitCode != 0 {
-            throw MiniproAPIError.readError("Reading chip failed. Exit code: \(result.exitCode)")
+            throw MiniproAPIError.readError(result.exitCode)
         }
 
         return result.stdOut
