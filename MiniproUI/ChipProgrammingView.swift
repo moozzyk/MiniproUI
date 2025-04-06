@@ -18,7 +18,7 @@ struct ChipProgrammingView: View {
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
     @State private var deviceDetails: DeviceDetails? = nil
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center) {
@@ -46,13 +46,12 @@ struct ChipProgrammingView: View {
                     Spacer()
                 }
                 VStack {
-                    Button("  <<  ") {}
-                    Button("  >>  ") {}
+                    ReadChipButton(device: selectedDevice, buffer: $buffer)
                 }
                 ZStack {
                     VStack {
                         if deviceDetails != nil {
-                            DeviceDetailsView(expectLogicChip: false,deviceDetails: $deviceDetails)
+                            DeviceDetailsView(expectLogicChip: false, deviceDetails: $deviceDetails)
                                 .padding(.top, 32)
                             Spacer()
                         }
@@ -121,6 +120,33 @@ struct SaveFileButton: View {
         .alert(item: $errorMessage) {
             Alert(
                 title: Text("Error saving file"), message: Text($0.message),
+                dismissButton: .default(Text("OK")))
+        }
+    }
+}
+
+struct ReadChipButton: View {
+    let device: String?
+    @Binding var buffer: Data?
+    @State private var errorMessage: DialogErrorMessage?
+
+    var body: some View {
+        Button(" << ") {
+            if let device = device {
+                buffer = nil
+                Task {
+                    do {
+                        buffer = try await MiniproAPI.read(device: device)
+                    } catch {
+                        errorMessage = .init(message: error.localizedDescription)
+                    }
+                }
+            }
+        }
+        .disabled(device == nil)
+        .alert(item: $errorMessage) {
+            Alert(
+                title: Text("Reading Chip Contents Failed"), message: Text($0.message),
                 dismissButton: .default(Text("OK")))
         }
     }
