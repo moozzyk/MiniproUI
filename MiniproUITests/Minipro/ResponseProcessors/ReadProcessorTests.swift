@@ -26,13 +26,13 @@ struct ReadProcessorTests {
     }
 
     @Test func readProcessorProgrammerNotFound() async throws {
-        #expect(throws: APIError.programmerNotFound) {
+        #expect(throws: MiniproAPIError.programmerNotFound) {
             try ReadProcessor.run(InvocationResult(exitCode: 1, stdOut: Data(), stdErr: "No programmer found."))
         }
     }
 
     @Test func readProcessorErrorExitCode() async throws {
-        #expect(throws: APIError.readError("Reading chip failed. Exit code: 1")) {
+        #expect(throws: MiniproAPIError.readError("Reading chip failed. Exit code: 1")) {
             try ReadProcessor.run(InvocationResult(exitCode: 1, stdOut: Data("garbage or empty".utf8), stdErr: "???"))
         }
     }
@@ -54,7 +54,7 @@ struct ReadProcessorTests {
                 """
         )
 
-        #expect(throws: APIError.invalidChip("Invalid Chip ID: expected 0x89001788, got 0xFCFFFEFF (unknown)")) {
+        #expect(throws: MiniproAPIError.invalidChip("Invalid Chip ID: expected 0x89001788, got 0xFCFFFEFF (unknown)")) {
             try ReadProcessor.run(miniproResult)
         }
     }
@@ -73,7 +73,7 @@ struct ReadProcessorTests {
                 Supply voltage: 5.13 V
                 Unsupported device!
                 """)
-        #expect(throws: APIError.unsupportedChip) {
+        #expect(throws: MiniproAPIError.unsupportedChip) {
             try ReadProcessor.run(miniproResult)
         }
     }

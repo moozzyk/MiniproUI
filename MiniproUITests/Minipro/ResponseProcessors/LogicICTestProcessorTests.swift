@@ -88,7 +88,7 @@ struct LogicICTestProcessorTests {
     }
 
     @Test func testLogicICTestProcessorChecksForErrors() {
-        #expect(throws: APIError.unknownError("Error")) {
+        #expect(throws: MiniproAPIError.unknownError("Error")) {
             try LogicICTestProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"), device: "7400")
         }
     }

@@ -151,7 +151,7 @@ struct DeviceDetailsProcessorTest {
     }
 
     @Test func testDeviceDetailsProcessorThrowsForUnknownDevice() {
-        #expect(throws: APIError.deviceNotFound("AT45DB161D[Page512]")) {
+        #expect(throws: MiniproAPIError.deviceNotFound("AT45DB161D[Page512]")) {
             try DeviceDetailsProcessor.run(
                 InvocationResult(
                     exitCode: 0, stdOut: Data(),
@@ -170,7 +170,7 @@ struct DeviceDetailsProcessorTest {
     }
 
     @Test func testDeviceDetailsProcessorChecksForErrors() {
-        #expect(throws: APIError.unknownError("Error")) {
+        #expect(throws: MiniproAPIError.unknownError("Error")) {
             try DeviceDetailsProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"))
         }
     }

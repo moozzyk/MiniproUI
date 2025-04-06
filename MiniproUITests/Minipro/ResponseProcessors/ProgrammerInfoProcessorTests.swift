@@ -44,13 +44,13 @@ struct ProgrammerInfoProcessorTests {
     }
 
     @Test func testProgrammerInfoProcessorCannotParseResponse() {
-        #expect(throws: APIError.programmerInfoUnavailable) {
+        #expect(throws: MiniproAPIError.programmerInfoUnavailable) {
             try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: ""))
         }
     }
 
     @Test func testProgrammerInfoProcessorChecksForErrors() {
-        #expect(throws: APIError.unknownError("Error")) {
+        #expect(throws: MiniproAPIError.unknownError("Error")) {
             try ProgrammerInfoProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"))
         }
     }

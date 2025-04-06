@@ -21,7 +21,7 @@ class LogicICTestProcessor {
         try ensureNoError(invocationResult: result)
         let lines = result.stdOutString.split(separator: "\n")
         guard lines.count > 0 else {
-            throw APIError.unknownError("Unexpected response format.")
+            throw MiniproAPIError.unknownError("Unexpected response format.")
         }
 
         return LogicICTestResult(

@@ -13,14 +13,14 @@ import Foundation
 struct ResponseProcessorUtilsTest {
 
     @Test func testEnsureNoErrorThrowsIfProgrammerNotConnected() {
-        #expect(throws: APIError.programmerNotFound) {
+        #expect(throws: MiniproAPIError.programmerNotFound) {
             try ensureNoError(
                 invocationResult: InvocationResult(exitCode: 1, stdOut: Data(), stdErr: "No programmer found.\n"))
         }
     }
 
     @Test func testEnsureNoErrorProcessorThrowsOnErrors() {
-        #expect(throws: APIError.unknownError("Error: something went wrong.")) {
+        #expect(throws: MiniproAPIError.unknownError("Error: something went wrong.")) {
             try ensureNoError(
                 invocationResult:
                     InvocationResult(exitCode: 1, stdOut: Data(), stdErr: "Error: something went wrong.\n"))
@@ -28,7 +28,7 @@ struct ResponseProcessorUtilsTest {
     }
 
     @Test func testEnsureNoErrorThrowsWhenForIncorrectDevicee() {
-        #expect(throws: APIError.deviceNotFound("AT45DB161D[Page512]")) {
+        #expect(throws: MiniproAPIError.deviceNotFound("AT45DB161D[Page512]")) {
             try DeviceDetailsProcessor.run(
                 InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Device AT45DB161D[Page512] not found!"))
         }

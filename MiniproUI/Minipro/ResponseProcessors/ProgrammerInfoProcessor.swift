@@ -61,7 +61,7 @@ class ProgrammerInfoProcessor {
         let supplyVoltage = try? supplyVoltage.firstMatch(in: result.stdErr)?.1
 
         guard model != nil && firmwareVersion != nil && deviceCode != nil && serialNumber != nil else {
-            throw APIError.programmerInfoUnavailable
+            throw MiniproAPIError.programmerInfoUnavailable
         }
 
         return ProgrammerInfo(

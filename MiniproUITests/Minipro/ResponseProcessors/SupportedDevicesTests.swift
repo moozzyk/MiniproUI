@@ -33,7 +33,7 @@ struct SupportedDevicesTests {
     }
 
     @Test func testSupportedDeviceChecksForErrors() {
-        #expect(throws: APIError.unknownError("Error")) {
+        #expect(throws: MiniproAPIError.unknownError("Error")) {
             try SupportedDevicesProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"))
         }
     }

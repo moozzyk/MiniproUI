@@ -7,16 +7,6 @@
 
 import Foundation
 
-enum APIError: Error, Equatable {
-    case programmerNotFound
-    case programmerInfoUnavailable
-    case deviceNotFound(String)
-    case readError(String)
-    case unsupportedChip
-    case invalidChip(String)
-    case unknownError(String)
-}
-
 class MiniproAPI {
     private static func ensureProgrammerConnected() async throws {
         let _ = try await getProgrammerInfo()
