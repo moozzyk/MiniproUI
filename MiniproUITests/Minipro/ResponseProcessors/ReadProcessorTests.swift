@@ -32,7 +32,7 @@ struct ReadProcessorTests {
     }
 
     @Test func readProcessorErrorExitCode() async throws {
-        #expect(throws: MiniproAPIError.readError("Reading chip failed. Exit code: 1")) {
+        #expect(throws: MiniproAPIError.readError(1)) {
             try ReadProcessor.run(InvocationResult(exitCode: 1, stdOut: Data("garbage or empty".utf8), stdErr: "???"))
         }
     }

@@ -10,8 +10,7 @@ import Foundation
 func ensureNoError(invocationResult: InvocationResult) throws {
     let stdErr = invocationResult.stdErr
 
-    let prgrammerNotFound = "No programmer found"
-    if stdErr.contains(prgrammerNotFound) {
+    if stdErr.contains("No programmer found") {
         throw MiniproAPIError.programmerNotFound
     }
 
@@ -19,6 +18,16 @@ func ensureNoError(invocationResult: InvocationResult) throws {
     let deviceNotFountMatch = try? deviceNotFound.firstMatch(in: stdErr)
     if deviceNotFountMatch != nil {
         throw MiniproAPIError.deviceNotFound(String(deviceNotFountMatch!.1))
+    }
+
+    let ioError = /IO error:(.*)/
+    let ioErrors = invocationResult.stdErr.split(separator: "\n")
+        .map { try? ioError.firstMatch(in: String($0))?.1 }
+        .filter { $0 != nil }
+        .map { String($0!).trimmingCharacters(in: .whitespacesAndNewlines) }
+
+    if !ioErrors.isEmpty {
+        throw MiniproAPIError.ioError(ioErrors.joined(separator: "\n"))
     }
 
     // TODO: Handle: Out of memory
