@@ -18,53 +18,63 @@ struct ChipProgrammingView: View {
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
     @State private var deviceDetails: DeviceDetails? = nil
+    @State private var showProgress = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center) {
-                Image(systemName: "memorychip.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-                    .padding(.trailing, 8)
+        ZStack {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .center) {
+                    Image(systemName: "memorychip.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                        .padding(.trailing, 8)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Chip " + "None")
-                        .font(.title)
-                        .fontWeight(.semibold)
-                }
-            }
-            .padding([.top, .horizontal])
-            Divider()
-            HStack {
-                VStack {
-                    BinaryDataView(data: $buffer)
-                    HStack {
-                        OpenFileButton(buffer: $buffer)
-                        SaveFileButton(buffer: $buffer)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Chip " + "None")
+                            .font(.title)
+                            .fontWeight(.semibold)
                     }
-                    Spacer()
                 }
-                VStack {
-                    ReadChipButton(device: selectedDevice, buffer: $buffer)
-                }
-                ZStack {
+                .padding([.top, .horizontal])
+                Divider()
+                HStack {
                     VStack {
-                        if deviceDetails != nil {
-                            DeviceDetailsView(expectLogicChip: false, deviceDetails: $deviceDetails)
-                                .padding(.top, 32)
+                        BinaryDataView(data: $buffer)
+                        HStack {
+                            OpenFileButton(buffer: $buffer)
+                            SaveFileButton(buffer: $buffer)
+                        }
+                        Spacer()
+                    }
+                    VStack {
+                        ReadChipButton(device: selectedDevice, buffer: $buffer, showProgress: $showProgress)
+                    }
+                    ZStack {
+                        VStack {
+                            if deviceDetails != nil {
+                                DeviceDetailsView(expectLogicChip: false, deviceDetails: $deviceDetails)
+                                    .padding(.top, 32)
+                                Spacer()
+                            }
+                        }
+                        VStack {
+                            SearchableListView(
+                                items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true
+                            )
+                            .frame(maxWidth: 658, maxHeight: 600)
+                            .padding([.trailing])
                             Spacer()
                         }
                     }
-                    VStack {
-                        SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true)
-                            .frame(maxWidth: 658, maxHeight: 600)
-                            .padding([.trailing])
-                        Spacer()
-                    }
                 }
+                Spacer()
             }
-            Spacer()
+            .disabled(showProgress)
+            .blur(radius: showProgress ? 2 : 0)
+            if showProgress {
+                ProgressDialogView(label: "Downloading Chip Contents...")
+            }
         }
         .onChange(of: selectedDevice) {
             Task {
@@ -128,18 +138,20 @@ struct SaveFileButton: View {
 struct ReadChipButton: View {
     let device: String?
     @Binding var buffer: Data?
+    @Binding var showProgress: Bool
     @State private var errorMessage: DialogErrorMessage?
 
     var body: some View {
         Button(" << ") {
             if let device = device {
-                buffer = nil
+                showProgress = true
                 Task {
                     do {
                         buffer = try await MiniproAPI.read(device: device)
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
+                    showProgress = false
                 }
             }
         }
