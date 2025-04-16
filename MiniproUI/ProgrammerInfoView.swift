@@ -11,27 +11,10 @@ struct ProgrammerInfoView: View {
     @Binding var programmerInfo: ProgrammerInfo?
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center) {
-                Image(systemName: "cpu.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-                    .padding(.trailing, 8)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Minipro " + (programmerInfo?.model ?? "Unknown"))
-                        .font(.title)
-                        .fontWeight(.semibold)
-                    if programmerInfo?.model != nil {
-                        Text(programmerInfo?.firmwareVersion ?? "")
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-            .padding([.top, .horizontal])
-
-            Divider()
-
+            TabHeaderView(
+                caption: "Minipro " + (programmerInfo?.model ?? "Unknown"),
+                secondaryCaption: programmerInfo?.firmwareVersion,
+                systemImageName: "cpu.fill")
             Form {
                 if programmerInfo?.model == nil {
                     ProgrammerNotConnected()

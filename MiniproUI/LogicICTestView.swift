@@ -15,21 +15,9 @@ struct LogicICTestView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center) {
-                Image(systemName: "flask.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-                    .padding(.trailing, 8)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Logic IC " + (deviceDetails?.name ?? "None"))
-                        .font(.title)
-                        .fontWeight(.semibold)
-                }
-            }
-            .padding([.top, .horizontal])
-            Divider()
+            TabHeaderView(
+                caption: "Logic IC " + (deviceDetails?.name ?? "None"),
+                systemImageName: "flask.fill")
             if supportedDevices.isEmpty {
                 Form {
                     ProgrammerNotConnected()

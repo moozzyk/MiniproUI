@@ -23,21 +23,9 @@ struct ChipProgrammingView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .center) {
-                    Image(systemName: "memorychip.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 50, height: 50)
-                        .padding(.trailing, 8)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Chip " + (selectedDevice ?? "None"))
-                            .font(.title)
-                            .fontWeight(.semibold)
-                    }
-                }
-                .padding([.top, .horizontal])
-                Divider()
+                TabHeaderView(
+                    caption: "Chip " + (selectedDevice ?? "None"),
+                    systemImageName: "memorychip.fill")
                 HStack {
                     VStack {
                         BinaryDataView(data: $buffer)
