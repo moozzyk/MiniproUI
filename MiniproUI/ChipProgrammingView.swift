@@ -31,7 +31,7 @@ struct ChipProgrammingView: View {
                         .padding(.trailing, 8)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Chip " + "None")
+                        Text("Chip " + (selectedDevice ?? "None"))
                             .font(.title)
                             .fontWeight(.semibold)
                     }
