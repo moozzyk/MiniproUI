@@ -24,7 +24,7 @@ struct ChipProgrammingView: View {
         ZStack {
             VStack(alignment: .leading, spacing: 16) {
                 TabHeaderView(
-                    caption: "Chip " + (selectedDevice ?? "None"),
+                    caption: "Selected Chip: " + (selectedDevice ?? "None"),
                     systemImageName: "memorychip.fill")
                 HStack {
                     VStack {

@@ -9,10 +9,19 @@ import SwiftUI
 
 struct ProgrammerInfoView: View {
     @Binding var programmerInfo: ProgrammerInfo?
+
+    func getProgrammerName(_ programmerInfo: ProgrammerInfo?) -> String {
+        let programmerModel = programmerInfo?.model
+        if let model = programmerModel {
+            return "Minipro \(model)"
+        }
+        return "Unknown"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             TabHeaderView(
-                caption: "Minipro " + (programmerInfo?.model ?? "Unknown"),
+                caption: "Programmer: " + getProgrammerName(programmerInfo),
                 secondaryCaption: programmerInfo?.firmwareVersion,
                 systemImageName: "cpu.fill")
             Form {

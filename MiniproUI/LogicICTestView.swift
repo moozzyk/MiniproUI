@@ -16,7 +16,7 @@ struct LogicICTestView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             TabHeaderView(
-                caption: "Logic IC " + (deviceDetails?.name ?? "None"),
+                caption: "Selected Logic IC: " + (deviceDetails?.name ?? "None"),
                 systemImageName: "flask.fill")
             if supportedDevices.isEmpty {
                 Form {
