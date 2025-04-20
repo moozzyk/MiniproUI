@@ -42,7 +42,7 @@ struct DeviceDetailsView: View {
             if !deviceDetails.isLogicChip {
                 return 400
             }
-            return 220
+            return 220 + (expectLogicChip ? 0 : 30) // account for the additional warning row
         }
         return 0
     }
