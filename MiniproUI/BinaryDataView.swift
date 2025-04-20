@@ -40,7 +40,7 @@ struct BinaryDataView: View {
                 Text("No data loaded.")
             }
         }
-        .frame(maxWidth: 658, maxHeight: 600)
+        .frame(maxWidth: 658, maxHeight: .infinity)
         .border(Color.gray)
     }
 
