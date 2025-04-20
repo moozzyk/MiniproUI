@@ -38,24 +38,35 @@ struct ChipProgrammingView: View {
                     VStack {
                         ReadChipButton(device: selectedDevice, buffer: $buffer, showProgress: $showProgress)
                     }
-                    ZStack {
+                    if supportedDevices.isEmpty  {
                         VStack {
-                            if deviceDetails != nil {
-                                DeviceDetailsView(expectLogicChip: false, deviceDetails: $deviceDetails)
-                                    .padding(.top, 32)
+                            Form {
+                                ProgrammerNotConnected()
+                            }
+                            .formStyle(.grouped)
+                            .padding(.top, 32)
+                        }
+                    } else {
+                        ZStack {
+                            VStack {
+                                if deviceDetails != nil {
+                                    DeviceDetailsView(expectLogicChip: false, deviceDetails: $deviceDetails)
+                                        .padding(.top, 32)
+                                    Spacer()
+                                }
+                            }
+                            VStack {
+                                SearchableListView(
+                                    items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true
+                                )
+                                .frame(maxWidth: 658, maxHeight: 600)
+                                .padding([.trailing])
                                 Spacer()
                             }
                         }
-                        VStack {
-                            SearchableListView(
-                                items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true
-                            )
-                            .frame(maxWidth: 658, maxHeight: 600)
-                            .padding([.trailing])
-                            Spacer()
-                        }
                     }
                 }
+                .padding()
                 Spacer()
             }
             .disabled(showProgress)
