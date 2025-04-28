@@ -18,7 +18,9 @@ struct ChipProgrammingView: View {
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
     @State private var deviceDetails: DeviceDetails? = nil
-    @State private var showProgress = false
+    @State private var progressMessage: String? = nil
+
+    private var showProgress: Bool { progressMessage != nil }
 
     var body: some View {
         ZStack {
@@ -36,7 +38,7 @@ struct ChipProgrammingView: View {
                         Spacer()
                     }
                     VStack {
-                        ReadChipButton(device: selectedDevice, buffer: $buffer, showProgress: $showProgress)
+                        ReadChipButton(device: selectedDevice, buffer: $buffer, progressMessage: $progressMessage)
                     }
                     if supportedDevices.isEmpty  {
                         VStack {
@@ -72,7 +74,7 @@ struct ChipProgrammingView: View {
             .disabled(showProgress)
             .blur(radius: showProgress ? 2 : 0)
             if showProgress {
-                ProgressDialogView(label: "Downloading Chip Contents...")
+                ProgressDialogView(label: progressMessage)
             }
         }
         .onChange(of: selectedDevice) {
@@ -137,20 +139,20 @@ struct SaveFileButton: View {
 struct ReadChipButton: View {
     let device: String?
     @Binding var buffer: Data?
-    @Binding var showProgress: Bool
+    @Binding var progressMessage: String?
     @State private var errorMessage: DialogErrorMessage?
 
     var body: some View {
         Button(" << ") {
             if let device = device {
-                showProgress = true
+                progressMessage = "Reading Chip Contents..."
                 Task {
                     do {
                         buffer = try await MiniproAPI.read(device: device)
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
-                    showProgress = false
+                    progressMessage = nil
                 }
             }
         }
