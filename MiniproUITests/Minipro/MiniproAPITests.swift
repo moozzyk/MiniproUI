@@ -5,6 +5,7 @@
 //  Created by Pawel Kadluczka on 2/3/25.
 //
 
+import Foundation
 import Testing
 
 @testable import MiniproUI
@@ -58,5 +59,16 @@ struct MiniproAPITests {
         ) {
             try await MiniproAPI.readDeviceId(device: "SMJ27C010A@TSOP32")
         }
+    }
+
+    @Test(.enabled("W27512 not present", isW27C512Present))
+    func testWriteReadRoundTrip() async throws {
+        let data = Data((0..<1024).map { UInt8($0 & 0xff) })
+        let writeResult = try await MiniproAPI.write(
+            device: "W27C512@DIP28", data: data, options: WriteOptions(ignoreFileSize: true))
+        #expect(writeResult.stdErr.contains("Verification OK"))
+
+        let readData = try await MiniproAPI.read(device: "W27C512@DIP28")
+        #expect(readData.subdata(in: 0..<1024) == data)
     }
 }

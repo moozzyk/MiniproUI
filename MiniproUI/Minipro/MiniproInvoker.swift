@@ -24,7 +24,7 @@ enum InvocationError: Error {
 class MiniproInvoker {
     private static let queue = DispatchQueue(label: "MiniproInvokeQueue")
 
-    public static func invoke(arguments: [String]) async throws -> InvocationResult {
+    public static func invoke(arguments: [String], stdinData: Data? = nil) async throws -> InvocationResult {
         return try await withCheckedThrowingContinuation { continuation in
             guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro")
             else {
@@ -38,6 +38,7 @@ class MiniproInvoker {
                     var stderr = Data()
                     let stdoutPipe = Pipe()
                     let stderrPipe = Pipe()
+                    let stdInPipe = Pipe()
                     stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
                         stdout.append(handle.availableData)
                     }
@@ -51,7 +52,13 @@ class MiniproInvoker {
                     process.arguments = arguments
                     process.standardOutput = stdoutPipe
                     process.standardError = stderrPipe
+                    process.standardInput = stdInPipe
                     try process.run()
+                    if let stdinData = stdinData {
+                        try stdInPipe.fileHandleForWriting.write(contentsOf: stdinData)
+                        stdInPipe.fileHandleForWriting.closeFile()
+
+                    }
                     process.waitUntilExit()
                     print("completed \(arguments)")
                     continuation.resume(

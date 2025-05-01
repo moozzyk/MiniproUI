@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct WriteOptions {
+    var ignoreFileSize: Bool = false
+    var ignoreChipIdMismatch: Bool = false
+}
+
 class MiniproAPI {
     private static func ensureProgrammerConnected() async throws {
         let _ = try await getProgrammerInfo()
@@ -41,5 +46,18 @@ class MiniproAPI {
     static func read(device: String) async throws -> Data {
         let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-r", "-"])
         return try ReadProcessor.run(result)
+    }
+
+    static func write(device: String, data: Data, options: WriteOptions) async throws -> InvocationResult {
+        var arguments = ["-p", device, "-w", "-"]
+        if options.ignoreFileSize {
+            arguments.append("-s")
+        }
+        if options.ignoreChipIdMismatch {
+            arguments.append("-y")
+        }
+
+        let result = try await MiniproInvoker.invoke(arguments: arguments, stdinData: data)
+        return result
     }
 }
