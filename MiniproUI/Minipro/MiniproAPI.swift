@@ -33,6 +33,11 @@ class MiniproAPI {
         return try LogicICTestProcessor.run(result, device: device)
     }
 
+    static func readDeviceId(device: String) async throws -> String {
+        let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-D"])
+        return try DeviceIdProcessor.run(result)
+    }
+
     static func read(device: String) async throws -> Data {
         let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-r", "-"])
         return try ReadProcessor.run(result)

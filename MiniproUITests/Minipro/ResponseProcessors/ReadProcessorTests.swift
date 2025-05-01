@@ -5,8 +5,8 @@
 //  Created by Pawel Kadluczka on 4/5/25.
 //
 
-import Foundation
 import Testing
+import Foundation
 
 @testable import MiniproUI
 

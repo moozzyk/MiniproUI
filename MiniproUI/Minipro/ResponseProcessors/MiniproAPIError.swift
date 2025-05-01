@@ -16,6 +16,7 @@ enum MiniproAPIError: Error, Equatable {
     case invalidChip(String)
     case unknownError(String)
     case ioError(String)
+    case chipIdMismatch(String, String)
 }
 
 extension MiniproAPIError: LocalizedError {
@@ -37,6 +38,8 @@ extension MiniproAPIError: LocalizedError {
             return "Unknown error: \(message)"
         case .ioError(let message):
             return "IO error: \(message)"
+        case .chipIdMismatch(let expected, let actual):
+            return "Chip ID mismatch: expected \(expected), actual \(actual)"
         }
     }
 }
