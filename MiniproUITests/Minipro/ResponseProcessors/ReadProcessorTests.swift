@@ -54,7 +54,7 @@ struct ReadProcessorTests {
                 """
         )
 
-        #expect(throws: MiniproAPIError.invalidChip("Invalid Chip ID: expected 0x89001788, got 0xFCFFFEFF (unknown)")) {
+        #expect(throws: MiniproAPIError.invalidChip("0x89001788", "0xFCFFFEFF")) {
             try ReadProcessor.run(miniproResult)
         }
     }

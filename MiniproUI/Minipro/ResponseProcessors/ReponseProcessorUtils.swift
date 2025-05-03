@@ -36,4 +36,13 @@ func ensureNoError(invocationResult: InvocationResult) throws {
     if stdErr.contains(error) {
         throw MiniproAPIError.unknownError(stdErr.trimmingCharacters(in: .whitespacesAndNewlines))
     }
+
+    if stdErr.contains("Unsupported device!") {
+        throw MiniproAPIError.unsupportedChip
+    }
+
+    let invalidChipId = /Invalid Chip ID: expected (\S+), got (\S+)/
+    if let matchedString = stdErr.firstMatch(of: invalidChipId) {
+        throw MiniproAPIError.invalidChip(String(matchedString.1), String(matchedString.2))
+    }
 }
