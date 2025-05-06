@@ -48,7 +48,7 @@ class MiniproAPI {
         return try ReadProcessor.run(result)
     }
 
-    static func write(device: String, data: Data, options: WriteOptions) async throws -> InvocationResult {
+    static func write(device: String, data: Data, options: WriteOptions) async throws {
         var arguments = ["-p", device, "-w", "-"]
         if options.ignoreFileSize {
             arguments.append("-s")
@@ -58,6 +58,6 @@ class MiniproAPI {
         }
 
         let result = try await MiniproInvoker.invoke(arguments: arguments, stdinData: data)
-        return result
+        try WriteProcessor.run(result)
     }
 }

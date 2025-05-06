@@ -79,7 +79,7 @@ struct ReadProcessorTests {
     }
 
     @Test func readProcessorUnsupportedNANDChip() async throws {
-        // "W25M02GV(x4)@WSON8
+        // W25M02GV(x4)@WSON8
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:

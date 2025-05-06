@@ -64,9 +64,10 @@ struct MiniproAPITests {
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testWriteReadRoundTrip() async throws {
         let data = Data((0..<1024).map { UInt8($0 & 0xff) })
-        let writeResult = try await MiniproAPI.write(
-            device: "W27C512@DIP28", data: data, options: WriteOptions(ignoreFileSize: true))
-        #expect(writeResult.stdErr.contains("Verification OK"))
+        await #expect(throws: Never.self) {
+            try await MiniproAPI.write(
+                device: "W27C512@DIP28", data: data, options: WriteOptions(ignoreFileSize: true))
+        }
 
         let readData = try await MiniproAPI.read(device: "W27C512@DIP28")
         #expect(readData.subdata(in: 0..<1024) == data)

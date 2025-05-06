@@ -38,9 +38,10 @@ struct ChipProgrammingView: View {
                         Spacer()
                     }
                     VStack {
-                        ReadChipButton(device: selectedDevice, buffer: $buffer, progressMessage: $progressMessage)
+                        ReadChipButton(device: deviceDetails, buffer: $buffer, progressMessage: $progressMessage)
+                        WriteChipButton(device: deviceDetails, buffer: buffer, progressMessage: $progressMessage)
                     }
-                    if supportedDevices.isEmpty  {
+                    if supportedDevices.isEmpty {
                         VStack {
                             Form {
                                 ProgrammerNotConnected()
@@ -137,7 +138,7 @@ struct SaveFileButton: View {
 }
 
 struct ReadChipButton: View {
-    let device: String?
+    let device: DeviceDetails?
     @Binding var buffer: Data?
     @Binding var progressMessage: String?
     @State private var errorMessage: DialogErrorMessage?
@@ -148,7 +149,7 @@ struct ReadChipButton: View {
                 progressMessage = "Reading Chip Contents..."
                 Task {
                     do {
-                        buffer = try await MiniproAPI.read(device: device)
+                        buffer = try await MiniproAPI.read(device: device.name)
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
@@ -156,10 +157,41 @@ struct ReadChipButton: View {
                 }
             }
         }
-        .disabled(device == nil)
+        .disabled(device?.isLogicChip ?? true)
         .alert(item: $errorMessage) {
             Alert(
-                title: Text("Reading Chip Contents Failed"), message: Text($0.message),
+                title: Text("Reading Chip Contents Failed"),
+                message: Text($0.message),
+                dismissButton: .default(Text("OK")))
+        }
+    }
+}
+
+struct WriteChipButton: View {
+    let device: DeviceDetails?
+    let buffer: Data?
+    @Binding var progressMessage: String?
+    @State private var errorMessage: DialogErrorMessage?
+
+    var body: some View {
+        Button(" >> ") {
+            if let device = device, let buffer = buffer {
+                progressMessage = "Writing Buffer Data..."
+                Task {
+                    do {
+                        try await MiniproAPI.write(device: device.name, data: buffer, options: WriteOptions())
+                    } catch {
+                        errorMessage = .init(message: error.localizedDescription)
+                    }
+                    progressMessage = nil
+                }
+            }
+        }
+        .disabled(device?.isLogicChip ?? true || buffer == nil)
+        .alert(item: $errorMessage) {
+            Alert(
+                title: Text("Write Failure"),
+                message: Text($0.message),
                 dismissButton: .default(Text("OK")))
         }
     }
