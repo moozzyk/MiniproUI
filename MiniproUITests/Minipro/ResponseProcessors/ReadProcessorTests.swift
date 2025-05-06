@@ -78,4 +78,23 @@ struct ReadProcessorTests {
         }
     }
 
+    @Test func readProcessorUnsupportedNANDChip() async throws {
+        // "W25M02GV(x4)@WSON8
+        let miniproResult = InvocationResult(
+            exitCode: 0, stdOut: Data(),
+            stdErr:
+                """
+                Found T48 00.1.31 (0x11f)
+                Warning: T48 support is experimental!
+                Device code: 46A16257
+                Serial code: HSSCVO9LARFMOYKYOMVE5123
+                Manufactured: 2024-06-2816:55
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.12 V
+                NAND chips not supported yet.
+                """)
+        #expect(throws: MiniproAPIError.unsupportedChip) {
+            try ReadProcessor.run(miniproResult)
+        }
+    }
 }

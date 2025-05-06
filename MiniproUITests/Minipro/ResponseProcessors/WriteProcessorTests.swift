@@ -5,8 +5,8 @@
 //  Created by Pawel Kadluczka on 5/1/25.
 //
 
-import Testing
 import Foundation
+import Testing
 
 @testable import MiniproUI
 
@@ -70,6 +70,32 @@ struct WriteProcessorTests {
                 """)
 
         #expect(throws: MiniproAPIError.invalidChip("0x97D6", "0xF8FF")) {
+            try WriteProcessor.run(miniproResult)
+        }
+    }
+
+    @Test func writeProcessorOvercurrentProtection() async throws {
+        // When trying to program a Logic Chip
+        let miniproResult = InvocationResult(
+            exitCode: 1,
+            stdOut:
+                Data(),
+            stdErr:
+                """
+                Found T48 00.1.31 (0x11f)
+                Warning: T48 support is experimental!
+                Device code: 46A16257
+                Serial code: HSSCVO9LARFMOYKYOMVE5123
+                Manufactured: 2024-06-2816:55
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.12 V
+                WARNING: Chip ID mismatch: expected 0xDA08, got 0xFFFF (unknown)
+                Erasing... 0.30Sec OK
+                Writing  Code...   0%
+                Overcurrent protection!
+                """)
+
+        #expect(throws: MiniproAPIError.unknownError("Overcurrent protection! Exit code: 1")) {
             try WriteProcessor.run(miniproResult)
         }
     }

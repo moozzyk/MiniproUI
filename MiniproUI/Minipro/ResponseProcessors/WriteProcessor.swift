@@ -20,14 +20,9 @@ class WriteProcessor {
         let incorrectFileSizeMatch = try? incorrectFileSizeRegex.firstMatch(in: stdErr)
         if let incorrectFileSizeMatch = incorrectFileSizeMatch {
             throw MiniproAPIError.incorrectFileSize(Int32(incorrectFileSizeMatch.2)!, Int32(incorrectFileSizeMatch.1)!)
-
         }
 
-        if result.exitCode != 0 {
-            throw MiniproAPIError.readError(result.exitCode)
-        }
-
-        throw MiniproAPIError.unknownError("Unknown error")
+        throw MiniproAPIError.unknownError(
+            "\(stdErr.split(separator: "\n").last ?? "") Exit code: \(result.exitCode)")
     }
 }
-

@@ -27,7 +27,7 @@ struct ResponseProcessorUtilsTest {
         }
     }
 
-    @Test func testEnsureNoErrorThrowsWhenForIncorrectDevicee() {
+    @Test func testEnsureNoErrorThrowsWhenForIncorrectDevice() {
         #expect(throws: MiniproAPIError.deviceNotFound("AT45DB161D[Page512]")) {
             try ensureNoError(
                 invocationResult:
