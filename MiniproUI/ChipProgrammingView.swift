@@ -31,6 +31,7 @@ struct ChipProgrammingView: View {
                 HStack {
                     VStack {
                         BinaryDataView(data: $buffer)
+                            .frame(minWidth: 658)
                         HStack {
                             OpenFileButton(buffer: $buffer)
                             SaveFileButton(buffer: $buffer)
