@@ -17,6 +17,7 @@ enum MiniproAPIError: Error, Equatable {
     case unknownError(String)
     case ioError(String)
     case chipIdMismatch(String, String)
+    case firmwareUpdateError(String)
     case incorrectFileSize(Int32, Int32)
 }
 
@@ -43,6 +44,8 @@ extension MiniproAPIError: LocalizedError {
             return "Chip ID mismatch: expected \(expected), actual \(actual)"
         case .incorrectFileSize(let expected, let actual):
             return "Incorrect file size: expected \(expected), actual \(actual)"
+        case .firmwareUpdateError(let message):
+            return "Firmware update error: \(message)"
         }
     }
 }

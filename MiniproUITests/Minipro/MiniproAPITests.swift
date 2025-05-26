@@ -72,4 +72,12 @@ struct MiniproAPITests {
         let readData = try await MiniproAPI.read(device: "W27C512@DIP28")
         #expect(readData.subdata(in: 0..<1024) == data)
     }
+
+    @Test(.disabled()) func testUpdateFirmware() async throws {
+        let firmwarePath = ""
+
+        await #expect(throws: Never.self) {
+            try await MiniproAPI.updateFirmware(firmwareFilePath: firmwarePath)
+        }
+    }
 }
