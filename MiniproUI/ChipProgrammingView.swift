@@ -33,8 +33,13 @@ struct ChipProgrammingView: View {
                         BinaryDataView(data: $buffer)
                             .frame(minWidth: 658)
                         HStack {
-                            OpenFileButton(buffer: $buffer)
-                            SaveFileButton(buffer: $buffer)
+                            OpenFileButton { url in
+                                buffer = try Data(contentsOf: url)
+                            }
+                            SaveFileButton { url in
+                                try buffer?.write(to: url)
+                            }
+                            .disabled(buffer == nil)
                         }
                         Spacer()
                     }
@@ -85,55 +90,6 @@ struct ChipProgrammingView: View {
                     deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device)
                 }
             }
-        }
-    }
-}
-
-struct OpenFileButton: View {
-    @Binding var buffer: Data?
-    @State private var errorMessage: DialogErrorMessage?
-
-    var body: some View {
-        Button("Open File") {
-            let openPanel = NSOpenPanel()
-            openPanel.allowsMultipleSelection = false
-            if openPanel.runModal() == .OK {
-                do {
-                    buffer = try Data(contentsOf: openPanel.url!)
-                } catch {
-                    errorMessage = .init(message: error.localizedDescription)
-                }
-            }
-        }.alert(item: $errorMessage) {
-            Alert(
-                title: Text("Error opening file"), message: Text($0.message),
-                dismissButton: .default(Text("OK")))
-        }
-    }
-}
-
-struct SaveFileButton: View {
-    @Binding var buffer: Data?
-    @State private var errorMessage: DialogErrorMessage?
-
-    var body: some View {
-        Button("Save As") {
-            let savePanel = NSSavePanel()
-            savePanel.canCreateDirectories = true
-            savePanel.isExtensionHidden = false
-            if savePanel.runModal() == .OK {
-                do {
-                    try buffer?.write(to: savePanel.url!)
-                } catch {
-                    errorMessage = .init(message: error.localizedDescription)
-                }
-            }
-        }
-        .disabled(buffer == nil)
-        .alert(item: $errorMessage) {
-            Alert(
-                title: Text("Error saving file"), message: Text($0.message),
-                dismissButton: .default(Text("OK")))
         }
     }
 }
