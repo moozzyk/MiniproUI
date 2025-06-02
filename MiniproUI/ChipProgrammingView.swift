@@ -33,7 +33,7 @@ struct ChipProgrammingView: View {
                         BinaryDataView(data: $buffer)
                             .frame(minWidth: 658)
                         HStack {
-                            OpenFileButton { url in
+                            OpenFileButton(caption: "Open File") { url in
                                 buffer = try Data(contentsOf: url)
                             }
                             SaveFileButton { url in

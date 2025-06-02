@@ -10,14 +10,16 @@ import SwiftUI
 
 struct OpenFileButton: View {
     @State private var errorMessage: DialogErrorMessage?
+    private let caption: String
     private let action: (URL) throws -> Void
 
-    init(_ action: @escaping (URL) throws -> Void) {
+    init(caption: String, action: @escaping (URL) throws -> Void) {
+        self.caption = caption
         self.action = action
     }
 
     var body: some View {
-        Button("Open File") {
+        Button(caption) {
             let openPanel = NSOpenPanel()
             openPanel.allowsMultipleSelection = false
             if openPanel.runModal() == .OK {

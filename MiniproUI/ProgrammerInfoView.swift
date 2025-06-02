@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProgrammerInfoView: View {
     @Binding var programmerInfo: ProgrammerInfo?
+    @State var firmwareFileUrl: URL?
 
     func getProgrammerName(_ programmerInfo: ProgrammerInfo?) -> String {
         let programmerModel = programmerInfo?.model
@@ -47,10 +48,29 @@ struct ProgrammerInfoView: View {
                             Text("Warnings")
                         }
                     ) {
-                        ForEach (programmerInfo?.warnings ?? [], id: \.self) {
+                        ForEach(programmerInfo?.warnings ?? [], id: \.self) {
                             Text($0)
                         }
                     }
+                }
+                Section(
+                    header: HStack {
+                        Text("Firmware Update")
+                    }
+                ) {
+                    HStack {
+                        Text("Firmware ")
+                        Spacer()
+                        OpenFileButton(caption: "Select Firmware...") { url in
+                            firmwareFileUrl = url
+                        }
+                    }
+                    HStack {
+                        Text ("Firmware file: \(firmwareFileUrl?.path ?? "N/A")")
+                        Spacer()
+                        Button("Update...") {
+                        }
+                    }.disabled(firmwareFileUrl == nil)
                 }
             }
             .formStyle(.grouped)
@@ -61,8 +81,6 @@ struct ProgrammerInfoView: View {
         }
     }
 }
-
-
 
 #Preview {
     ProgrammerInfoView(
