@@ -73,7 +73,7 @@ struct ProgrammerInfoView: View {
                         HStack {
                             Text("Firmware file: \(firmwareFileUrl?.path ?? "N/A")")
                             Spacer()
-                            UpdateFirmwareButton(firmwareUrl: $firmwareFileUrl, progressMessage: $progressMessage)
+                            UpdateFirmwareButton(firmwareUrl: $firmwareFileUrl, progressMessage: $progressMessage, programmerInfo: $programmerInfo)
                         }.disabled(firmwareFileUrl == nil)
                     }
                 }
@@ -94,6 +94,7 @@ struct ProgrammerInfoView: View {
 struct UpdateFirmwareButton: View {
     @Binding var firmwareUrl: URL?
     @Binding var progressMessage: String?
+    @Binding var programmerInfo: ProgrammerInfo?
     @State private var errorMessage: DialogErrorMessage?
 
     var body: some View {
@@ -103,6 +104,7 @@ struct UpdateFirmwareButton: View {
                 Task {
                     do {
                         try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path())
+                        programmerInfo = try await MiniproAPI.getProgrammerInfo()
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
