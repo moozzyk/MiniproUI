@@ -13,6 +13,12 @@ struct ProgrammerInfoView: View {
     @State var progressMessage: String?
 
     private var showProgress: Bool { progressMessage != nil }
+    private var isFirmwareUpdateSupported: Bool {
+        let model = programmerInfo?.model ?? ""
+        // firmware update not supported for TL866A and TL866CS
+        // due to an additional prompt in the firmware update handler
+        return model == "T48" || model == "T56" || model == "TL866II+"
+    }
 
     func getProgrammerName(_ programmerInfo: ProgrammerInfo?) -> String {
         let programmerModel = programmerInfo?.model
@@ -58,23 +64,27 @@ struct ProgrammerInfoView: View {
                             }
                         }
                     }
-                    Section(
-                        header: HStack {
-                            Text("Firmware Update")
-                        }
-                    ) {
-                        HStack {
-                            Text("Firmware ")
-                            Spacer()
-                            OpenFileButton(caption: "Select Firmware...") { url in
-                                firmwareFileUrl = url
+                    if isFirmwareUpdateSupported {
+                        Section(
+                            header: HStack {
+                                Text("Firmware Update")
                             }
+                        ) {
+                            HStack {
+                                Text("Firmware ")
+                                Spacer()
+                                OpenFileButton(caption: "Select Firmware...") { url in
+                                    firmwareFileUrl = url
+                                }
+                            }
+                            HStack {
+                                Text("Firmware file: \(firmwareFileUrl?.path ?? "N/A")")
+                                Spacer()
+                                UpdateFirmwareButton(
+                                    firmwareUrl: $firmwareFileUrl, progressMessage: $progressMessage,
+                                    programmerInfo: $programmerInfo)
+                            }.disabled(firmwareFileUrl == nil)
                         }
-                        HStack {
-                            Text("Firmware file: \(firmwareFileUrl?.path ?? "N/A")")
-                            Spacer()
-                            UpdateFirmwareButton(firmwareUrl: $firmwareFileUrl, progressMessage: $progressMessage, programmerInfo: $programmerInfo)
-                        }.disabled(firmwareFileUrl == nil)
                     }
                 }
                 .formStyle(.grouped)
