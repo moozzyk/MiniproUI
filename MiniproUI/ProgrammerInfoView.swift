@@ -84,6 +84,7 @@ struct ProgrammerInfoView: View {
                                     firmwareUrl: $firmwareFileUrl, progressMessage: $progressMessage,
                                     programmerInfo: $programmerInfo)
                             }.disabled(firmwareFileUrl == nil)
+                            Link("Learn more about downloading firmware", destination: URL(string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware")!)
                         }
                     }
                 }
