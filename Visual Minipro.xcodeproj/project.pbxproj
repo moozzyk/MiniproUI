@@ -57,7 +57,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5A1378592D3A0900006F0165 /* MiniproUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiniproUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A1378592D3A0900006F0165 /* Visual Minipro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Visual Minipro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A13786A2D3A0901006F0165 /* MiniproUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniproUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A1378742D3A0901006F0165 /* MiniproUIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiniproUIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A559C9E2D3F3F60000A364C /* logicic.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = logicic.xml; sourceTree = "<group>"; };
@@ -127,7 +127,7 @@
 		5A13785A2D3A0900006F0165 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5A1378592D3A0900006F0165 /* MiniproUI.app */,
+				5A1378592D3A0900006F0165 /* Visual Minipro.app */,
 				5A13786A2D3A0901006F0165 /* MiniproUITests.xctest */,
 				5A1378742D3A0901006F0165 /* MiniproUIUITests.xctest */,
 			);
@@ -145,9 +145,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5A1378582D3A0900006F0165 /* MiniproUI */ = {
+		5A1378582D3A0900006F0165 /* Visual Minipro */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5A13787E2D3A0901006F0165 /* Build configuration list for PBXNativeTarget "MiniproUI" */;
+			buildConfigurationList = 5A13787E2D3A0901006F0165 /* Build configuration list for PBXNativeTarget "Visual Minipro" */;
 			buildPhases = (
 				5A1378552D3A0900006F0165 /* Sources */,
 				5A1378562D3A0900006F0165 /* Frameworks */,
@@ -162,11 +162,11 @@
 			fileSystemSynchronizedGroups = (
 				5A13785B2D3A0900006F0165 /* MiniproUI */,
 			);
-			name = MiniproUI;
+			name = "Visual Minipro";
 			packageProductDependencies = (
 			);
 			productName = MiniproUI;
-			productReference = 5A1378592D3A0900006F0165 /* MiniproUI.app */;
+			productReference = 5A1378592D3A0900006F0165 /* Visual Minipro.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5A1378692D3A0901006F0165 /* MiniproUITests */ = {
@@ -238,7 +238,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5A1378542D3A0900006F0165 /* Build configuration list for PBXProject "MiniproUI" */;
+			buildConfigurationList = 5A1378542D3A0900006F0165 /* Build configuration list for PBXProject "Visual Minipro" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -252,7 +252,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5A1378582D3A0900006F0165 /* MiniproUI */,
+				5A1378582D3A0900006F0165 /* Visual Minipro */,
 				5A1378692D3A0901006F0165 /* MiniproUITests */,
 				5A1378732D3A0901006F0165 /* MiniproUIUITests */,
 			);
@@ -312,12 +312,12 @@
 /* Begin PBXTargetDependency section */
 		5A13786C2D3A0901006F0165 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5A1378582D3A0900006F0165 /* MiniproUI */;
+			target = 5A1378582D3A0900006F0165 /* Visual Minipro */;
 			targetProxy = 5A13786B2D3A0901006F0165 /* PBXContainerItemProxy */;
 		};
 		5A1378762D3A0901006F0165 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5A1378582D3A0900006F0165 /* MiniproUI */;
+			target = 5A1378582D3A0900006F0165 /* Visual Minipro */;
 			targetProxy = 5A1378752D3A0901006F0165 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -576,7 +576,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5A1378542D3A0900006F0165 /* Build configuration list for PBXProject "MiniproUI" */ = {
+		5A1378542D3A0900006F0165 /* Build configuration list for PBXProject "Visual Minipro" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5A13787C2D3A0901006F0165 /* Debug */,
@@ -585,7 +585,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5A13787E2D3A0901006F0165 /* Build configuration list for PBXNativeTarget "MiniproUI" */ = {
+		5A13787E2D3A0901006F0165 /* Build configuration list for PBXNativeTarget "Visual Minipro" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5A13787F2D3A0901006F0165 /* Debug */,
