@@ -11,7 +11,7 @@
 		5A559CA22D3F41A2000A364C /* infoic.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5A559CA12D3F41A2000A364C /* infoic.xml */; };
 		5A75B9B42D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; };
 		5A75B9B52D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		5A75B9B82D3CED2D00DF9FA7 /* minipro in Embed minipro */ = {isa = PBXBuildFile; fileRef = 5A75B9B72D3CED2D00DF9FA7 /* minipro */; };
+		5AE5AE372E18938E0034923D /* minipro in Embed minipro */ = {isa = PBXBuildFile; fileRef = 5AE5AE362E18938E0034923D /* minipro */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,7 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				5A75B9B82D3CED2D00DF9FA7 /* minipro in Embed minipro */,
+				5AE5AE372E18938E0034923D /* minipro in Embed minipro */,
 			);
 			name = "Embed minipro";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -63,7 +63,7 @@
 		5A559C9E2D3F3F60000A364C /* logicic.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = logicic.xml; sourceTree = "<group>"; };
 		5A559CA12D3F41A2000A364C /* infoic.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = infoic.xml; sourceTree = "<group>"; };
 		5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libusb-1.0.0.dylib"; sourceTree = "<group>"; };
-		5A75B9B72D3CED2D00DF9FA7 /* minipro */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = minipro; sourceTree = "<group>"; };
+		5AE5AE362E18938E0034923D /* minipro */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = minipro; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -113,9 +113,9 @@
 		5A1378502D3A0900006F0165 = {
 			isa = PBXGroup;
 			children = (
+				5AE5AE362E18938E0034923D /* minipro */,
 				5A559CA12D3F41A2000A364C /* infoic.xml */,
 				5A559C9E2D3F3F60000A364C /* logicic.xml */,
-				5A75B9B72D3CED2D00DF9FA7 /* minipro */,
 				5A13785B2D3A0900006F0165 /* MiniproUI */,
 				5A13786D2D3A0901006F0165 /* MiniproUITests */,
 				5A1378772D3A0901006F0165 /* MiniproUIUITests */,
@@ -450,7 +450,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = MiniproUI/MiniproUI.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
