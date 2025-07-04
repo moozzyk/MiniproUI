@@ -4,6 +4,7 @@
 
 ## User settings
 xcuserdata/
+xcshareddata/
 
 ## Obj-C/Swift specific
 *.hmap
@@ -64,6 +65,7 @@ fastlane/test_output
 # Misc
 .DS_Store
 /minipro
+/minipro_rel
 libusb-1.0.0.dylib
 infoic.xml
 logicic.xml

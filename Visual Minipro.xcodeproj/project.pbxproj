@@ -11,7 +11,7 @@
 		5A559CA22D3F41A2000A364C /* infoic.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5A559CA12D3F41A2000A364C /* infoic.xml */; };
 		5A75B9B42D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; };
 		5A75B9B52D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		5A75B9B82D3CED2D00DF9FA7 /* minipro in Embed minipro */ = {isa = PBXBuildFile; fileRef = 5A75B9B72D3CED2D00DF9FA7 /* minipro */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5A75B9B82D3CED2D00DF9FA7 /* minipro in Embed minipro */ = {isa = PBXBuildFile; fileRef = 5A75B9B72D3CED2D00DF9FA7 /* minipro */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -358,6 +358,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = QYNLSX6HFA;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -421,6 +422,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = QYNLSX6HFA;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -482,7 +484,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = MiniproUI/MiniproUI.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
