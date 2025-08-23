@@ -4,7 +4,7 @@
 
 The missing Mac OS app for [XGecu](http://www.xgecu.com/en/) programmers. 
 
-I built [Visual Minipro](https://apps.apple.com/us/app/visual-minipro/id6747261192) because I couldn't find a user-friendly way to interact with XGecu programmers (TL866CS, TL866A, TL866II+, T48, T56) on Mac.
+I built [Visual Minipro](https://apps.apple.com/app/id6747261192) because I couldn't find a user-friendly way to interact with XGecu programmers (TL866CS, TL866A, TL866II+, T48, T56) on Mac.
 
 ## Features
 
