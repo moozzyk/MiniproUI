@@ -6,14 +6,34 @@
 //
 
 import Foundation
+import os
 
-struct InvocationResult {
+struct InvocationResult: CustomDebugStringConvertible {
     let exitCode: Int32
     let stdOut: Data
     let stdErr: String
 
     var stdOutString: String {
         String(data: stdOut, encoding: .utf8) ?? ""
+    }
+
+    var debugDescription: String {
+        return
+            """
+            exitCode: \(exitCode)
+            stdOut: \(shorten(stdOutString))
+            stdErr: \(shorten(stdErr))
+            """
+    }
+
+    private func shorten(_ string: String) -> String {
+        let maxLength = 500
+        if string.count <= maxLength {
+            return string
+        }
+        let prefix = string.prefix(maxLength / 2)
+        let suffix = string.suffix(maxLength / 2)
+        return "\(prefix)...\(suffix)"
     }
 }
 
@@ -26,14 +46,16 @@ class MiniproInvoker {
 
     public static func invoke(arguments: [String], stdinData: Data? = nil) async throws -> InvocationResult {
         return try await withCheckedThrowingContinuation { continuation in
+            let logger = Logger(subsystem: "com.3d-logic.minitpro", category: "MiniproInvoker")
             guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro")
             else {
+                logger.error("minipro executable not found")
                 continuation.resume(throwing: InvocationError.executableNotFound)
                 return
             }
             queue.async {
                 do {
-                    print("starting \(arguments)")
+                    logger.notice("invoking minipro with arguments: \(arguments, privacy: .public)")
                     var stdout = Data()
                     var stderr = Data()
                     let stdoutPipe = Pipe()
@@ -60,14 +82,13 @@ class MiniproInvoker {
 
                     }
                     process.waitUntilExit()
-                    print("completed \(arguments)")
-                    continuation.resume(
-                        returning:
-                            InvocationResult(
-                                exitCode: process.terminationStatus,
-                                stdOut: stdout,
-                                stdErr: String(data: stderr, encoding: .utf8) ?? ""
-                            ))
+                    let invocationResult = InvocationResult(
+                        exitCode: process.terminationStatus,
+                        stdOut: stdout,
+                        stdErr: String(data: stderr, encoding: .utf8) ?? ""
+                    )
+                    logger.notice("invocation completed \(String(describing: invocationResult), privacy: .public)")
+                    continuation.resume(returning: invocationResult)
                 } catch {
                     continuation.resume(throwing: error)
                 }
