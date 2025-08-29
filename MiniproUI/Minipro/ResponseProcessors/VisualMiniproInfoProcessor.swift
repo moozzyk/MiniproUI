@@ -13,21 +13,38 @@ struct VisualMiniproInfo: Equatable, Hashable {
 }
 
 class VisualMiniproInfoProcessor {
-    private static let miniproVersion = /(minipro version) (\S+)/
+    private static let miniproVersion = /minipro version\s+(\S+)/
     private static let miniproCommitKeys = [
         "Commit date", "Git commit", "Git branch",
     ]
 
     public static func run(_ result: InvocationResult) throws -> VisualMiniproInfo {
-        let resultLines = result.stdErr.split(separator: "\n")
+        return VisualMiniproInfo(
+            visualMiniproDetails: getVisualMiniproDetails(), miniproDetails: getMiniproDetails(result))
+    }
 
+    private static func getVisualMiniproDetails() -> [KeyValuePair] {
+        let visualMiniproDetails = [
+            KeyValuePair(key: "Version", value: extractBundleMetadata("CFBundleShortVersionString"))
+        ]
+        return visualMiniproDetails
+    }
+
+    private static func extractBundleMetadata(_ key: String) -> String {
+        return Bundle.main.infoDictionary?[key] as? String ?? "Unknown"
+    }
+
+    private static func getMiniproDetails(_ result: InvocationResult) -> [KeyValuePair] {
+        let resultLines = result.stdErr.split(separator: "\n")
         let miniProversionMatch = try? miniproVersion.firstMatch(in: result.stdErr)
 
         var miniproCommitInfo: [KeyValuePair] = []
         if let miniProversionMatch {
-            miniproCommitInfo.append(KeyValuePair(key: String(miniProversionMatch.1), value: String(miniProversionMatch.2)))
+            miniproCommitInfo.append(
+                KeyValuePair(key: "Version", value: String(miniProversionMatch.1)))
         }
         miniproCommitInfo.append(contentsOf: extractInfo(resultLines: resultLines, keys: miniproCommitKeys))
-        return VisualMiniproInfo(visualMiniproDetails: [], miniproDetails: miniproCommitInfo)
+        return miniproCommitInfo
     }
+
 }
