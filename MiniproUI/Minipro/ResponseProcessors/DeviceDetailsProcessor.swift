@@ -7,11 +7,6 @@
 
 import Foundation
 
-struct KeyValuePair: Equatable, Hashable {
-    let key: String
-    let value: String
-}
-
 struct DeviceDetails: Equatable, Hashable {
     let name: String
     let deviceInfo: [KeyValuePair]
@@ -38,20 +33,5 @@ class DeviceDetailsProcessor {
         let isLogicChip = deviceInfo.last?.key == "Vector count"
         return DeviceDetails(
             name: name, deviceInfo: deviceInfo, programmingInfo: programmingInfo, isLogicChip: isLogicChip)
-    }
-
-    private static func extractInfo(resultLines: [Substring], keys: [String]) -> [KeyValuePair] {
-        var info = [KeyValuePair]()
-        keys.forEach { key in
-            resultLines.forEach { line in
-                if line.starts(with: key) {
-                    info.append(
-                        KeyValuePair(
-                            key: key,
-                            value: line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)))
-                }
-            }
-        }
-        return info
     }
 }

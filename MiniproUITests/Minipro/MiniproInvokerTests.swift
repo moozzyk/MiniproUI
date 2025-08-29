@@ -7,7 +7,7 @@
 
 import Testing
 
-@testable import MiniproUI
+@testable import Visual_Minipro
 
 struct MiniproInvokerTests {
     @Test func testInvokeNoError() async throws {

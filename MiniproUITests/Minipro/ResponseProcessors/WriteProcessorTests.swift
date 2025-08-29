@@ -8,7 +8,7 @@
 import Foundation
 import Testing
 
-@testable import MiniproUI
+@testable import Visual_Minipro
 
 struct WriteProcessorTests {
 

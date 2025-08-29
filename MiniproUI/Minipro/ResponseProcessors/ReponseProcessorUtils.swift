@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct KeyValuePair: Equatable, Hashable {
+    let key: String
+    let value: String
+}
+
 func ensureNoError(invocationResult: InvocationResult) throws {
     let stdErr = invocationResult.stdErr
 
@@ -45,4 +50,19 @@ func ensureNoError(invocationResult: InvocationResult) throws {
     if let matchedString = stdErr.firstMatch(of: invalidChipId) {
         throw MiniproAPIError.invalidChip(String(matchedString.1), String(matchedString.2))
     }
+}
+
+func extractInfo(resultLines: [Substring], keys: [String]) -> [KeyValuePair] {
+    var info = [KeyValuePair]()
+    keys.forEach { key in
+        resultLines.forEach { line in
+            if line.starts(with: key) {
+                info.append(
+                    KeyValuePair(
+                        key: key,
+                        value: line.dropFirst(key.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)))
+            }
+        }
+    }
+    return info
 }

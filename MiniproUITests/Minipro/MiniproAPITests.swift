@@ -8,7 +8,7 @@
 import Foundation
 import Testing
 
-@testable import MiniproUI
+@testable import Visual_Minipro
 
 struct MiniproAPITests {
     @Sendable static func isW27C512Present() async throws -> Bool {

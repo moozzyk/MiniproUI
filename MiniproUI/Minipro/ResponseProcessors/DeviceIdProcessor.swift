@@ -17,7 +17,6 @@ class DeviceIdProcessor {
             throw MiniproAPIError.chipIdMismatch(String(chipIdMismatchMatch.1), String(chipIdMismatchMatch.2))
         }
 
-
         let chipIdRegex = /Chip ID: +(\S+) +OK/
         if let chipId = try? chipIdRegex.firstMatch(in: result.stdErr)?.1 {
             return String(chipId)

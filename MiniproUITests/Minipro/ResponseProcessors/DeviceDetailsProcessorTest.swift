@@ -7,7 +7,7 @@
 
 import Testing
 
-@testable import MiniproUI
+@testable import Visual_Minipro
 import Foundation
 
 struct DeviceDetailsProcessorTest {
