@@ -11,11 +11,13 @@ enum ViewType: String, Hashable, CaseIterable {
     case epromProgramming = "Chip Programming"
     case logicIcTest = "Logic IC Test"
     case programmerInfo = "Programmer Information"
+    case visualMiniproInfo = "About Visual Minipro"
 }
 
 class MiniproModel: ObservableObject {
     @Published var programmerInfo: ProgrammerInfo?
     @Published var supportedDevices: [String] = []
+    // TODO: Add Visual Minipro details here to avoid flicker
 }
 
 struct ContentView: View {
@@ -37,8 +39,14 @@ struct ContentView: View {
             } else if selectedItem == .logicIcTest {
                 LogicICTestView(supportedDevices: $model.supportedDevices)
                     .navigationTitle(selectedItem.rawValue)
-            } else {
+            } else if selectedItem == .epromProgramming {
                 ChipProgrammingView(supportedDevices: $model.supportedDevices)
+                    .navigationTitle(selectedItem.rawValue)
+            } else if selectedItem == .visualMiniproInfo {
+                VisualMiniproInfoView()
+                    .navigationTitle(selectedItem.rawValue)
+            } else {
+                VisualMiniproInfoView()
                     .navigationTitle(selectedItem.rawValue)
             }
         }

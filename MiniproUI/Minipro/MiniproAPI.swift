@@ -66,7 +66,7 @@ class MiniproAPI {
         try UpdateFirmwareProcessor.run(result)
     }
 
-    static func miniproInfo() async throws -> VisualMiniproInfo {
+    static func getVisualMiniproInfo() async throws -> VisualMiniproInfo {
         let result = try await MiniproInvoker.invoke(arguments: ["--version"])
         return try VisualMiniproInfoProcessor.run(result)
     }

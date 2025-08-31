@@ -9,7 +9,11 @@ import Foundation
 
 struct VisualMiniproInfo: Equatable, Hashable {
     let visualMiniproDetails: [KeyValuePair]
-    let miniproDetails: [KeyValuePair]
+    var version: String {
+        get {
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        }
+    }
 }
 
 class VisualMiniproInfoProcessor {
@@ -19,13 +23,11 @@ class VisualMiniproInfoProcessor {
     ]
 
     public static func run(_ result: InvocationResult) throws -> VisualMiniproInfo {
-        return VisualMiniproInfo(
-            visualMiniproDetails: getVisualMiniproDetails(), miniproDetails: getMiniproDetails(result))
+        return VisualMiniproInfo(visualMiniproDetails: getVisualMiniproDetails() + getMiniproDetails(result))
     }
 
     private static func getVisualMiniproDetails() -> [KeyValuePair] {
         let visualMiniproDetails = [
-            KeyValuePair(key: "Version", value: extractBundleMetadata("CFBundleShortVersionString")),
             KeyValuePair(key: "Commit date", value: getCommitDate()),
             KeyValuePair(key: "Git commit", value: getGitCommit()),
             KeyValuePair(key: "Git branch", value: getGitBranch()),
@@ -33,21 +35,20 @@ class VisualMiniproInfoProcessor {
         return visualMiniproDetails
     }
 
-    private static func extractBundleMetadata(_ key: String) -> String {
-        return Bundle.main.infoDictionary?[key] as? String ?? "Unknown"
-    }
-
     private static func getMiniproDetails(_ result: InvocationResult) -> [KeyValuePair] {
         let resultLines = result.stdErr.split(separator: "\n")
-        let miniProversionMatch = try? miniproVersion.firstMatch(in: result.stdErr)
-
-        var miniproCommitInfo: [KeyValuePair] = []
-        if let miniProversionMatch {
-            miniproCommitInfo.append(
-                KeyValuePair(key: "Version", value: String(miniProversionMatch.1)))
+        let miniproCommitInfo = extractInfo(resultLines: resultLines, keys: miniproCommitKeys).map{
+            KeyValuePair(key: "minipro \($0.key.lowercased())", value: $0.value)
         }
-        miniproCommitInfo.append(contentsOf: extractInfo(resultLines: resultLines, keys: miniproCommitKeys))
-        return miniproCommitInfo
+
+        return extractMiniproVersion(from: result.stdErr) + miniproCommitInfo
     }
 
+    private static func extractMiniproVersion(from stdErr: String) -> [KeyValuePair] {
+        let miniProversionMatch = try? miniproVersion.firstMatch(in: stdErr)
+        if let miniProversionMatch {
+            return [KeyValuePair(key: "minipro version", value: String(miniProversionMatch.1))]
+        }
+        return []
+    }
 }

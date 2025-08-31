@@ -42,19 +42,17 @@ struct VisualMiniproInfoProcessorTest {
 
         let expected = VisualMiniproInfo(
             visualMiniproDetails: [
-                KeyValuePair(
-                    key: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String),
                 KeyValuePair(key: "Commit date", value: getCommitDate()),
                 KeyValuePair(key: "Git commit", value: getGitCommit()),
                 KeyValuePair(key: "Git branch", value: getGitBranch()),
-            ],
-            miniproDetails: [
-                KeyValuePair(key: "Version", value: "0.7.2"),
-                KeyValuePair(key: "Commit date", value: "2024-12-26 21:31:24 -0800"),
-                KeyValuePair(key: "Git commit", value: "b9cee362816931a5679ed20bf4ae7bff4b4c1fbb"),
-                KeyValuePair(key: "Git branch", value: "master"),
+                KeyValuePair(key: "minipro version", value: "0.7.2"),
+                KeyValuePair(key: "minipro commit date", value: "2024-12-26 21:31:24 -0800"),
+                KeyValuePair(key: "minipro git commit", value: "b9cee362816931a5679ed20bf4ae7bff4b4c1fbb"),
+                KeyValuePair(key: "minipro git branch", value: "master"),
             ])
 
-        #expect(try VisualMiniproInfoProcessor.run(miniproResult) == expected)
+        let visualMiniproInfo = try VisualMiniproInfoProcessor.run(miniproResult)
+        #expect(visualMiniproInfo.version == Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)
+        #expect(visualMiniproInfo == expected)
     }
 }
