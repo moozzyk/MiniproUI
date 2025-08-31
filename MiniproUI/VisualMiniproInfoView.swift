@@ -20,6 +20,7 @@ struct VisualMiniproInfoView: View {
                 Form {
                     Section(
                         header: HStack {
+                            Image("VisualMiniproIconImage")
                             Text("About Visual Minipro")
                         }
                     ) {
