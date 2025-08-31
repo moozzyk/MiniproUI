@@ -43,7 +43,10 @@ struct VisualMiniproInfoProcessorTest {
         let expected = VisualMiniproInfo(
             visualMiniproDetails: [
                 KeyValuePair(
-                    key: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)
+                    key: "Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String),
+                KeyValuePair(key: "Commit date", value: getCommitDate()),
+                KeyValuePair(key: "Git commit", value: getGitCommit()),
+                KeyValuePair(key: "Git branch", value: getGitBranch()),
             ],
             miniproDetails: [
                 KeyValuePair(key: "Version", value: "0.7.2"),

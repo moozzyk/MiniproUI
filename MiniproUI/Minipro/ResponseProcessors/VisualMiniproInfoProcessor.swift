@@ -25,7 +25,10 @@ class VisualMiniproInfoProcessor {
 
     private static func getVisualMiniproDetails() -> [KeyValuePair] {
         let visualMiniproDetails = [
-            KeyValuePair(key: "Version", value: extractBundleMetadata("CFBundleShortVersionString"))
+            KeyValuePair(key: "Version", value: extractBundleMetadata("CFBundleShortVersionString")),
+            KeyValuePair(key: "Commit date", value: getCommitDate()),
+            KeyValuePair(key: "Git commit", value: getGitCommit()),
+            KeyValuePair(key: "Git branch", value: getGitBranch()),
         ]
         return visualMiniproDetails
     }

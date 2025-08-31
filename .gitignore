@@ -71,3 +71,5 @@ libusb-1.0.0.dylib
 infoic.xml
 logicic.xml
 /misc
+
+MiniproUI/BuildInfo.swift
