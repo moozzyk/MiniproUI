@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct VisualMiniproInfoView: View {
-    @State var visualMiniproInfo: VisualMiniproInfo?
+    @Binding var visualMiniproInfo: VisualMiniproInfo?
 
     var body: some View {
         ZStack {
@@ -51,5 +51,6 @@ struct VisualMiniproInfoView: View {
 }
 
 #Preview {
-    VisualMiniproInfoView()
+    VisualMiniproInfoView(visualMiniproInfo: .constant(nil))
 }
+

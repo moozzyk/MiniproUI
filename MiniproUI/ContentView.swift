@@ -17,7 +17,7 @@ enum ViewType: String, Hashable, CaseIterable {
 class MiniproModel: ObservableObject {
     @Published var programmerInfo: ProgrammerInfo?
     @Published var supportedDevices: [String] = []
-    // TODO: Add Visual Minipro details here to avoid flicker
+    @Published var visualMiniproInfo: VisualMiniproInfo?
 }
 
 struct ContentView: View {
@@ -31,6 +31,7 @@ struct ContentView: View {
             }.task {
                 model.supportedDevices = (try? await MiniproAPI.getSupportedDevices()) ?? []
                 model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
+                model.visualMiniproInfo = try? await MiniproAPI.getVisualMiniproInfo()
             }
         } detail: {
             if selectedItem == .programmerInfo {
@@ -43,10 +44,10 @@ struct ContentView: View {
                 ChipProgrammingView(supportedDevices: $model.supportedDevices)
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {
-                VisualMiniproInfoView()
+                VisualMiniproInfoView(visualMiniproInfo: $model.visualMiniproInfo)
                     .navigationTitle(selectedItem.rawValue)
             } else {
-                VisualMiniproInfoView()
+                VisualMiniproInfoView(visualMiniproInfo: $model.visualMiniproInfo)
                     .navigationTitle(selectedItem.rawValue)
             }
         }
