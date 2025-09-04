@@ -17,7 +17,7 @@ class MiniproAPI {
         let _ = try await getProgrammerInfo()
     }
     static func getProgrammerInfo() async throws -> ProgrammerInfo {
-        let result = try await MiniproInvoker.invoke(arguments: ["-t"])
+        let result = try await MiniproInvoker.invoke(arguments: ["--version"])
         return try ProgrammerInfoProcessor.run(result)
     }
 
