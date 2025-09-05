@@ -25,6 +25,7 @@ struct VisualMiniproInfoView: View {
                         }
                     ) {
                         Section {
+                            PropertyRow(label: "Version", value: visualMiniproInfo?.version ?? "Unknown")
                             ForEach(visualMiniproInfo?.visualMiniproDetails ?? [], id: \.self) {
                                 PropertyRow(label: $0.key, value: $0.value)
                             }
