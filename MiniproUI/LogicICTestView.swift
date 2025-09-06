@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LogicICTestView: View {
-    @Binding var supportedDevices: [String]
+    @Binding var supportedLogicICs: [String]
     @State private var selectedDevice: String? = nil
     @State private var deviceDetails: DeviceDetails? = nil
     @State private var logicICTestResult: LogicICTestResult? = nil
@@ -18,13 +18,13 @@ struct LogicICTestView: View {
             TabHeaderView(
                 caption: "Selected Logic IC: " + (deviceDetails?.name ?? "None"),
                 systemImageName: "flask.fill")
-            if supportedDevices.isEmpty {
+            if supportedLogicICs.isEmpty {
                 Form {
                     ProgrammerNotConnected()
                 }.formStyle(.grouped)
             } else {
                 HStack {
-                    SearchableListView(items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: false)
+                    SearchableListView(items: $supportedLogicICs, selectedItem: $selectedDevice, isCollapsible: false)
                         .frame(maxWidth: 300)
                         .padding(20)
                     VStack {
@@ -47,7 +47,7 @@ struct LogicICTestView: View {
                 }
             }
         }.task {
-            supportedDevices = (try? await MiniproAPI.getSupportedDevices()) ?? []
+            supportedLogicICs = (try? await MiniproAPI.getSupportedDevices())?.logicICs ?? []
         }.onChange(of: selectedDevice) {
             Task {
                 if let device = selectedDevice {
@@ -60,5 +60,5 @@ struct LogicICTestView: View {
 }
 
 #Preview {
-    LogicICTestView(supportedDevices: .constant(["7400", "7404", "PIC16LF505"]))
+    LogicICTestView(supportedLogicICs: .constant(["7400", "7404", "PIC16LF505"]))
 }

@@ -13,7 +13,7 @@ struct DialogErrorMessage: Identifiable {
 }
 
 struct ChipProgrammingView: View {
-    @Binding var supportedDevices: [String]
+    @Binding var supportedEEPROMs: [String]
     @State private var selectedDevice: String?
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
@@ -47,7 +47,7 @@ struct ChipProgrammingView: View {
                         ReadChipButton(device: deviceDetails, buffer: $buffer, progressMessage: $progressMessage)
                         WriteChipButton(device: deviceDetails, buffer: buffer, progressMessage: $progressMessage)
                     }
-                    if supportedDevices.isEmpty {
+                    if supportedEEPROMs.isEmpty {
                         VStack {
                             Form {
                                 ProgrammerNotConnected()
@@ -66,7 +66,7 @@ struct ChipProgrammingView: View {
                             }
                             VStack {
                                 SearchableListView(
-                                    items: $supportedDevices, selectedItem: $selectedDevice, isCollapsible: true
+                                    items: $supportedEEPROMs, selectedItem: $selectedDevice, isCollapsible: true
                                 )
                                 .frame(maxWidth: 658, maxHeight: 600)
                                 .padding([.trailing])
@@ -155,5 +155,5 @@ struct WriteChipButton: View {
 }
 
 #Preview {
-    ChipProgrammingView(supportedDevices: .constant(["7400", "7404", "PIC16LF505"]))
+    ChipProgrammingView(supportedEEPROMs: .constant(["7400", "7404", "PIC16LF505"]))
 }

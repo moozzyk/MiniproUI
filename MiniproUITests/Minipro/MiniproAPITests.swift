@@ -28,9 +28,12 @@ struct MiniproAPITests {
 
     @Test func testGetSupportedDevices() async throws {
         let result = try await MiniproAPI.getSupportedDevices()
-        #expect(result.count > 1000)
-        #expect(result.contains("AM29F040B@DIP32"))
-        #expect(result.count == Set(result).count)
+        #expect(result.logicICs.count > 100 && result.logicICs.count < 1000)
+        #expect(result.logicICs.contains("7400"))
+        #expect(result.logicICs.count == Set(result.logicICs).count)
+        #expect(result.eepromICs.count > 1000)
+        #expect(result.eepromICs.contains("AM29F040B@DIP32"))
+        #expect(result.eepromICs.count == Set(result.eepromICs).count)
     }
 
     @Test func testGetDevicesDetials() async throws {

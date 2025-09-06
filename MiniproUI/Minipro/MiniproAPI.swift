@@ -21,7 +21,7 @@ class MiniproAPI {
         return try ProgrammerInfoProcessor.run(result)
     }
 
-    static func getSupportedDevices() async throws -> [String] {
+    static func getSupportedDevices() async throws -> SupportedDevices {
         try await ensureProgrammerConnected()
         let result = try await MiniproInvoker.invoke(arguments: ["-l"])
         return try SupportedDevicesProcessor.run(result)

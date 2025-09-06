@@ -16,7 +16,8 @@ enum ViewType: String, Hashable, CaseIterable {
 
 class MiniproModel: ObservableObject {
     @Published var programmerInfo: ProgrammerInfo?
-    @Published var supportedDevices: [String] = []
+    @Published var supportedLogicICs: [String] = []
+    @Published var supportedEEPROMs: [String] = []
     @Published var visualMiniproInfo: VisualMiniproInfo?
 }
 
@@ -29,7 +30,9 @@ struct ContentView: View {
             List(ViewType.allCases, id: \.self, selection: $selectedItem) { item in
                 Text(item.rawValue)
             }.task {
-                model.supportedDevices = (try? await MiniproAPI.getSupportedDevices()) ?? []
+                let supportedDevices = try? await MiniproAPI.getSupportedDevices()
+                model.supportedLogicICs = supportedDevices?.logicICs ?? []
+                model.supportedEEPROMs = supportedDevices?.eepromICs ?? []
                 model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
                 model.visualMiniproInfo = try? await MiniproAPI.getVisualMiniproInfo()
             }
@@ -38,10 +41,10 @@ struct ContentView: View {
                 ProgrammerInfoView(programmerInfo: $model.programmerInfo)
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .logicIcTest {
-                LogicICTestView(supportedDevices: $model.supportedDevices)
+                LogicICTestView(supportedLogicICs: $model.supportedLogicICs)
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .epromProgramming {
-                ChipProgrammingView(supportedDevices: $model.supportedDevices)
+                ChipProgrammingView(supportedEEPROMs: $model.supportedEEPROMs)
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {
                 VisualMiniproInfoView(visualMiniproInfo: $model.visualMiniproInfo)
