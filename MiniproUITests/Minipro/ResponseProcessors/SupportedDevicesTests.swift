@@ -77,10 +77,10 @@ struct SupportedDevicesTests {
 
         let supportedDevices = try SupportedDevicesProcessor.run(miniproResult)
         #expect(
-            supportedDevices.logicICs == ["7497", "8212(custom)", "82C55A-5(OKI)(custom)"])
+            supportedDevices.logicICs == ["7497", "8212", "82C55A-5(OKI)"])
         #expect(
             supportedDevices.eepromICs == [
-                "(EVERSPIN)MR0A16A@SSOP44(0.8mm)", "ACE24AC04", "ATF750C-TEST(custom)",
+                "(EVERSPIN)MR0A16A@SSOP44(0.8mm)", "ACE24AC04", "ATF750C-TEST",
             ])
     }
 

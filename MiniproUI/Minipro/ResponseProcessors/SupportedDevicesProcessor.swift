@@ -34,9 +34,7 @@ class SupportedDevicesProcessor {
                     icNames.insert(
                         name.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(
                             of: "\t", with: "&#9;"))
-                    // Custom chips have "(custom)" appended to their names:
-                    // https://gitlab.com/DavidGriffith/minipro/-/blob/master/src/database.c#L516
-                    icNames.insert(name.trimmingCharacters(in: .whitespacesAndNewlines) + "(custom)")
+                    icNames.insert(name.trimmingCharacters(in: .whitespacesAndNewlines))
                 }
             }
         }
@@ -46,7 +44,12 @@ class SupportedDevicesProcessor {
     public static func run(_ result: InvocationResult) throws -> SupportedDevices {
         try ensureNoError(invocationResult: result)
 
-        let lines = result.stdOutString.components(separatedBy: .newlines)
+        // Custom chips have "(custom)" appended to their names:
+        // https://gitlab.com/DavidGriffith/minipro/-/blob/master/src/database.c#L516
+        let lines = result.stdOutString.components(separatedBy: .newlines).map {
+            $0.replacingOccurrences(of: #"\(custom\)"#, with: "", options: .regularExpression)
+        }.filter { !$0.isEmpty }
+
         return SupportedDevices(
             logicICs: getLogicICs(lines),
             eepromICs: getEepromICs(lines))
