@@ -19,6 +19,7 @@ class MiniproModel: ObservableObject {
     @Published var supportedLogicICs: [String] = []
     @Published var supportedEEPROMs: [String] = []
     @Published var logicICDetails: DeviceDetails?
+    @Published var logicICTestResult: LogicICTestResult?
     @Published var visualMiniproInfo: VisualMiniproInfo?
 }
 
@@ -42,8 +43,11 @@ struct ContentView: View {
                 ProgrammerInfoView(programmerInfo: $model.programmerInfo)
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .logicIcTest {
-                LogicICTestView(supportedLogicICs: $model.supportedLogicICs, logicICDetails: $model.logicICDetails)
-                    .navigationTitle(selectedItem.rawValue)
+                LogicICTestView(
+                    supportedLogicICs: $model.supportedLogicICs, logicICDetails: $model.logicICDetails,
+                    logicICTestResult: $model.logicICTestResult
+                )
+                .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .epromProgramming {
                 ChipProgrammingView(supportedEEPROMs: $model.supportedEEPROMs)
                     .navigationTitle(selectedItem.rawValue)
@@ -61,4 +65,3 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
-

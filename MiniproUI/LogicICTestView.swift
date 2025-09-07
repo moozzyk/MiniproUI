@@ -10,8 +10,8 @@ import SwiftUI
 struct LogicICTestView: View {
     @Binding var supportedLogicICs: [String]
     @Binding var logicICDetails: DeviceDetails?
+    @Binding var logicICTestResult: LogicICTestResult?
     @State private var selectedDevice: String? = nil
-    @State private var logicICTestResult: LogicICTestResult? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -60,5 +60,7 @@ struct LogicICTestView: View {
 }
 
 #Preview {
-    LogicICTestView(supportedLogicICs: .constant(["7400", "7404", "PIC16LF505"]), logicICDetails: .constant(nil))
+    LogicICTestView(
+        supportedLogicICs: .constant(["7400", "7404", "PIC16LF505"]), logicICDetails: .constant(nil),
+        logicICTestResult: .constant(nil))
 }
