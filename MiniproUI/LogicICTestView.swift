@@ -9,14 +9,14 @@ import SwiftUI
 
 struct LogicICTestView: View {
     @Binding var supportedLogicICs: [String]
+    @Binding var logicICDetails: DeviceDetails?
     @State private var selectedDevice: String? = nil
-    @State private var deviceDetails: DeviceDetails? = nil
     @State private var logicICTestResult: LogicICTestResult? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             TabHeaderView(
-                caption: "Selected Logic IC: " + (deviceDetails?.name ?? "None"),
+                caption: "Selected Logic IC: " + (logicICDetails?.name ?? "None"),
                 systemImageName: "flask.fill")
             if supportedLogicICs.isEmpty {
                 Form {
@@ -28,15 +28,15 @@ struct LogicICTestView: View {
                         .frame(maxWidth: 300)
                         .padding(20)
                     VStack {
-                        if deviceDetails != nil {
-                            DeviceDetailsView(expectLogicChip: true, deviceDetails: $deviceDetails)
+                        if logicICDetails != nil {
+                            DeviceDetailsView(expectLogicChip: true, deviceDetails: $logicICDetails)
                             Button("Test") {
                                 Task {
                                     logicICTestResult = try? await MiniproAPI.testLogicIC(
-                                        device: deviceDetails!.name)
+                                        device: logicICDetails!.name)
                                 }
                             }
-                            .disabled(!(deviceDetails?.isLogicChip ?? true))
+                            .disabled(!(logicICDetails?.isLogicChip ?? true))
                             if logicICTestResult == nil {
                                 Spacer()
                             }
@@ -51,7 +51,7 @@ struct LogicICTestView: View {
         }.onChange(of: selectedDevice) {
             Task {
                 if let device = selectedDevice {
-                    deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device)
+                    logicICDetails = try? await MiniproAPI.getDeviceDetails(device: device)
                 }
                 logicICTestResult = nil
             }
@@ -60,5 +60,5 @@ struct LogicICTestView: View {
 }
 
 #Preview {
-    LogicICTestView(supportedLogicICs: .constant(["7400", "7404", "PIC16LF505"]))
+    LogicICTestView(supportedLogicICs: .constant(["7400", "7404", "PIC16LF505"]), logicICDetails: .constant(nil))
 }
