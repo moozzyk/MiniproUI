@@ -13,7 +13,7 @@ struct DialogErrorMessage: Identifiable {
 }
 
 struct ChipProgrammingView: View {
-    @Binding var supportedEEPROMs: [String]
+    @Binding var supportedDevices: SupportedDevices?
     @State private var selectedDevice: String?
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
@@ -47,6 +47,7 @@ struct ChipProgrammingView: View {
                         ReadChipButton(device: deviceDetails, buffer: $buffer, progressMessage: $progressMessage)
                         WriteChipButton(device: deviceDetails, buffer: buffer, progressMessage: $progressMessage)
                     }
+                    let supportedEEPROMs = supportedDevices?.eepromICs ?? []
                     if supportedEEPROMs.isEmpty {
                         VStack {
                             Form {
@@ -66,7 +67,8 @@ struct ChipProgrammingView: View {
                             }
                             VStack {
                                 SearchableListView(
-                                    items: $supportedEEPROMs, selectedItem: $selectedDevice, isCollapsible: true
+                                    items: supportedEEPROMs, selectedItem: $selectedDevice,
+                                    isCollapsible: true
                                 )
                                 .frame(maxWidth: 658, maxHeight: 600)
                                 .padding([.trailing])
@@ -85,7 +87,7 @@ struct ChipProgrammingView: View {
             }
         }
         .task {
-            supportedEEPROMs = (try? await MiniproAPI.getSupportedDevices())?.eepromICs ?? []
+            supportedDevices = try? await MiniproAPI.getSupportedDevices()
         }
         .onChange(of: selectedDevice) {
             Task {
@@ -158,5 +160,5 @@ struct WriteChipButton: View {
 }
 
 #Preview {
-    ChipProgrammingView(supportedEEPROMs: .constant(["7400", "7404", "PIC16LF505"]))
+    ChipProgrammingView(supportedDevices: .constant(nil))
 }

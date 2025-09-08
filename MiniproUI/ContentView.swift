@@ -21,6 +21,7 @@ class MiniproModel: ObservableObject {
     @Published var logicICDetails: DeviceDetails?
     @Published var logicICTestResult: LogicICTestResult?
     @Published var visualMiniproInfo: VisualMiniproInfo?
+    @Published var supportedDevices: SupportedDevices?
 }
 
 struct ContentView: View {
@@ -32,9 +33,7 @@ struct ContentView: View {
             List(ViewType.allCases, id: \.self, selection: $selectedItem) { item in
                 Text(item.rawValue)
             }.task {
-                let supportedDevices = try? await MiniproAPI.getSupportedDevices()
-                model.supportedLogicICs = supportedDevices?.logicICs ?? []
-                model.supportedEEPROMs = supportedDevices?.eepromICs ?? []
+                model.supportedDevices = try? await MiniproAPI.getSupportedDevices()
                 model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
                 model.visualMiniproInfo = try? await MiniproAPI.getVisualMiniproInfo()
             }
@@ -44,12 +43,12 @@ struct ContentView: View {
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .logicIcTest {
                 LogicICTestView(
-                    supportedLogicICs: $model.supportedLogicICs, logicICDetails: $model.logicICDetails,
+                    supportedDevices: $model.supportedDevices, logicICDetails: $model.logicICDetails,
                     logicICTestResult: $model.logicICTestResult
                 )
                 .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .epromProgramming {
-                ChipProgrammingView(supportedEEPROMs: $model.supportedEEPROMs)
+                ChipProgrammingView(supportedDevices: $model.supportedDevices)
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {
                 VisualMiniproInfoView(visualMiniproInfo: $model.visualMiniproInfo)

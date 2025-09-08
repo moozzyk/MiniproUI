@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchableListView: View {
-    @Binding var items: [String]
+    let items: [String]
     @Binding var selectedItem: String?
     @State var searchText: String = ""
     @State var shouldShowList = true
@@ -77,5 +77,5 @@ struct SearchBar: View {
 }
 
 #Preview {
-    SearchableListView(items: .constant(["apple", "orange", "banana"]), selectedItem: .constant(nil), isCollapsible: false)
+    SearchableListView(items: ["apple", "orange", "banana"], selectedItem: .constant(nil), isCollapsible: false)
 }
