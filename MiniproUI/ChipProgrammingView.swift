@@ -84,6 +84,9 @@ struct ChipProgrammingView: View {
                 ProgressDialogView(label: progressMessage)
             }
         }
+        .task {
+            supportedEEPROMs = (try? await MiniproAPI.getSupportedDevices())?.eepromICs ?? []
+        }
         .onChange(of: selectedDevice) {
             Task {
                 if let device = selectedDevice {
