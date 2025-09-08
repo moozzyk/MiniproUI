@@ -16,8 +16,6 @@ enum ViewType: String, Hashable, CaseIterable {
 
 class MiniproModel: ObservableObject {
     @Published var programmerInfo: ProgrammerInfo?
-    @Published var supportedLogicICs: [String] = []
-    @Published var supportedEEPROMs: [String] = []
     @Published var logicICDetails: DeviceDetails?
     @Published var logicICTestResult: LogicICTestResult?
     @Published var visualMiniproInfo: VisualMiniproInfo?
