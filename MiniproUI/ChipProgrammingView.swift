@@ -15,8 +15,8 @@ struct DialogErrorMessage: Identifiable {
 struct ChipProgrammingView: View {
     @Binding var supportedDevices: SupportedDevices?
     @Binding var deviceDetails: DeviceDetails?
+    @Binding var buffer: Data?
     @State private var selectedDevice: String?
-    @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
     @State private var progressMessage: String? = nil
 
@@ -163,5 +163,5 @@ struct WriteChipButton: View {
 }
 
 #Preview {
-    ChipProgrammingView(supportedDevices: .constant(nil), deviceDetails: .constant(nil))
+    ChipProgrammingView(supportedDevices: .constant(nil), deviceDetails: .constant(nil), buffer: .constant(nil))
 }
