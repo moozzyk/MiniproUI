@@ -14,10 +14,10 @@ struct DialogErrorMessage: Identifiable {
 
 struct ChipProgrammingView: View {
     @Binding var supportedDevices: SupportedDevices?
+    @Binding var deviceDetails: DeviceDetails?
     @State private var selectedDevice: String?
     @State private var buffer: Data?
     @State private var errorMessage: DialogErrorMessage?
-    @State private var deviceDetails: DeviceDetails? = nil
     @State private var progressMessage: String? = nil
 
     private var showProgress: Bool { progressMessage != nil }
@@ -88,6 +88,9 @@ struct ChipProgrammingView: View {
         }
         .task {
             supportedDevices = try? await MiniproAPI.getSupportedDevices()
+        }
+        .onAppear() {
+            selectedDevice = deviceDetails?.name
         }
         .onChange(of: selectedDevice) {
             Task {
@@ -160,5 +163,5 @@ struct WriteChipButton: View {
 }
 
 #Preview {
-    ChipProgrammingView(supportedDevices: .constant(nil))
+    ChipProgrammingView(supportedDevices: .constant(nil), deviceDetails: .constant(nil))
 }
