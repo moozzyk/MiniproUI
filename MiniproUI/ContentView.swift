@@ -19,7 +19,7 @@ class MiniproModel: ObservableObject {
     @Published var logicICDetails: DeviceDetails?
     @Published var logicICTestResult: LogicICTestResult?
     @Published var visualMiniproInfo: VisualMiniproInfo?
-    @Published var supportedDevices: SupportedDevices?
+    @Published var supportedDevices: SupportedDevices? = SupportedDevices(logicICs: [], eepromICs: ["Loading..."])
 }
 
 struct ContentView: View {
