@@ -46,7 +46,7 @@ class MiniproInvoker {
 
     public static func invoke(arguments: [String], stdinData: Data? = nil) async throws -> InvocationResult {
         return try await withCheckedThrowingContinuation { continuation in
-            let logger = Logger(subsystem: "com.3d-logic.minitpro", category: "MiniproInvoker")
+            let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "MiniproInvoker")
             guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro")
             else {
                 logger.error("minipro executable not found")
@@ -79,7 +79,6 @@ class MiniproInvoker {
                     if let stdinData = stdinData {
                         try stdInPipe.fileHandleForWriting.write(contentsOf: stdinData)
                         stdInPipe.fileHandleForWriting.closeFile()
-
                     }
                     process.waitUntilExit()
                     let invocationResult = InvocationResult(
