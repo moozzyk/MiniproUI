@@ -44,7 +44,12 @@ enum InvocationError: Error {
 class MiniproInvoker {
     private static let queue = DispatchQueue(label: "MiniproInvokeQueue")
 
-    public static func invoke(arguments: [String], stdinData: Data? = nil) async throws -> InvocationResult {
+    public static func invoke(
+        arguments: [String], stdinData: Data? = nil, onProgress: @escaping ((Data) -> Void) = ({ _ in })
+    )
+        async throws
+        -> InvocationResult
+    {
         return try await withCheckedThrowingContinuation { continuation in
             let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "MiniproInvoker")
             guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro")
@@ -65,7 +70,9 @@ class MiniproInvoker {
                         stdout.append(handle.availableData)
                     }
                     stderrPipe.fileHandleForReading.readabilityHandler = { handle in
-                        stderr.append(handle.availableData)
+                        let data = handle.availableData
+                        stderr.append(data)
+                        onProgress(data)
                     }
 
                     let process = Process()
