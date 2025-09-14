@@ -9,13 +9,14 @@ import SwiftUI
 
 struct ProgressDialogView: View {
     let label: String?
+    @Binding var progressUpdate: ProgressUpdate?
 
     var body: some View {
         VStack(spacing: 40) {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle())
             if let label = label {
-                Text(label)
+                Text("\(label) \(progressUpdate?.percentage ?? -1)")
             }
         }
         .padding(120)
@@ -28,5 +29,8 @@ struct ProgressDialogView: View {
 }
 
 #Preview {
-    ProgressDialogView(label: "Downloading Chip Contents...")
+    ProgressDialogView(
+        label: "Downloading Chip Contents...",
+        progressUpdate: .constant(ProgressUpdate(operation: "Writing Code", percentage: 20))
+    )
 }

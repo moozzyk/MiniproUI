@@ -43,12 +43,18 @@ class MiniproAPI {
         return try DeviceIdProcessor.run(result)
     }
 
-    static func read(device: String) async throws -> Data {
-        let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-r", "-"])
+    static func read(device: String, progressUpdate: @escaping ((ProgressUpdate) -> Void)) async throws -> Data {
+        let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-r", "-"]) { progress in
+            if let update = ProgressUpdateProcessor.run(progress) {
+                progressUpdate(update)
+            }
+        }
         return try ReadProcessor.run(result)
     }
 
-    static func write(device: String, data: Data, options: WriteOptions) async throws {
+    static func write(
+        device: String, data: Data, options: WriteOptions, progressUpdate: @escaping ((ProgressUpdate) -> Void)
+    ) async throws {
         var arguments = ["-p", device, "-w", "-"]
         if options.ignoreFileSize {
             arguments.append("-s")
@@ -59,7 +65,7 @@ class MiniproAPI {
 
         let result = try await MiniproInvoker.invoke(arguments: arguments, stdinData: data) { progress in
             if let update = ProgressUpdateProcessor.run(progress) {
-                print("\(update)")
+                progressUpdate(update)
             }
         }
 

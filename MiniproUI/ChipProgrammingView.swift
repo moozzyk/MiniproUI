@@ -19,6 +19,7 @@ struct ChipProgrammingView: View {
     @State private var selectedDevice: String?
     @State private var errorMessage: DialogErrorMessage?
     @State private var progressMessage: String? = nil
+    @State private var progressUpdate: ProgressUpdate? = nil
 
     private var showProgress: Bool { progressMessage != nil }
 
@@ -44,8 +45,12 @@ struct ChipProgrammingView: View {
                         Spacer()
                     }
                     VStack {
-                        ReadChipButton(device: deviceDetails, buffer: $buffer, progressMessage: $progressMessage)
-                        WriteChipButton(device: deviceDetails, buffer: buffer, progressMessage: $progressMessage)
+                        ReadChipButton(
+                            device: deviceDetails, buffer: $buffer, progressMessage: $progressMessage,
+                            progressUpdate: $progressUpdate)
+                        WriteChipButton(
+                            device: deviceDetails, buffer: buffer, progressMessage: $progressMessage,
+                            progressUpdate: $progressUpdate)
                     }
                     let supportedEEPROMs = supportedDevices?.eepromICs ?? []
                     if supportedEEPROMs.isEmpty {
@@ -83,13 +88,13 @@ struct ChipProgrammingView: View {
             .disabled(showProgress)
             .blur(radius: showProgress ? 2 : 0)
             if showProgress {
-                ProgressDialogView(label: progressMessage)
+                ProgressDialogView(label: progressMessage, progressUpdate: $progressUpdate)
             }
         }
         .task {
             supportedDevices = try? await MiniproAPI.getSupportedDevices()
         }
-        .onAppear() {
+        .onAppear {
             selectedDevice = deviceDetails?.name
         }
         .onChange(of: selectedDevice) {
@@ -106,6 +111,7 @@ struct ReadChipButton: View {
     let device: DeviceDetails?
     @Binding var buffer: Data?
     @Binding var progressMessage: String?
+    @Binding var progressUpdate: ProgressUpdate?
     @State private var errorMessage: DialogErrorMessage?
 
     var body: some View {
@@ -114,7 +120,9 @@ struct ReadChipButton: View {
                 progressMessage = "Reading Chip Contents..."
                 Task {
                     do {
-                        buffer = try await MiniproAPI.read(device: device.name)
+                        buffer = try await MiniproAPI.read(device: device.name) {
+                            progressUpdate = $0
+                        }
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
@@ -136,6 +144,7 @@ struct WriteChipButton: View {
     let device: DeviceDetails?
     let buffer: Data?
     @Binding var progressMessage: String?
+    @Binding var progressUpdate: ProgressUpdate?
     @State private var errorMessage: DialogErrorMessage?
 
     var body: some View {
@@ -144,7 +153,9 @@ struct WriteChipButton: View {
                 progressMessage = "Writing Buffer Data..."
                 Task {
                     do {
-                        try await MiniproAPI.write(device: device.name, data: buffer, options: WriteOptions())
+                        try await MiniproAPI.write(device: device.name, data: buffer, options: WriteOptions()) {
+                            progressUpdate = $0
+                        }
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }

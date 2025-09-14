@@ -13,7 +13,7 @@ struct ProgressUpdate: Equatable {
 }
 
 class ProgressUpdateProcessor {
-    private static let progressRegex = /(Reading \w+|Writing \w+)...\s+(\d+)%/
+    private static let progressRegex = /(Reading\s+\w+|Writing\s+\w+)...\s+(\d+)%/
 
     public static func run(_ data: Data?) -> ProgressUpdate? {
         guard let data else {
@@ -21,7 +21,6 @@ class ProgressUpdateProcessor {
         }
 
         let update = String(data: data, encoding: .utf8)
-
         if let matchedString = update?.firstMatch(of: progressRegex) {
             return ProgressUpdate(operation: String(matchedString.1), percentage: Int(String(matchedString.2)) ?? 0)
         }
