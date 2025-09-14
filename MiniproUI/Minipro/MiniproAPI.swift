@@ -57,7 +57,12 @@ class MiniproAPI {
             arguments.append("-y")
         }
 
-        let result = try await MiniproInvoker.invoke(arguments: arguments, stdinData: data)
+        let result = try await MiniproInvoker.invoke(arguments: arguments, stdinData: data) { progress in
+            if let update = ProgressUpdateProcessor.run(progress) {
+                print("\(update)")
+            }
+        }
+
         try WriteProcessor.run(result)
     }
 
