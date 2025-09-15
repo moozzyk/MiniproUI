@@ -126,7 +126,11 @@ struct ReadChipButton: View {
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
+                    progressUpdate = ProgressUpdate(operation: "", percentage: 100)
+                    await Task.yield()
+                    try await Task.sleep(nanoseconds: 1000 * 1_000_000)
                     progressMessage = nil
+                    progressUpdate = nil
                 }
             }
         }
@@ -154,12 +158,19 @@ struct WriteChipButton: View {
                 Task {
                     do {
                         try await MiniproAPI.write(device: device.name, data: buffer, options: WriteOptions()) {
+                            if $0.operation.contains("Reading") {
+                                progressMessage = "Verifying Data..."
+                            }
                             progressUpdate = $0
                         }
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
+                    progressUpdate = ProgressUpdate(operation: "", percentage: 100)
+                    await Task.yield()
+                    try await Task.sleep(nanoseconds: 1000 * 1_000_000)
                     progressMessage = nil
+                    progressUpdate = nil
                 }
             }
         }

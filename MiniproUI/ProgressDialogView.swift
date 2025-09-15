@@ -13,13 +13,15 @@ struct ProgressDialogView: View {
 
     var body: some View {
         VStack(spacing: 40) {
-            ProgressView()
-                .progressViewStyle(CircularProgressViewStyle())
-            if let label = label {
-                Text("\(label) \(progressUpdate?.percentage ?? -1)")
+            let progress = Double(progressUpdate?.percentage ?? 0)/100
+            ProgressView(value: progress) {
+                if let label = label {
+                    Text(label)
+                }
             }
         }
-        .padding(120)
+        .frame(maxWidth: 200)
+        .padding(30)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color(NSColor.windowBackgroundColor))
