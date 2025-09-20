@@ -87,7 +87,7 @@ struct MiniproAPITests {
         let firmwarePath = ""
 
         await #expect(throws: Never.self) {
-            try await MiniproAPI.updateFirmware(firmwareFilePath: firmwarePath)
+            try await MiniproAPI.updateFirmware(firmwareFilePath: firmwarePath) { _ in }
         }
     }
 }

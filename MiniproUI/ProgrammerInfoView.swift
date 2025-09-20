@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProgrammerInfoView: View {
     @Binding var programmerInfo: ProgrammerInfo?
+    @State var progressUpdate: ProgressUpdate?
     @State var firmwareFileUrl: URL?
     @State var progressMessage: String?
 
@@ -82,9 +83,12 @@ struct ProgrammerInfoView: View {
                                 Spacer()
                                 UpdateFirmwareButton(
                                     firmwareUrl: $firmwareFileUrl, progressMessage: $progressMessage,
-                                    programmerInfo: $programmerInfo)
+                                    progressUpdate: $progressUpdate, programmerInfo: $programmerInfo)
                             }.disabled(firmwareFileUrl == nil)
-                            Link("Learn more about downloading firmware", destination: URL(string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware")!)
+                            Link(
+                                "Learn more about downloading firmware",
+                                destination: URL(
+                                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware")!)
                         }
                     }
                 }
@@ -92,7 +96,7 @@ struct ProgrammerInfoView: View {
             }
             .blur(radius: showProgress ? 2 : 0)
             if showProgress {
-                ProgressDialogView(label: progressMessage, progressUpdate: .constant(nil))
+                ProgressDialogView(label: progressMessage, progressUpdate: $progressUpdate)
             }
         }
         .frame(minWidth: 400, minHeight: 500)
@@ -105,6 +109,7 @@ struct ProgrammerInfoView: View {
 struct UpdateFirmwareButton: View {
     @Binding var firmwareUrl: URL?
     @Binding var progressMessage: String?
+    @Binding var progressUpdate: ProgressUpdate?
     @Binding var programmerInfo: ProgrammerInfo?
     @State private var errorMessage: DialogErrorMessage?
 
@@ -114,12 +119,18 @@ struct UpdateFirmwareButton: View {
             if let firmwareUrl = firmwareUrl {
                 Task {
                     do {
-                        try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path())
+                        try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path()) {
+                            progressUpdate = $0
+                        }
+                        progressUpdate = ProgressUpdate(operation: "", percentage: 100)
+                        await Task.yield()
                         programmerInfo = try await MiniproAPI.getProgrammerInfo()
+                        try await Task.sleep(nanoseconds: 500 * 1_000_000)
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
                     progressMessage = nil
+                    progressUpdate = nil
                 }
             }
         }

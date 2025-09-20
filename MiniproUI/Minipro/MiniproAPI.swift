@@ -72,8 +72,15 @@ class MiniproAPI {
         try WriteProcessor.run(result)
     }
 
-    static func updateFirmware(firmwareFilePath: String) async throws {
-        let result = try await MiniproInvoker.invoke(arguments: ["-F", firmwareFilePath], stdinData: Data("y".utf8))
+    static func updateFirmware(firmwareFilePath: String, progressUpdate: @escaping ((ProgressUpdate) -> Void))
+        async throws
+    {
+        let result = try await MiniproInvoker.invoke(arguments: ["-F", firmwareFilePath], stdinData: Data("y".utf8)) {
+            progress in
+            if let update = ProgressUpdateProcessor.run(progress) {
+                progressUpdate(update)
+            }
+        }
         try UpdateFirmwareProcessor.run(result)
     }
 
