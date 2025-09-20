@@ -13,7 +13,7 @@ struct ProgressUpdate: Equatable {
 }
 
 class ProgressUpdateProcessor {
-    private static let progressRegex = /(Reading\s+\w+|Writing\s+\w+)...\s+(\d+)%/
+    private static let progressRegex = /(Reading\s+\w+|Writing\s+\w+|Reflashing)...\s+(\d+)%/
 
     public static func run(_ data: Data?) -> ProgressUpdate? {
         guard let data else {

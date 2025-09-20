@@ -52,6 +52,29 @@ struct ProgressUpdatePorcessorTests {
                 == ProgressUpdate(operation: "Writing Data", percentage: 1))
     }
 
+    @Test func testReflashingOperation() async throws {
+        #expect(
+            ProgressUpdateProcessor.run("\u{1B}[Reflashing...  2%\r".data(using: .utf8))
+                == ProgressUpdate(operation: "Reflashing", percentage: 2))
+
+        #expect(
+            ProgressUpdateProcessor.run("\u{1B}[KReflashing... 22%\r".data(using: .utf8))
+                == ProgressUpdate(operation: "Reflashing", percentage: 22))
+
+        #expect(
+            ProgressUpdateProcessor.run("\u{1B}[KReflashing... 100%\r".data(using: .utf8))
+                == ProgressUpdate(operation: "Reflashing", percentage: 100))
+
+        #expect(
+            ProgressUpdateProcessor.run("../t48/t48-1.1.34.dat contains firmware version 00.1.34\n\nDo you want to continue with firmware update? y/n:Switching to bootloader... OK\nErasing... OK\nReflashing... \r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  0%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  1%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  2%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing...  3%\r\u{1b}[KReflashing... ".data(using: .utf8))
+                == ProgressUpdate(operation: "Reflashing", percentage: 0))
+        #expect(
+            ProgressUpdateProcessor.run("Reflashing... 82%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 83%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 84%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 85%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 86%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 87%\r\u{1b}[KReflashing... 88".data(using: .utf8))
+                == ProgressUpdate(operation: "Reflashing", percentage: 82)
+        )
+
+    }
+
     @Test func testRandomInputs() async throws {
         let inputs = ["", "stdErr: Found T48 00.1.34 (0x122)", "Some Code...   34%"]
         for i in inputs {
