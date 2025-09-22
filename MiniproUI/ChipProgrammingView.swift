@@ -17,11 +17,6 @@ struct ChipProgrammingView: View {
     @Binding var deviceDetails: DeviceDetails?
     @Binding var buffer: Data?
     @State private var selectedDevice: String?
-    @State private var errorMessage: DialogErrorMessage?
-    @State private var progressMessage: String? = nil
-    @State private var progressUpdate: ProgressUpdate? = nil
-
-    private var showProgress: Bool { progressMessage != nil }
 
     var body: some View {
         ZStack {
@@ -45,12 +40,8 @@ struct ChipProgrammingView: View {
                         Spacer()
                     }
                     VStack {
-                        ReadChipButton(
-                            device: deviceDetails, buffer: $buffer, progressMessage: $progressMessage,
-                            progressUpdate: $progressUpdate)
-                        WriteChipButton(
-                            device: deviceDetails, buffer: buffer, progressMessage: $progressMessage,
-                            progressUpdate: $progressUpdate)
+                        ReadChipButton(device: deviceDetails, buffer: $buffer)
+                        WriteChipButton(device: deviceDetails, buffer: buffer)
                     }
                     let supportedEEPROMs = supportedDevices?.eepromICs ?? []
                     if supportedEEPROMs.isEmpty {
@@ -85,11 +76,6 @@ struct ChipProgrammingView: View {
                 .padding()
                 Spacer()
             }
-            .disabled(showProgress)
-            .blur(radius: showProgress ? 2 : 0)
-            if showProgress {
-                ProgressDialogView(label: progressMessage, progressUpdate: $progressUpdate)
-            }
         }
         .task {
             supportedDevices = try? await MiniproAPI.getSupportedDevices()
@@ -110,14 +96,14 @@ struct ChipProgrammingView: View {
 struct ReadChipButton: View {
     let device: DeviceDetails?
     @Binding var buffer: Data?
-    @Binding var progressMessage: String?
-    @Binding var progressUpdate: ProgressUpdate?
+    @State private var progressUpdate: ProgressUpdate? = nil
     @State private var errorMessage: DialogErrorMessage?
+    @State private var isPresented = false
 
     var body: some View {
         Button(" << ") {
             if let device = device {
-                progressMessage = "Reading Chip Contents..."
+                isPresented = true
                 Task {
                     do {
                         buffer = try await MiniproAPI.read(device: device.name) {
@@ -129,12 +115,15 @@ struct ReadChipButton: View {
                     progressUpdate = ProgressUpdate(operation: "", percentage: 100)
                     await Task.yield()
                     try await Task.sleep(nanoseconds: 1000 * 1_000_000)
-                    progressMessage = nil
+                    isPresented = false
                     progressUpdate = nil
                 }
             }
         }
         .disabled(device?.isLogicChip ?? true)
+        .sheet(isPresented: $isPresented) {
+            ProgressDialogView(label: .constant("Reading Chip Contents..."), progressUpdate: $progressUpdate)
+        }
         .alert(item: $errorMessage) {
             Alert(
                 title: Text("Reading Chip Contents Failed"),
@@ -147,14 +136,16 @@ struct ReadChipButton: View {
 struct WriteChipButton: View {
     let device: DeviceDetails?
     let buffer: Data?
-    @Binding var progressMessage: String?
-    @Binding var progressUpdate: ProgressUpdate?
+    @State private var progressUpdate: ProgressUpdate?
     @State private var errorMessage: DialogErrorMessage?
+    @State private var progressMessage: String?
+    @State private var isPresented = false
 
     var body: some View {
         Button(" >> ") {
             if let device = device, let buffer = buffer {
-                progressMessage = "Writing Buffer Data..."
+                progressMessage = "Writing Chip Contents..."
+                isPresented = true
                 Task {
                     do {
                         try await MiniproAPI.write(device: device.name, data: buffer, options: WriteOptions()) {
@@ -169,12 +160,15 @@ struct WriteChipButton: View {
                     progressUpdate = ProgressUpdate(operation: "", percentage: 100)
                     await Task.yield()
                     try await Task.sleep(nanoseconds: 1000 * 1_000_000)
-                    progressMessage = nil
+                    isPresented = false
                     progressUpdate = nil
                 }
             }
         }
         .disabled(device?.isLogicChip ?? true || buffer == nil)
+        .sheet(isPresented: $isPresented) {
+            ProgressDialogView(label: $progressMessage, progressUpdate: $progressUpdate)
+        }
         .alert(item: $errorMessage) {
             Alert(
                 title: Text("Write Failure"),

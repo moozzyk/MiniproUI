@@ -96,7 +96,7 @@ struct ProgrammerInfoView: View {
             }
             .blur(radius: showProgress ? 2 : 0)
             if showProgress {
-                ProgressDialogView(label: progressMessage, progressUpdate: $progressUpdate)
+                ProgressDialogView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
         .frame(minWidth: 400, minHeight: 500)

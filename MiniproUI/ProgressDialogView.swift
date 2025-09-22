@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProgressDialogView: View {
-    let label: String?
+    @Binding var label: String?
     @Binding var progressUpdate: ProgressUpdate?
 
     var body: some View {
@@ -32,7 +32,7 @@ struct ProgressDialogView: View {
 
 #Preview {
     ProgressDialogView(
-        label: "Downloading Chip Contents...",
+        label: .constant("Downloading Chip Contents..."),
         progressUpdate: .constant(ProgressUpdate(operation: "Writing Code", percentage: 20))
     )
 }
