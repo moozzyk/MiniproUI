@@ -81,9 +81,7 @@ struct ProgrammerInfoView: View {
                             HStack {
                                 Text("Firmware file: \(firmwareFileUrl?.path ?? "N/A")")
                                 Spacer()
-                                UpdateFirmwareButton(
-                                    firmwareUrl: $firmwareFileUrl, progressMessage: $progressMessage,
-                                    progressUpdate: $progressUpdate, programmerInfo: $programmerInfo)
+                                UpdateFirmwareButton(firmwareUrl: $firmwareFileUrl, programmerInfo: $programmerInfo)
                             }.disabled(firmwareFileUrl == nil)
                             Link(
                                 "Learn more about downloading firmware",
@@ -93,10 +91,6 @@ struct ProgrammerInfoView: View {
                     }
                 }
                 .formStyle(.grouped)
-            }
-            .blur(radius: showProgress ? 2 : 0)
-            if showProgress {
-                ProgressDialogView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
         .frame(minWidth: 400, minHeight: 500)
@@ -108,15 +102,15 @@ struct ProgrammerInfoView: View {
 
 struct UpdateFirmwareButton: View {
     @Binding var firmwareUrl: URL?
-    @Binding var progressMessage: String?
-    @Binding var progressUpdate: ProgressUpdate?
     @Binding var programmerInfo: ProgrammerInfo?
+    @State private var progressUpdate: ProgressUpdate?
     @State private var errorMessage: DialogErrorMessage?
+    @State private var isPresented = false
 
     var body: some View {
         Button("Update...") {
-            progressMessage = "Updating Firmware..."
             if let firmwareUrl = firmwareUrl {
+                isPresented = true
                 Task {
                     do {
                         try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path()) {
@@ -129,14 +123,18 @@ struct UpdateFirmwareButton: View {
                     } catch {
                         errorMessage = .init(message: error.localizedDescription)
                     }
-                    progressMessage = nil
+                    isPresented = false
                     progressUpdate = nil
                 }
             }
         }
+        .disabled(firmwareUrl == nil)
+        .sheet(isPresented: $isPresented) {
+            ProgressDialogView(label: .constant("Updating firmware..."), progressUpdate: $progressUpdate)
+        }
         .alert(item: $errorMessage) {
             Alert(
-                title: Text("Write Failure"),
+                title: Text("Firmware Update Failure"),
                 message: Text($0.message),
                 dismissButton: .default(Text("OK")))
         }
