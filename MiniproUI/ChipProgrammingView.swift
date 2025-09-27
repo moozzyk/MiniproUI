@@ -122,7 +122,9 @@ struct ReadChipButton: View {
         }
         .disabled(device?.isLogicChip ?? true)
         .sheet(isPresented: $isPresented) {
-            ProgressDialogView(label: .constant("Reading Chip Contents..."), progressUpdate: $progressUpdate)
+            ModalDialogView {
+                ProgressBarView(label: .constant("Reading Chip Contents..."), progressUpdate: $progressUpdate)
+            }
         }
         .alert(item: $errorMessage) {
             Alert(
@@ -167,7 +169,9 @@ struct WriteChipButton: View {
         }
         .disabled(device?.isLogicChip ?? true || buffer == nil)
         .sheet(isPresented: $isPresented) {
-            ProgressDialogView(label: $progressMessage, progressUpdate: $progressUpdate)
+            ModalDialogView {
+                ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
+            }
         }
         .alert(item: $errorMessage) {
             Alert(

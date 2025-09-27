@@ -130,7 +130,9 @@ struct UpdateFirmwareButton: View {
         }
         .disabled(firmwareUrl == nil)
         .sheet(isPresented: $isPresented) {
-            ProgressDialogView(label: .constant("Updating firmware..."), progressUpdate: $progressUpdate)
+            ModalDialogView {
+                ProgressBarView(label: .constant("Updating firmware..."), progressUpdate: $progressUpdate)
+            }
         }
         .alert(item: $errorMessage) {
             Alert(
