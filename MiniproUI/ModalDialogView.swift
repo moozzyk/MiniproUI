@@ -12,7 +12,6 @@ struct ModalDialogView <Content: View>: View {
 
     var body: some View {
         content()
-            .frame(maxWidth: 200)
             .padding(30)
             .background(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)

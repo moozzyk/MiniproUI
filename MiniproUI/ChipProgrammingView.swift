@@ -138,46 +138,18 @@ struct ReadChipButton: View {
 struct WriteChipButton: View {
     let device: DeviceDetails?
     let buffer: Data?
-    @State private var progressUpdate: ProgressUpdate?
-    @State private var errorMessage: DialogErrorMessage?
-    @State private var progressMessage: String?
     @State private var isPresented = false
 
     var body: some View {
         Button(" >> ") {
-            if let device = device, let buffer = buffer {
-                progressMessage = "Writing Chip Contents..."
-                isPresented = true
-                Task {
-                    do {
-                        try await MiniproAPI.write(device: device.name, data: buffer, options: WriteOptions()) {
-                            if $0.operation.contains("Reading") {
-                                progressMessage = "Verifying Data..."
-                            }
-                            progressUpdate = $0
-                        }
-                    } catch {
-                        errorMessage = .init(message: error.localizedDescription)
-                    }
-                    progressUpdate = ProgressUpdate(operation: "", percentage: 100)
-                    await Task.yield()
-                    try await Task.sleep(nanoseconds: 1000 * 1_000_000)
-                    isPresented = false
-                    progressUpdate = nil
-                }
-            }
+            isPresented = device != nil && buffer != nil
         }
         .disabled(device?.isLogicChip ?? true || buffer == nil)
         .sheet(isPresented: $isPresented) {
             ModalDialogView {
-                ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
+                WriteChipView(device: device!, buffer: buffer!, isPresented: $isPresented)
+                    .frame(width: 300, height: 100)
             }
-        }
-        .alert(item: $errorMessage) {
-            Alert(
-                title: Text("Write Failure"),
-                message: Text($0.message),
-                dismissButton: .default(Text("OK")))
         }
     }
 }
