@@ -16,6 +16,7 @@ struct ChipProgrammingView: View {
     @Binding var supportedDevices: SupportedDevices?
     @Binding var deviceDetails: DeviceDetails?
     @Binding var buffer: Data?
+    @Binding var writeOptions: WriteOptions
     @State private var selectedDevice: String?
 
     var body: some View {
@@ -41,7 +42,7 @@ struct ChipProgrammingView: View {
                     }
                     VStack {
                         ReadChipButton(device: deviceDetails, buffer: $buffer)
-                        WriteChipButton(device: deviceDetails, buffer: buffer)
+                        WriteChipButton(device: deviceDetails, buffer: buffer, writeOptions: $writeOptions)
                     }
                     let supportedEEPROMs = supportedDevices?.eepromICs ?? []
                     if supportedEEPROMs.isEmpty {
@@ -138,6 +139,7 @@ struct ReadChipButton: View {
 struct WriteChipButton: View {
     let device: DeviceDetails?
     let buffer: Data?
+    @Binding var writeOptions: WriteOptions
     @State private var isPresented = false
 
     var body: some View {
@@ -147,7 +149,7 @@ struct WriteChipButton: View {
         .disabled(device?.isLogicChip ?? true || buffer == nil)
         .sheet(isPresented: $isPresented) {
             ModalDialogView {
-                WriteChipView(device: device!, buffer: buffer!, isPresented: $isPresented)
+                WriteChipView(device: device!, buffer: buffer!, isPresented: $isPresented, writeOptions: $writeOptions)
                     .frame(width: 300, height: 100)
             }
         }
@@ -155,5 +157,7 @@ struct WriteChipButton: View {
 }
 
 #Preview {
-    ChipProgrammingView(supportedDevices: .constant(nil), deviceDetails: .constant(nil), buffer: .constant(nil))
+    ChipProgrammingView(
+        supportedDevices: .constant(nil), deviceDetails: .constant(nil), buffer: .constant(nil),
+        writeOptions: .constant(WriteOptions()))
 }

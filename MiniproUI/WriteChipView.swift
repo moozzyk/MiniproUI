@@ -16,6 +16,7 @@ struct WriteChipView: View {
     let device: DeviceDetails
     let buffer: Data
     @Binding var isPresented: Bool
+    @Binding var writeOptions: WriteOptions
     @State private var writeChipState = WriteChipState.writeOptions
     @State private var progressUpdate: ProgressUpdate?
     @State private var progressMessage: String?
@@ -25,7 +26,7 @@ struct WriteChipView: View {
         VStack {
             if writeChipState == .writeOptions {
                 Spacer()
-                WriteOptionsView()
+                WriteOptionsView(writeOptions: $writeOptions)
                 Spacer()
                 HStack {
                     Button("Cancel") {
@@ -35,7 +36,7 @@ struct WriteChipView: View {
                         progressMessage = "Writing Chip Contents..."
                         Task {
                             do {
-                                try await MiniproAPI.write(device: device.name, data: buffer, options: WriteOptions()) {
+                                try await MiniproAPI.write(device: device.name, data: buffer, options: writeOptions) {
                                     if $0.operation.contains("Reading") {
                                         progressMessage = "Verifying Data..."
                                     }
@@ -69,10 +70,12 @@ struct WriteChipView: View {
 }
 
 struct WriteOptionsView: View {
+    @Binding var writeOptions: WriteOptions
+
     var body: some View {
         Form {
-            Toggle("Ignore file mismatch", isOn: .constant(false))
-            Toggle("Ignore chip ID mismatch", isOn: .constant(false))
+            Toggle("Ignore file size mismatch", isOn: $writeOptions.ignoreFileSize)
+            Toggle("Ignore chip ID mismatch", isOn: $writeOptions.ignoreChipIdMismatch)
         }
     }
 }

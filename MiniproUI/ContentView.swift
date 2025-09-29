@@ -22,6 +22,7 @@ class MiniproModel: ObservableObject {
     @Published var supportedDevices: SupportedDevices? = SupportedDevices(logicICs: [], eepromICs: ["Loading..."])
     @Published var deviceDetails: DeviceDetails?
     @Published var buffer: Data?
+    @Published var writeOptions = WriteOptions()
 }
 
 struct ContentView: View {
@@ -50,7 +51,8 @@ struct ContentView: View {
             } else if selectedItem == .epromProgramming {
                 ChipProgrammingView(
                     supportedDevices: $model.supportedDevices, deviceDetails: $model.deviceDetails,
-                    buffer: $model.buffer
+                    buffer: $model.buffer,
+                    writeOptions: $model.writeOptions
                 )
                 .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {
