@@ -8,7 +8,7 @@
 import Foundation
 
 struct WriteOptions {
-    var ignoreFileSize: Bool = false
+    var ignoreFileSizeMismatch: Bool = false
     var ignoreChipIdMismatch: Bool = false
 }
 
@@ -56,7 +56,7 @@ class MiniproAPI {
         device: String, data: Data, options: WriteOptions, progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws {
         var arguments = ["-p", device, "-w", "-"]
-        if options.ignoreFileSize {
+        if options.ignoreFileSizeMismatch {
             arguments.append("-s")
         }
         if options.ignoreChipIdMismatch {

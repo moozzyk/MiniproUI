@@ -74,7 +74,7 @@ struct WriteOptionsView: View {
 
     var body: some View {
         Form {
-            Toggle("Ignore file size mismatch", isOn: $writeOptions.ignoreFileSize)
+            Toggle("Ignore file size mismatch", isOn: $writeOptions.ignoreFileSizeMismatch)
             Toggle("Ignore chip ID mismatch", isOn: $writeOptions.ignoreChipIdMismatch)
         }
     }
