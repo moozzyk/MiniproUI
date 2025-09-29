@@ -12,7 +12,7 @@ import Testing
 
 struct WriteProcessorTests {
 
-    @Test func writePorcessorSuccessuflResponse() async throws {
+    @Test func writeProcessorSuccessuflResponse() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -26,7 +26,7 @@ struct WriteProcessorTests {
         }
     }
 
-    @Test func writePorcessorIncorrectFileSize() async throws {
+    @Test func writeProcessorIncorrectFileSize() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
