@@ -21,18 +21,29 @@ struct WriteChipView: View {
     @State private var writeChipState = WriteChipState.writeOptions
     @State private var progressUpdate: ProgressUpdate?
     @State private var progressMessage: String?
+    @State private var newWriteOptions: WriteOptions
+
+    init(device: DeviceDetails, buffer: Data, isPresented: Binding<Bool>, writeOptions: Binding<WriteOptions>, errorMessage: Binding<DialogErrorMessage?>) {
+        self.device = device
+        self.buffer = buffer
+        self._isPresented = isPresented
+        self._writeOptions = writeOptions
+        self._errorMessage = errorMessage
+        newWriteOptions = writeOptions.wrappedValue
+    }
 
     var body: some View {
         VStack {
             if writeChipState == .writeOptions {
                 Spacer()
-                WriteOptionsView(writeOptions: $writeOptions)
+                WriteOptionsView(writeOptions: $newWriteOptions)
                 Spacer()
                 HStack {
                     Button("Cancel") {
                         isPresented = false
                     }
                     Button("Write") {
+                        writeOptions = newWriteOptions
                         progressMessage = "Writing Chip Contents..."
                         Task {
                             do {
