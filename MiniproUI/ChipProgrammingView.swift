@@ -141,6 +141,7 @@ struct WriteChipButton: View {
     let buffer: Data?
     @Binding var writeOptions: WriteOptions
     @State private var isPresented = false
+    @State private var errorMessage: DialogErrorMessage?
 
     var body: some View {
         Button(" >> ") {
@@ -149,9 +150,18 @@ struct WriteChipButton: View {
         .disabled(device?.isLogicChip ?? true || buffer == nil)
         .sheet(isPresented: $isPresented) {
             ModalDialogView {
-                WriteChipView(device: device!, buffer: buffer!, isPresented: $isPresented, writeOptions: $writeOptions)
-                    .frame(width: 300, height: 100)
+                WriteChipView(
+                    device: device!, buffer: buffer!, isPresented: $isPresented, writeOptions: $writeOptions,
+                    errorMessage: $errorMessage
+                )
+                .frame(width: 300, height: 100)
             }
+        }
+        .alert(item: $errorMessage) {
+            Alert(
+                title: Text("Write Failure"),
+                message: Text($0.message),
+                dismissButton: .default(Text("OK")))
         }
     }
 }

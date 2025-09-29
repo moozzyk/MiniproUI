@@ -17,10 +17,10 @@ struct WriteChipView: View {
     let buffer: Data
     @Binding var isPresented: Bool
     @Binding var writeOptions: WriteOptions
+    @Binding var errorMessage: DialogErrorMessage?
     @State private var writeChipState = WriteChipState.writeOptions
     @State private var progressUpdate: ProgressUpdate?
     @State private var progressMessage: String?
-    @State private var errorMessage: DialogErrorMessage?
 
     var body: some View {
         VStack {
@@ -54,12 +54,6 @@ struct WriteChipView: View {
                         writeChipState = .writingData
                     }
                     .keyboardShortcut(.defaultAction)
-                    .alert(item: $errorMessage) {
-                        Alert(
-                            title: Text("Write Failure"),
-                            message: Text($0.message),
-                            dismissButton: .default(Text("OK")))
-                    }
                 }
                 Spacer()
             } else {
