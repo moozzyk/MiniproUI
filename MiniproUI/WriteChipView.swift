@@ -63,13 +63,29 @@ struct WriteChipView: View {
     }
 }
 
+struct ToggleWithWarning: View {
+    let caption: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            HStack {
+                Text(caption)
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.yellow)
+                    .opacity(isOn ? 1 : 0)
+            }
+        }
+    }
+}
+
 struct WriteOptionsView: View {
     @Binding var writeOptions: WriteOptions
 
     var body: some View {
         Form {
-            Toggle("Ignore file size mismatch", isOn: $writeOptions.ignoreFileSizeMismatch)
-            Toggle("Ignore chip ID mismatch", isOn: $writeOptions.ignoreChipIdMismatch)
+            ToggleWithWarning(caption: "Ignore file size mismatch", isOn: $writeOptions.ignoreFileSizeMismatch)
+            ToggleWithWarning(caption: "Ignore chip ID mismatch", isOn: $writeOptions.ignoreChipIdMismatch)
         }
     }
 }
