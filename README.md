@@ -27,6 +27,6 @@ Visual Minipro is available from [Apple app store](https://apps.apple.com/us/app
 
 You can build the app yourself from this repository. However, it requires additional preparation of the [`minipro`](https://gitlab.com/DavidGriffith/minipro) tool as described in the Apple's [Bundles And Frameworks](https://developer.apple.com/documentation/xcode/bundles-and-frameworks) documentation. 
 
-## Licencse 
+## License 
 
 Visual Minipro is available under the [GNU General Public License]([https://github.com/moozzyk/MiniproUI/blob/main/LICENSE) as it wraps the excellent [`minipro`](https://gitlab.com/DavidGriffith/minipro) tool released under GPL.
