@@ -23,7 +23,10 @@ struct WriteChipView: View {
     @State private var progressMessage: String?
     @State private var newWriteOptions: WriteOptions
 
-    init(device: DeviceDetails, buffer: Data, isPresented: Binding<Bool>, writeOptions: Binding<WriteOptions>, errorMessage: Binding<DialogErrorMessage?>) {
+    init(
+        device: DeviceDetails, buffer: Data, isPresented: Binding<Bool>, writeOptions: Binding<WriteOptions>,
+        errorMessage: Binding<DialogErrorMessage?>
+    ) {
         self.device = device
         self.buffer = buffer
         self._isPresented = isPresented
@@ -74,29 +77,72 @@ struct WriteChipView: View {
     }
 }
 
-struct ToggleWithWarning: View {
-    let caption: String
-    @Binding var isOn: Bool
-
-    var body: some View {
-        Toggle(isOn: $isOn) {
-            HStack {
-                Text(caption)
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(.yellow)
-                    .opacity(isOn ? 1 : 0)
-            }
-        }
-    }
-}
-
 struct WriteOptionsView: View {
     @Binding var writeOptions: WriteOptions
 
     var body: some View {
         Form {
-            ToggleWithWarning(caption: "Ignore file size mismatch", isOn: $writeOptions.ignoreFileSizeMismatch)
-            ToggleWithWarning(caption: "Ignore chip ID mismatch", isOn: $writeOptions.ignoreChipIdMismatch)
+            Section("Write Options") {
+                VStack(alignment: .leading, spacing: 0) {
+                    OptionToggleRow(
+                        title: "Ignore file size mismatch",
+                        isOn: $writeOptions.ignoreFileSizeMismatch,
+                        showWarning: true
+                    )
+                    Divider()
+
+                    OptionToggleRow(
+                        title: "Ignore chip ID mismatch",
+                        isOn: $writeOptions.ignoreChipIdMismatch,
+                        showWarning: true
+                    )
+                    Divider()
+
+                    OptionToggleRow(
+                        title: "Skip verification after writing",
+                        isOn: .constant(false),
+                        showWarning: true
+                    )
+                    Divider()
+
+                    OptionToggleRow(
+                        title: "Unprotect chip before writing",
+                        isOn: .constant(false),
+                        showWarning: false
+                    )
+                    Divider()
+
+                    OptionToggleRow(
+                        title: "Protect chip after writing",
+                        isOn: .constant(false),
+                        showWarning: false
+                    )
+                }
+            }
         }
+        .toggleStyle(.checkbox)
+        .formStyle(.grouped)
+        .padding(.vertical, 2)
+        .scrollContentBackground(.hidden)
+        .background(Color(.windowBackgroundColor))
+    }
+}
+
+private struct OptionToggleRow: View {
+    let title: String
+    @Binding var isOn: Bool
+    let showWarning: Bool
+
+    private let iconSlot: CGFloat = 18
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.yellow)
+                .opacity(isOn && showWarning ? 1 : 0)
+                .frame(width: iconSlot, height: 16)
+            Toggle(title, isOn: $isOn)
+        }
+        .padding(.vertical, 6)
     }
 }

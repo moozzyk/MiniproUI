@@ -154,7 +154,6 @@ struct WriteChipButton: View {
                     device: device!, buffer: buffer!, isPresented: $isPresented, writeOptions: $writeOptions,
                     errorMessage: $errorMessage
                 )
-                .frame(width: 300, height: 100)
             }
         }
         .alert(item: $errorMessage) {
