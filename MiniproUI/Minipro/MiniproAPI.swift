@@ -10,6 +10,9 @@ import Foundation
 struct WriteOptions {
     var ignoreFileSizeMismatch: Bool = false
     var ignoreChipIdMismatch: Bool = false
+    var skipVerification: Bool = false
+    var unprotectBeforeWrite: Bool = false
+    var protectAfterWrite: Bool = false
 }
 
 class MiniproAPI {

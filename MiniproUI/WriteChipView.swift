@@ -100,21 +100,21 @@ struct WriteOptionsView: View {
 
                     OptionToggleRow(
                         title: "Skip verification after writing",
-                        isOn: .constant(false),
+                        isOn: $writeOptions.skipVerification,
                         showWarning: true
                     )
                     Divider()
 
                     OptionToggleRow(
                         title: "Unprotect chip before writing",
-                        isOn: .constant(false),
+                        isOn: $writeOptions.unprotectBeforeWrite,
                         showWarning: false
                     )
                     Divider()
 
                     OptionToggleRow(
                         title: "Protect chip after writing",
-                        isOn: .constant(false),
+                        isOn: $writeOptions.protectAfterWrite,
                         showWarning: false
                     )
                 }
