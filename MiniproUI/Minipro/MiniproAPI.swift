@@ -56,14 +56,23 @@ class MiniproAPI {
     }
 
     static func write(
-        device: String, data: Data, options: WriteOptions, progressUpdate: @escaping ((ProgressUpdate) -> Void)
+        device: String, data: Data, writeOptions: WriteOptions, progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws {
         var arguments = ["-p", device, "-w", "-"]
-        if options.ignoreFileSizeMismatch {
+        if writeOptions.ignoreFileSizeMismatch {
             arguments.append("-s")
         }
-        if options.ignoreChipIdMismatch {
+        if writeOptions.ignoreChipIdMismatch {
             arguments.append("-y")
+        }
+        if writeOptions.skipVerification {
+            arguments.append("--skip_verify")
+        }
+        if writeOptions.unprotectBeforeWrite {
+            arguments.append("--unprotect")
+        }
+        if writeOptions.protectAfterWrite {
+            arguments.append("--protect")
         }
 
         let result = try await MiniproInvoker.invoke(arguments: arguments, stdinData: data) { progress in
@@ -72,7 +81,7 @@ class MiniproAPI {
             }
         }
 
-        try WriteProcessor.run(result)
+        try WriteProcessor.run(result, writeOptions)
     }
 
     static func updateFirmware(firmwareFilePath: String, progressUpdate: @escaping ((ProgressUpdate) -> Void))

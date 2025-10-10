@@ -22,7 +22,39 @@ struct WriteProcessorTests {
         )
 
         #expect(throws: Never.self) {
-            try WriteProcessor.run(miniproResult)
+            try WriteProcessor.run(miniproResult, WriteOptions())
+        }
+    }
+
+    @Test func writeProcessorVerificationFailed() async throws {
+        // non-matching chip + ignore chip ID mismatch + ignore file size mismatch
+        let miniproResult = InvocationResult(
+            exitCode: 0,
+            stdOut:
+                Data(),
+            stdErr:
+                """
+                Found T48 00.1.33 (0x121)
+                Warning: T48 support is not yet complete!
+                Warning: Firmware is out of date.
+                Expected  01.1.34 (0x122)
+                Found     00.1.33 (0x121)
+                Device code: 46A16257
+                Serial code: HSSCVO9LARFMOYKYOMVE5123
+                Manufactured: 2024-06-2816:55
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.10 V
+                WARNING: Chip ID mismatch: expected 0xDA01, got 0xFDFD (unknown)
+                Warning: Incorrect file size: 16384 (needed 131072)
+                Erasing... 9.01Sec OK
+                Writing  Code...   0%
+                Verification failed at address 0x0000: File=0xF3, Device=0xFD
+                """)
+        #expect(
+            throws: MiniproAPIError.verificationFailed("Verification failed at address 0x0000: File=0xF3, Device=0xFD")
+        ) {
+            try WriteProcessor.run(
+                miniproResult, WriteOptions(ignoreFileSizeMismatch: true, ignoreChipIdMismatch: true))
         }
     }
 
@@ -45,7 +77,7 @@ struct WriteProcessorTests {
         )
 
         #expect(throws: MiniproAPIError.incorrectFileSize(512, 32768)) {
-            try WriteProcessor.run(miniproResult)
+            try WriteProcessor.run(miniproResult, WriteOptions())
         }
     }
 
@@ -70,7 +102,38 @@ struct WriteProcessorTests {
                 """)
 
         #expect(throws: MiniproAPIError.invalidChip("0x97D6", "0xF8FF")) {
-            try WriteProcessor.run(miniproResult)
+            try WriteProcessor.run(miniproResult, WriteOptions())
+        }
+    }
+
+    @Test func writeProcessorChipMismatchSizeMismatchIgnoredSkipVerify() async throws {
+        let miniproResult = InvocationResult(
+            exitCode: 0,
+            stdOut:
+                Data(),
+            stdErr:
+                """
+                Found T48 00.1.33 (0x121)
+                Warning: T48 support is not yet complete!
+                Warning: Firmware is out of date.
+                  Expected  01.1.34 (0x122)
+                  Found     00.1.33 (0x121)
+                Device code: 46A16257
+                Serial code: HSSCVO9LARFMOYKYOMVE5123
+                Manufactured: 2024-06-2816:55
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.10 V
+                WARNING: Chip ID mismatch: expected 0xDA01, got 0xFDFD (unknown)
+                Warning: Incorrect file size: 16384 (needed 131072)
+                Erasing... 9.00Sec OK
+                Writing Code...  0.29Sec  OK
+                """)
+
+        #expect(throws: Never.self) {
+            try WriteProcessor.run(
+                miniproResult,
+                WriteOptions(
+                    ignoreFileSizeMismatch: true, ignoreChipIdMismatch: true, skipVerification: true))
         }
     }
 
@@ -96,7 +159,7 @@ struct WriteProcessorTests {
                 """)
 
         #expect(throws: MiniproAPIError.unknownError("Overcurrent protection! Exit code: 1")) {
-            try WriteProcessor.run(miniproResult)
+            try WriteProcessor.run(miniproResult, WriteOptions())
         }
     }
 }

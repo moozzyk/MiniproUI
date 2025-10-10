@@ -70,7 +70,7 @@ struct MiniproAPITests {
         var writeProgressUpdates = 0
         await #expect(throws: Never.self) {
             try await MiniproAPI.write(
-                device: "W27C512@DIP28", data: data, options: WriteOptions(ignoreFileSizeMismatch: true)
+                device: "W27C512@DIP28", data: data, writeOptions: WriteOptions(ignoreFileSizeMismatch: true)
             ) { _ in
                 writeProgressUpdates += 1
             }

@@ -50,7 +50,7 @@ struct WriteChipView: View {
                         progressMessage = "Writing Chip Contents..."
                         Task {
                             do {
-                                try await MiniproAPI.write(device: device.name, data: buffer, options: writeOptions) {
+                                try await MiniproAPI.write(device: device.name, data: buffer, writeOptions: writeOptions) {
                                     if $0.operation.contains("Reading") {
                                         progressMessage = "Verifying Data..."
                                     }

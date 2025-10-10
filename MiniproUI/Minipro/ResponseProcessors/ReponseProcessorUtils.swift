@@ -12,7 +12,7 @@ struct KeyValuePair: Equatable, Hashable {
     let value: String
 }
 
-func ensureNoError(invocationResult: InvocationResult) throws {
+func ensureNoError(invocationResult: InvocationResult, ignoreInvalidChipId: Bool = false) throws {
     let stdErr = invocationResult.stdErr
 
     if stdErr.contains("No programmer found") {
@@ -46,9 +46,11 @@ func ensureNoError(invocationResult: InvocationResult) throws {
         throw MiniproAPIError.unsupportedChip
     }
 
-    let invalidChipId = /Invalid Chip ID: expected (\S+), got (\S+)/
-    if let matchedString = stdErr.firstMatch(of: invalidChipId) {
-        throw MiniproAPIError.invalidChip(String(matchedString.1), String(matchedString.2))
+    if !ignoreInvalidChipId {
+        let invalidChipId = /Invalid Chip ID: expected (\S+), got (\S+)/
+        if let matchedString = stdErr.firstMatch(of: invalidChipId) {
+            throw MiniproAPIError.invalidChip(String(matchedString.1), String(matchedString.2))
+        }
     }
 }
 

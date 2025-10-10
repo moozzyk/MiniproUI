@@ -8,18 +8,33 @@
 import Foundation
 
 class WriteProcessor {
-    public static func run(_ result: InvocationResult) throws {
-        try ensureNoError(invocationResult: result)
+    public static func run(_ result: InvocationResult, _ writeOptions: WriteOptions) throws {
+        try ensureNoError(invocationResult: result, ignoreInvalidChipId: writeOptions.ignoreChipIdMismatch)
 
         let stdErr = result.stdErr
-        if stdErr.hasSuffix("Verification OK\n") {
-            return
+        if writeOptions.skipVerification {
+            if stdErr.contains(/Writing .* OK/) {
+                return
+            }
+        } else {
+            if stdErr.hasSuffix("Verification OK\n") {
+                return
+            }
+
+            let verificationFailedRegex = /Verification failed at address.*$/
+            let verificationFailedMatch = try? verificationFailedRegex.firstMatch(in: stdErr)
+            if let verificationFailedMatch = verificationFailedMatch {
+                throw MiniproAPIError.verificationFailed(String(verificationFailedMatch.0))
+            }
         }
 
-        let incorrectFileSizeRegex = /Incorrect file size: (\d+) \(needed (\d+)/
-        let incorrectFileSizeMatch = try? incorrectFileSizeRegex.firstMatch(in: stdErr)
-        if let incorrectFileSizeMatch = incorrectFileSizeMatch {
-            throw MiniproAPIError.incorrectFileSize(Int32(incorrectFileSizeMatch.2)!, Int32(incorrectFileSizeMatch.1)!)
+        if !writeOptions.ignoreFileSizeMismatch {
+            let incorrectFileSizeRegex = /Incorrect file size: (\d+) \(needed (\d+)/
+            let incorrectFileSizeMatch = try? incorrectFileSizeRegex.firstMatch(in: stdErr)
+            if let incorrectFileSizeMatch = incorrectFileSizeMatch {
+                throw MiniproAPIError.incorrectFileSize(
+                    Int32(incorrectFileSizeMatch.2)!, Int32(incorrectFileSizeMatch.1)!)
+            }
         }
 
         throw MiniproAPIError.unknownError(

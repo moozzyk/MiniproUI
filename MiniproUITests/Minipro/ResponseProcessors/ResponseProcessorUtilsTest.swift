@@ -74,4 +74,51 @@ struct ResponseProcessorUtilsTest {
         }
 
     }
+
+    @Test func testInvalidChipID() {
+        #expect(throws: MiniproAPIError.invalidChip("0xDA01", "0xFDFD")) {
+            try ensureNoError(
+                invocationResult: InvocationResult(
+                    exitCode: 1, stdOut: Data(),
+                    stdErr:
+                        """
+                        Found T48 00.1.33 (0x121)
+                        Warning: T48 support is not yet complete!
+                        Warning: Firmware is out of date.
+                          Expected  01.1.34 (0x122)
+                          Found     00.1.33 (0x121)
+                        Device code: 46A16257
+                        Serial code: HSSCVO9LARFMOYKYOMVE5123
+                        Manufactured: 2024-06-2816:55
+                        USB speed: 480Mbps (USB 2.0)
+                        Supply voltage: 5.10 V
+                        Invalid Chip ID: expected 0xDA01, got 0xFDFD (unknown)
+                        (use '-y' to continue anyway at your own risk)
+                        """))
+        }
+    }
+
+    @Test func testInvalidChipIDIgnoredIfRequested() {
+        #expect(throws: Never.self) {
+            try ensureNoError(
+                invocationResult: InvocationResult(
+                    exitCode: 1, stdOut: Data(),
+                    stdErr:
+                        """
+                        Found T48 00.1.33 (0x121)
+                        Warning: T48 support is not yet complete!
+                        Warning: Firmware is out of date.
+                          Expected  01.1.34 (0x122)
+                          Found     00.1.33 (0x121)
+                        Device code: 46A16257
+                        Serial code: HSSCVO9LARFMOYKYOMVE5123
+                        Manufactured: 2024-06-2816:55
+                        USB speed: 480Mbps (USB 2.0)
+                        Supply voltage: 5.10 V
+                        Invalid Chip ID: expected 0xDA01, got 0xFDFD (unknown)
+                        (use '-y' to continue anyway at your own risk)
+                        """),
+                ignoreInvalidChipId: true)
+        }
+    }
 }
