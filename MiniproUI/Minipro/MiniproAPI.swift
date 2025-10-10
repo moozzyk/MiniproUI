@@ -26,28 +26,28 @@ class MiniproAPI {
 
     static func getSupportedDevices() async throws -> SupportedDevices {
         try await ensureProgrammerConnected()
-        let result = try await MiniproInvoker.invoke(arguments: ["-l"])
+        let result = try await MiniproInvoker.invoke(arguments: ["--list"])
         return try SupportedDevicesProcessor.run(result)
     }
 
     static func getDeviceDetails(device: String) async throws -> DeviceDetails {
         try await ensureProgrammerConnected()
-        let result = try await MiniproInvoker.invoke(arguments: ["-d", device])
+        let result = try await MiniproInvoker.invoke(arguments: ["--get_info", device])
         return try DeviceDetailsProcessor.run(result)
     }
 
     static func testLogicIC(device: String) async throws -> LogicICTestResult {
-        let result = try await MiniproInvoker.invoke(arguments: ["-T", "-p", device])
+        let result = try await MiniproInvoker.invoke(arguments: ["--logic_test", "--device", device])
         return try LogicICTestProcessor.run(result, device: device)
     }
 
     static func readDeviceId(device: String) async throws -> String {
-        let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-D"])
+        let result = try await MiniproInvoker.invoke(arguments: ["--device", device, "--read_id"])
         return try DeviceIdProcessor.run(result)
     }
 
     static func read(device: String, progressUpdate: @escaping ((ProgressUpdate) -> Void)) async throws -> Data {
-        let result = try await MiniproInvoker.invoke(arguments: ["-p", device, "-r", "-"]) { progress in
+        let result = try await MiniproInvoker.invoke(arguments: ["--device", device, "--read", "-"]) { progress in
             if let update = ProgressUpdateProcessor.run(progress) {
                 progressUpdate(update)
             }
@@ -58,12 +58,12 @@ class MiniproAPI {
     static func write(
         device: String, data: Data, writeOptions: WriteOptions, progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws {
-        var arguments = ["-p", device, "-w", "-"]
+        var arguments = ["--device", device, "--write", "-"]
         if writeOptions.ignoreFileSizeMismatch {
-            arguments.append("-s")
+            arguments.append("--no_size_error")
         }
         if writeOptions.ignoreChipIdMismatch {
-            arguments.append("-y")
+            arguments.append("--no_id_error")
         }
         if writeOptions.skipVerification {
             arguments.append("--skip_verify")
@@ -87,7 +87,9 @@ class MiniproAPI {
     static func updateFirmware(firmwareFilePath: String, progressUpdate: @escaping ((ProgressUpdate) -> Void))
         async throws
     {
-        let result = try await MiniproInvoker.invoke(arguments: ["-F", firmwareFilePath], stdinData: Data("y".utf8)) {
+        let result = try await MiniproInvoker.invoke(
+            arguments: ["--update", firmwareFilePath], stdinData: Data("y".utf8)
+        ) {
             progress in
             if let update = ProgressUpdateProcessor.run(progress) {
                 progressUpdate(update)
