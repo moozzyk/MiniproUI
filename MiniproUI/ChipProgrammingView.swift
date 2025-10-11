@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-struct DialogErrorMessage: Identifiable {
-    var id: String { message }
-    let message: String
-}
-
 struct ChipProgrammingView: View {
     @Binding var supportedDevices: SupportedDevices?
     @Binding var deviceDetails: DeviceDetails?
