@@ -87,6 +87,50 @@ struct LogicICTestProcessorTests {
         #expect(logicICTestResult == expectedResult)
     }
 
+    @Test func testLogicICTestErrorRunningFirstStep() async throws {
+        let miniproResult = InvocationResult(
+            exitCode: 1,
+            stdOut: Data(),
+            stdErr:
+                """
+                Found T48 00.1.34 (0x122)
+                Warning: T48 support is not yet complete!
+                Device code: 46A16257
+                Serial code: HSSCVO9LARFMOYKYOMVE5123
+                Manufactured: 2024-06-2816:55
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.09 V
+                Overcurrent protection!\u{07}
+                Error running the first step of logic test.
+                """)
+
+        #expect(throws: MiniproAPIError.logicICTestError("Error running the first step of logic test.")) {
+            try LogicICTestProcessor.run(miniproResult, device: "7400")
+        }
+    }
+
+    @Test func testLogicICTestErrorRunningSecondStep() async throws {
+        let miniproResult = InvocationResult(
+            exitCode: 1,
+            stdOut: Data(),
+            stdErr:
+                """
+                Found T48 00.1.34 (0x122)
+                Warning: T48 support is not yet complete!
+                Device code: 46A16257
+                Serial code: HSSCVO9LARFMOYKYOMVE5123
+                Manufactured: 2024-06-2816:55
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.09 V
+                Overcurrent protection!\u{07}
+                Error running the second step of logic test.
+                """)
+
+        #expect(throws: MiniproAPIError.logicICTestError("Error running the second step of logic test.")) {
+            try LogicICTestProcessor.run(miniproResult, device: "7400")
+        }
+    }
+
     @Test func testLogicICTestProcessorChecksForErrors() {
         #expect(throws: MiniproAPIError.unknownError("Error")) {
             try LogicICTestProcessor.run(InvocationResult(exitCode: 0, stdOut: Data(), stdErr: "Error"), device: "7400")

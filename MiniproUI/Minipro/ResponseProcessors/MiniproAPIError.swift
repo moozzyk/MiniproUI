@@ -20,6 +20,7 @@ enum MiniproAPIError: Error, Equatable {
     case firmwareUpdateError(String)
     case incorrectFileSize(Int32, Int32)
     case verificationFailed(String)
+    case logicICTestError(String)
 }
 
 extension MiniproAPIError: LocalizedError {
@@ -48,6 +49,8 @@ extension MiniproAPIError: LocalizedError {
         case .firmwareUpdateError(let message):
             return "Firmware update error: \(message)"
         case .verificationFailed(let message):
+            return message
+        case .logicICTestError(let message):
             return message
         }
     }

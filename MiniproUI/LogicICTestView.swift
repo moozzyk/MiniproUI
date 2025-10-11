@@ -12,6 +12,7 @@ struct LogicICTestView: View {
     @Binding var logicICDetails: DeviceDetails?
     @Binding var logicICTestResult: LogicICTestResult?
     @State private var selectedDevice: String? = nil
+    @State private var errorMessage: DialogErrorMessage? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -33,8 +34,13 @@ struct LogicICTestView: View {
                             DeviceDetailsView(expectLogicChip: true, deviceDetails: $logicICDetails)
                             Button("Test") {
                                 Task {
-                                    logicICTestResult = try? await MiniproAPI.testLogicIC(
-                                        device: logicICDetails!.name)
+                                    do {
+                                        logicICTestResult = try await MiniproAPI.testLogicIC(
+                                            device: logicICDetails!.name)
+                                    } catch {
+                                        errorMessage = .init(message: error.localizedDescription)
+                                        logicICTestResult = nil
+                                    }
                                 }
                             }
                             .disabled(!(logicICDetails?.isLogicChip ?? true))
@@ -56,6 +62,11 @@ struct LogicICTestView: View {
                 }
                 logicICTestResult = nil
             }
+        }.alert(item: $errorMessage) {
+            Alert(
+                title: Text("Logic IC Test Error"),
+                message: Text($0.message),
+                dismissButton: .default(Text("OK")))
         }
     }
 }

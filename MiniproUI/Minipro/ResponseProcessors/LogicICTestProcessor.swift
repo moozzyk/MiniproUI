@@ -16,8 +16,13 @@ struct LogicICTestResult: Equatable {
 
 class LogicICTestProcessor {
     private static let numErrors = /Logic test failed: (\S+) errors encountered/
+    private static let logicICTestError = /Error running the \S+ step of logic test./
 
     public static func run(_ result: InvocationResult, device: String) throws -> LogicICTestResult {
+        let testError = result.stdErr.firstMatch(of: logicICTestError)
+        if let matchedString = testError {
+            throw MiniproAPIError.logicICTestError(String(matchedString.0))
+        }
         try ensureNoError(invocationResult: result)
         let lines = result.stdOutString.split(separator: "\n")
         guard lines.count > 0 else {
