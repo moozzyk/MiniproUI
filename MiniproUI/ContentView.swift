@@ -11,6 +11,7 @@ enum ViewType: String, Hashable, CaseIterable {
     case epromProgramming = "Chip Programming"
     case logicIcTest = "Logic IC Test"
     case programmerInfo = "Programmer Information"
+    case settings = "Settings"
     case visualMiniproInfo = "About Visual Minipro"
 }
 
@@ -57,6 +58,9 @@ struct ContentView: View {
                 .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {
                 VisualMiniproInfoView(visualMiniproInfo: $model.visualMiniproInfo)
+                    .navigationTitle(selectedItem.rawValue)
+            } else if selectedItem == .settings {
+                SettingsView()
                     .navigationTitle(selectedItem.rawValue)
             } else {
                 VisualMiniproInfoView(visualMiniproInfo: $model.visualMiniproInfo)
