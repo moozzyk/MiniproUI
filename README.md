@@ -9,7 +9,8 @@ I built [Visual Minipro](https://apps.apple.com/app/id6747261192) because I coul
 ## Features
 
 ### Read and write EEPROM contents
-https://github.com/user-attachments/assets/75f53601-40af-4012-b0bf-7672574d0ef6
+https://github.com/user-attachments/assets/4cd2db91-cdf6-4231-864a-26a64bfba875
+
 
 ### Test 74xx/40xx logic ICs
 https://github.com/user-attachments/assets/f3a2b88c-bb74-402d-9272-92c0314b62e6
