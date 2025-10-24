@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var items = ["Apple", "Banana", "Orange"]
+    @State private var items: [String] = []
     @State private var newItemText = ""
 
     var body: some View {
@@ -17,35 +17,37 @@ struct SettingsView: View {
                 TabHeaderView(
                     caption: "Settings",
                     systemImageName: "gearshape.fill")
-                VStack {
-                    Text("Favorite chips")
-                    List {
-                        ForEach(items.indices, id: \.self) { index in
-                            HStack {
-                                TextField("Chip name pattern...", text: $items[index])
-                                Button {
-                                    items.remove(at: index)
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
+                Form {
+                    Section(
+                        header: Text("Favorite chips")
+                    ) {
+                        List {
+                            ForEach(items.indices, id: \.self) { index in
+                                HStack {
+                                    TextField("Chip name pattern...", text: $items[index])
+                                    Button {
+                                        items.remove(at: index)
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                    }
+                                    .buttonStyle(.borderless)
+                                    .foregroundColor(.secondary)
                                 }
-                                .buttonStyle(.borderless)
-                                .foregroundColor(.secondary)
+                            }
+                            HStack {
+                                TextField("Chip name pattern...", text: $newItemText)
+                                    .onSubmit {
+                                        addNewItem()
+                                    }
+                                    .textFieldStyle(.roundedBorder)
+                                Button("Add") {
+                                    addNewItem()
+                                }
                             }
                         }
                     }
-
-                    HStack {
-                        TextField("Chip name pattern...", text: $newItemText)
-                            .onSubmit {
-                                addNewItem()
-                            }
-                        Button("Add") {
-                            addNewItem()
-                        }
-                    }
-                }.padding()
-
-                Spacer()
+                }
+                .formStyle(.grouped)
             }
         }.frame(minWidth: 400, minHeight: 500)
     }
