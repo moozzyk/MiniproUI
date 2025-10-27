@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    private static let favoriteChipsKey = "favoriteChips"
-
-    @State private var items: [String] = (UserDefaults.standard.stringArray(forKey: favoriteChipsKey) ?? [])
+    @State private var items: [String] = UserDefaults.standard.favoriteChips
     @State private var newItemText = ""
 
     var body: some View {
@@ -64,7 +62,7 @@ struct SettingsView: View {
     }
 
     private func updateFavoriteChips() {
-        UserDefaults.standard.set(items, forKey: SettingsView.favoriteChipsKey)
+        UserDefaults.standard.favoriteChips = items
     }
 }
 
