@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var items: [String] = []
+    private static let favoriteChipsKey = "favoriteChips"
+
+    @State private var items: [String] = (UserDefaults.standard.stringArray(forKey: favoriteChipsKey) ?? [])
     @State private var newItemText = ""
 
     var body: some View {
@@ -27,6 +29,7 @@ struct SettingsView: View {
                                     TextField("Chip name pattern...", text: $items[index])
                                     Button {
                                         items.remove(at: index)
+                                        updateFavoriteChips()
                                     } label: {
                                         Image(systemName: "xmark.circle.fill")
                                     }
@@ -55,8 +58,13 @@ struct SettingsView: View {
     private func addNewItem() {
         if !newItemText.isEmpty {
             items.append(newItemText)
+            updateFavoriteChips()
             newItemText = ""
         }
+    }
+
+    private func updateFavoriteChips() {
+        UserDefaults.standard.set(items, forKey: SettingsView.favoriteChipsKey)
     }
 }
 
