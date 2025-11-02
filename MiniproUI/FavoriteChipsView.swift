@@ -19,7 +19,8 @@ struct FavoriteChipsView: View {
                 List {
                     ForEach(items.indices, id: \.self) { index in
                         HStack {
-                            TextField("Chip name pattern...", text: $items[index])
+                            Text(items[index])
+                            Spacer()
                             Button {
                                 items.remove(at: index)
                                 updateFavoriteChips()
@@ -28,6 +29,7 @@ struct FavoriteChipsView: View {
                             }
                             .buttonStyle(.borderless)
                             .foregroundColor(.secondary)
+
                         }
                     }
                     HStack {
