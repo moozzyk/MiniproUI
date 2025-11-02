@@ -59,7 +59,7 @@ struct ChipProgrammingView: View {
                             }
                             VStack {
                                 SearchableListView(
-                                    items: supportedEEPROMs, selectedItem: $selectedDevice,
+                                    items: filterFavoriteChips(supportedEEPROMs), selectedItem: $selectedDevice,
                                     isCollapsible: true
                                 )
                                 .frame(maxWidth: 658, maxHeight: 600)
@@ -86,6 +86,14 @@ struct ChipProgrammingView: View {
                 }
             }
         }
+    }
+
+    func filterFavoriteChips(_ supportedEEPROMs: [String]) -> [String] {
+        let favoriteChips = UserDefaults.standard.favoriteChips
+        let filteredChips = supportedEEPROMs.filter { eeprom in
+            favoriteChips.contains { eeprom.lowercased().contains($0.lowercased()) }
+        }
+        return filteredChips.isEmpty ? supportedEEPROMs : filteredChips
     }
 }
 
