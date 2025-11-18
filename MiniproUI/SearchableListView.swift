@@ -12,13 +12,23 @@ struct SearchableListView: View {
     @Binding var selectedItem: String?
     @State var searchText: String = ""
     @State var shouldShowList = true
+    @State var applyAdditionalFilter = true
     let isCollapsible: Bool
+    let additionalFilter: (([String]) -> [String])?
+
+    func prefilterItems() -> [String] {
+        if additionalFilter != nil && applyAdditionalFilter {
+            return additionalFilter!(items)
+        }
+        return items
+    }
 
     var filteredItems: [String] {
+        let prefilteredItems = self.prefilterItems()
         if searchText.isEmpty {
-            return items
+            return prefilteredItems
         } else {
-            return items.filter { $0.localizedCaseInsensitiveContains(searchText) }
+            return prefilteredItems.filter { $0.localizedCaseInsensitiveContains(searchText) }
         }
     }
 
@@ -30,6 +40,11 @@ struct SearchableListView: View {
                 Spacer()
                 SearchBar(searchText: $searchText)
                     .padding(.leading, 32)
+                if additionalFilter != nil {
+                    Toggle("Apply favorite chips filter", isOn: $applyAdditionalFilter)
+                        .labelsHidden()
+                        .help(Text("Apply favorite chips filter"))
+                }
             }
             if shouldShowList && filteredItems.count > 0 {
                 List(filteredItems, id: \.self, selection: $selectedItem) { item in
@@ -77,5 +92,6 @@ struct SearchBar: View {
 }
 
 #Preview {
-    SearchableListView(items: ["apple", "orange", "banana"], selectedItem: .constant(nil), isCollapsible: false)
+    SearchableListView(
+        items: ["apple", "orange", "banana"], selectedItem: .constant(nil), isCollapsible: false, additionalFilter: nil)
 }

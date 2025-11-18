@@ -59,9 +59,8 @@ struct ChipProgrammingView: View {
                             }
                             VStack {
                                 SearchableListView(
-                                    items: filterFavoriteChips(supportedEEPROMs), selectedItem: $selectedDevice,
-                                    isCollapsible: true
-                                )
+                                    items: supportedEEPROMs, selectedItem: $selectedDevice,
+                                    isCollapsible: true, additionalFilter: filterFavoriteChips)
                                 .frame(maxWidth: 658, maxHeight: 600)
                                 .padding([.trailing])
                                 Spacer()

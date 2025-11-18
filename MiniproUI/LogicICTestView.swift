@@ -26,9 +26,12 @@ struct LogicICTestView: View {
                 }.formStyle(.grouped)
             } else {
                 HStack {
-                    SearchableListView(items: supportedLogicICs, selectedItem: $selectedDevice, isCollapsible: false)
-                        .frame(maxWidth: 300)
-                        .padding(20)
+                    SearchableListView(
+                        items: supportedLogicICs, selectedItem: $selectedDevice, isCollapsible: false,
+                        additionalFilter: nil
+                    )
+                    .frame(maxWidth: 300)
+                    .padding(20)
                     VStack {
                         if logicICDetails != nil {
                             DeviceDetailsView(expectLogicChip: true, deviceDetails: $logicICDetails)

@@ -29,7 +29,6 @@ struct FavoriteChipsView: View {
                             }
                             .buttonStyle(.borderless)
                             .foregroundColor(.secondary)
-
                         }
                     }
                     HStack {
