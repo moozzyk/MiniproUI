@@ -26,6 +26,7 @@ struct FavoriteChipsView: View {
                                 updateFavoriteChips()
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
                             }
                             .buttonStyle(.borderless)
                             .foregroundColor(.secondary)
