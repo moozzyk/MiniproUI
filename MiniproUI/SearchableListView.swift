@@ -84,6 +84,14 @@ struct SearchBar: View {
                     .frame(height: 30)
                     .textFieldStyle(.plain)
                     .cornerRadius(6)
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                }
+                .buttonStyle(.borderless)
+                .padding(.trailing, 8)
             }
             .background(.white)
             .cornerRadius(6)
