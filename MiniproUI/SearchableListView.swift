@@ -10,6 +10,7 @@ import SwiftUI
 struct SearchableListView: View {
     let items: [String]
     @Binding var selectedItem: String?
+    @State var selectedListItem: String?
     @State var searchText: String = ""
     @State var shouldShowList = true
     @State var applyAdditionalFilter = true
@@ -47,17 +48,19 @@ struct SearchableListView: View {
                 }
             }
             if shouldShowList && filteredItems.count > 0 {
-                List(filteredItems, id: \.self, selection: $selectedItem) { item in
+                List(filteredItems, id: \.self, selection: $selectedListItem) { item in
                     Text("  " + item)
                 }
                 .frame(maxHeight: CGFloat(44 + (filteredItems.count - 1) * 24))
             }
             Spacer()
-        }.onChange(of: selectedItem) {
-            if isCollapsible {
-                if let selectedItem = selectedItem {
-                    searchText = selectedItem
+        }.onChange(of: selectedListItem) {
+            if selectedListItem != nil {
+                selectedItem = selectedListItem
+                if isCollapsible {
+                    searchText = selectedListItem ?? ""
                     shouldShowList = false
+                    selectedListItem = nil
                 }
             }
         }.onChange(of: searchText) {
