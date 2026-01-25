@@ -109,7 +109,9 @@ struct ReadChipButton: View {
                 isPresented = true
                 Task {
                     do {
-                        buffer = try await MiniproAPI.read(device: device.name) {
+                        buffer = try await MiniproAPI.read(
+                            device: device.name, readOptions: ReadOptions()
+                        ) {
                             progressUpdate = $0
                         }
                     } catch {

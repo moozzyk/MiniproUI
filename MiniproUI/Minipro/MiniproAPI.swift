@@ -51,7 +51,7 @@ class MiniproAPI {
     }
 
     static func read(
-        device: String, readOptions: ReadOptions = ReadOptions(),
+        device: String, readOptions: ReadOptions,
         progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws -> Data {
         var arguments = ["--device", device, "--read", "-"]

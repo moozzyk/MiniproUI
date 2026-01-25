@@ -58,7 +58,7 @@ struct MiniproAPITests {
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdThrowsForChipMismatch() async throws {
         await #expect(
-            throws: MiniproAPIError.chipIdMismatch("0x97D6", "0xF8FF")
+            throws: MiniproAPIError.chipIdMismatch("0x97D6", "0x0000")
         ) {
             try await MiniproAPI.readDeviceId(device: "SMJ27C010A@TSOP32")
         }
@@ -78,7 +78,9 @@ struct MiniproAPITests {
         #expect(writeProgressUpdates > 0)
 
         var readProgressUpdates = 0
-        let readData = try await MiniproAPI.read(device: "W27C512@DIP28") { _ in readProgressUpdates += 1 }
+        let readData = try await MiniproAPI.read(device: "W27C512@DIP28", readOptions: ReadOptions()) {
+            _ in readProgressUpdates += 1
+        }
         #expect(readData.subdata(in: 0..<1024) == data)
         #expect(readProgressUpdates > 0)
     }
