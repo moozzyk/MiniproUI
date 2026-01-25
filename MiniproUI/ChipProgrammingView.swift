@@ -11,6 +11,7 @@ struct ChipProgrammingView: View {
     @Binding var supportedDevices: SupportedDevices?
     @Binding var deviceDetails: DeviceDetails?
     @Binding var buffer: Data?
+    @Binding var readOptions: ReadOptions
     @Binding var writeOptions: WriteOptions
     @State private var selectedDevice: String?
 
@@ -36,7 +37,7 @@ struct ChipProgrammingView: View {
                         Spacer()
                     }
                     VStack {
-                        ReadChipButton(device: deviceDetails, buffer: $buffer)
+                        ReadChipButton(device: deviceDetails, buffer: $buffer, readOptions: $readOptions)
                         WriteChipButton(device: deviceDetails, buffer: buffer, writeOptions: $writeOptions)
                     }
                     let supportedEEPROMs = supportedDevices?.eepromICs ?? []
@@ -60,7 +61,8 @@ struct ChipProgrammingView: View {
                             VStack {
                                 SearchableListView(
                                     items: supportedEEPROMs, selectedItem: $selectedDevice,
-                                    isCollapsible: true, additionalFilter: filterFavoriteChips)
+                                    isCollapsible: true, additionalFilter: filterFavoriteChips
+                                )
                                 .frame(maxWidth: 658, maxHeight: 600)
                                 .padding([.trailing])
                                 Spacer()
@@ -99,6 +101,7 @@ struct ChipProgrammingView: View {
 struct ReadChipButton: View {
     let device: DeviceDetails?
     @Binding var buffer: Data?
+    @Binding var readOptions: ReadOptions
     @State private var progressUpdate: ProgressUpdate? = nil
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
@@ -109,9 +112,7 @@ struct ReadChipButton: View {
                 isPresented = true
                 Task {
                     do {
-                        buffer = try await MiniproAPI.read(
-                            device: device.name, readOptions: ReadOptions()
-                        ) {
+                        buffer = try await MiniproAPI.read(device: device.name, readOptions: readOptions) {
                             progressUpdate = $0
                         }
                     } catch {
@@ -172,5 +173,5 @@ struct WriteChipButton: View {
 #Preview {
     ChipProgrammingView(
         supportedDevices: .constant(nil), deviceDetails: .constant(nil), buffer: .constant(nil),
-        writeOptions: .constant(WriteOptions()))
+        readOptions: .constant(ReadOptions()), writeOptions: .constant(WriteOptions()))
 }

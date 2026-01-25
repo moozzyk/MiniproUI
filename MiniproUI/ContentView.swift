@@ -23,6 +23,7 @@ class MiniproModel: ObservableObject {
     @Published var supportedDevices: SupportedDevices? = SupportedDevices(logicICs: [], eepromICs: ["Loading..."])
     @Published var deviceDetails: DeviceDetails?
     @Published var buffer: Data?
+    @Published var readOptions = ReadOptions()
     @Published var writeOptions = WriteOptions()
 }
 
@@ -53,6 +54,7 @@ struct ContentView: View {
                 ChipProgrammingView(
                     supportedDevices: $model.supportedDevices, deviceDetails: $model.deviceDetails,
                     buffer: $model.buffer,
+                    readOptions: $model.readOptions,
                     writeOptions: $model.writeOptions
                 )
                 .navigationTitle(selectedItem.rawValue)
