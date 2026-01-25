@@ -102,34 +102,20 @@ struct ReadChipButton: View {
     let device: DeviceDetails?
     @Binding var buffer: Data?
     @Binding var readOptions: ReadOptions
-    @State private var progressUpdate: ProgressUpdate? = nil
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
 
     var body: some View {
         Button(" << ") {
-            if let device = device {
-                isPresented = true
-                Task {
-                    do {
-                        buffer = try await MiniproAPI.read(device: device.name, readOptions: readOptions) {
-                            progressUpdate = $0
-                        }
-                    } catch {
-                        errorMessage = .init(message: error.localizedDescription)
-                    }
-                    progressUpdate = ProgressUpdate(operation: "", percentage: 100)
-                    await Task.yield()
-                    try await Task.sleep(nanoseconds: 1000 * 1_000_000)
-                    isPresented = false
-                    progressUpdate = nil
-                }
-            }
+            isPresented = device != nil
         }
         .disabled(device?.isLogicChip ?? true)
         .sheet(isPresented: $isPresented) {
             ModalDialogView {
-                ProgressBarView(label: .constant("Reading Chip Contents..."), progressUpdate: $progressUpdate)
+                ReadChipView(
+                    device: device!, buffer: $buffer, isPresented: $isPresented, readOptions: $readOptions,
+                    errorMessage: $errorMessage
+                )
             }
         }
         .alert(item: $errorMessage) {
