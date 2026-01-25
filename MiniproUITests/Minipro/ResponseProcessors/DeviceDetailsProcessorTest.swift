@@ -162,7 +162,7 @@ struct DeviceDetailsProcessorTest {
     ]
 
     @Test(arguments: testCases)
-    func testDeviceDetaislProcessorForIC(testCase: (String, DeviceDetails)) async throws {
+    func testDeviceDetailsProcessorForIC(testCase: (String, DeviceDetails)) async throws {
         let (input, expectedDeviceDetails) = testCase
         let result = InvocationResult(exitCode: 0, stdOut: Data(), stdErr: input)
         let deviceDetails = try DeviceDetailsProcessor.run(result)

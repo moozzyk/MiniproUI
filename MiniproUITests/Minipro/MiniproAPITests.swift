@@ -36,7 +36,7 @@ struct MiniproAPITests {
         #expect(result.eepromICs.count == Set(result.eepromICs).count)
     }
 
-    @Test func testGetDevicesDetials() async throws {
+    @Test func testGetDevicesDetails() async throws {
         let deviceDetails = try await MiniproAPI.getDeviceDetails(device: "SMJ27C010A@TSOP32")
         #expect(deviceDetails.deviceInfo.count >= 4)
         #expect(deviceDetails.programmingInfo.count > 0)
