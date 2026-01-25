@@ -16,11 +16,12 @@ struct DeviceDetails: Equatable, Hashable {
 
 class DeviceDetailsProcessor {
     private static let deviceInfoKeys = [
-        "Name", "Available on", "Memory", "Package", "ICSP", "VCC voltage", "Vector count", "Protocol",
+        "Name", "Available on", "Memory", "Package", "Default VCC voltage", "Vector count", "Protocol",
         "Read buffer size", "Write buffer size",
     ]
     private static let programmingInfoKeys = [
-        "VPP programming voltage", "VDD write voltage", "VCC verify voltage", "Pulse delay",
+        "Default VPP programming voltage", "Default VDD write voltage", "Default VCC verify voltage",
+        "Default write pulse",
     ]
 
     public static func run(_ result: InvocationResult) throws -> DeviceDetails {
