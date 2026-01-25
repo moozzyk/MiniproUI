@@ -1,0 +1,117 @@
+//
+//  ReadChipView.swift
+//  Visual Minipro
+//
+//  Created by Pawel Kadluczka on 1/25/26.
+//
+
+import SwiftUI
+
+enum ReadChipState {
+    case readOptions
+    case readingData
+}
+
+struct ReadChipView: View {
+    let device: DeviceDetails
+    @Binding var buffer: Data?
+    @Binding var isPresented: Bool
+    @Binding var readOptions: ReadOptions
+    @Binding var errorMessage: DialogErrorMessage?
+    @State private var readChipState = ReadChipState.readOptions
+    @State private var progressUpdate: ProgressUpdate?
+    @State private var progressMessage: String?
+    @State private var newReadOptions: ReadOptions
+
+    init(
+        device: DeviceDetails, buffer: Binding<Data?>, isPresented: Binding<Bool>, readOptions: Binding<ReadOptions>,
+        errorMessage: Binding<DialogErrorMessage?>
+    ) {
+        self.device = device
+        self._buffer = buffer
+        self._isPresented = isPresented
+        self._readOptions = readOptions
+        self._errorMessage = errorMessage
+        newReadOptions = readOptions.wrappedValue
+    }
+
+    var body: some View {
+        VStack {
+            if readChipState == .readOptions {
+                Spacer()
+                ReadOptionsView(readOptions: $newReadOptions)
+                Spacer()
+                HStack {
+                    Button("Cancel") {
+                        isPresented = false
+                    }
+                    Button("Read") {
+                        readOptions = newReadOptions
+                        progressMessage = "Reading Chip Contents..."
+                        Task {
+                            do {
+                                buffer = try await MiniproAPI.read(device: device.name, readOptions: readOptions) {
+                                    progressUpdate = $0
+                                }
+                            } catch {
+                                errorMessage = .init(message: error.localizedDescription)
+                            }
+                            progressUpdate = ProgressUpdate(operation: "", percentage: 100)
+                            await Task.yield()
+                            try await Task.sleep(nanoseconds: 1000 * 1_000_000)
+                            isPresented = false
+                            progressUpdate = nil
+                        }
+                        readChipState = .readingData
+                    }
+                    .keyboardShortcut(.defaultAction)
+                }
+                Spacer()
+            } else {
+                ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
+            }
+        }
+    }
+}
+
+struct ReadOptionsView: View {
+    @Binding var readOptions: ReadOptions
+
+    var body: some View {
+        Form {
+            Section("Read Options") {
+                VStack(alignment: .leading, spacing: 0) {
+                    OptionToggleRow(
+                        title: "Ignore chip ID mismatch",
+                        isOn: $readOptions.ignoreChipIdMismatch,
+                        showWarning: true
+                    )
+                }
+            }
+        }
+        .toggleStyle(.checkbox)
+        .formStyle(.grouped)
+        .padding(.vertical, 2)
+        .scrollContentBackground(.hidden)
+        .background(Color(.windowBackgroundColor))
+    }
+}
+
+private struct OptionToggleRow: View {
+    let title: String
+    @Binding var isOn: Bool
+    let showWarning: Bool
+
+    private let iconSlot: CGFloat = 18
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.yellow)
+                .opacity(isOn && showWarning ? 1 : 0)
+                .frame(width: iconSlot, height: 16)
+            Toggle(title, isOn: $isOn)
+        }
+        .padding(.vertical, 6)
+    }
+}
