@@ -15,6 +15,10 @@ struct WriteOptions {
     var protectAfterWrite: Bool = false
 }
 
+struct ReadOptions {
+    var ignoreChipIdMismatch: Bool = false
+}
+
 class MiniproAPI {
     private static func ensureProgrammerConnected() async throws {
         let _ = try await getProgrammerInfo()
@@ -46,8 +50,15 @@ class MiniproAPI {
         return try DeviceIdProcessor.run(result)
     }
 
-    static func read(device: String, progressUpdate: @escaping ((ProgressUpdate) -> Void)) async throws -> Data {
-        let result = try await MiniproInvoker.invoke(arguments: ["--device", device, "--read", "-"]) { progress in
+    static func read(
+        device: String, readOptions: ReadOptions = ReadOptions(),
+        progressUpdate: @escaping ((ProgressUpdate) -> Void)
+    ) async throws -> Data {
+        var arguments = ["--device", device, "--read", "-"]
+        if readOptions.ignoreChipIdMismatch {
+            arguments.append("--no_id_error")
+        }
+        let result = try await MiniproInvoker.invoke(arguments: arguments) { progress in
             if let update = ProgressUpdateProcessor.run(progress) {
                 progressUpdate(update)
             }
