@@ -16,11 +16,12 @@ struct OptionToggleRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
+            Toggle(title, isOn: $isOn)
+                .toggleStyle(.switch)
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(.yellow)
                 .opacity(isOn && showWarning ? 1 : 0)
                 .frame(width: iconSlot, height: 16)
-            Toggle(title, isOn: $isOn)
         }
         .padding(.vertical, 6)
     }
