@@ -10,7 +10,7 @@ import SwiftUI
 enum ViewType: String, Hashable, CaseIterable {
     case epromProgramming = "Chip Programming"
     case logicIcTest = "Logic IC Test"
-    case programmerInfo = "Programmer Information"
+    case programmerInfo = "Programmer Info"
     case settings = "Settings"
     case visualMiniproInfo = "About Visual Minipro"
 }
@@ -39,7 +39,7 @@ struct ContentView: View {
                 model.supportedDevices = try? await MiniproAPI.getSupportedDevices()
                 model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
                 model.visualMiniproInfo = try? await MiniproAPI.getVisualMiniproInfo()
-            }
+            }.navigationSplitViewColumnWidth(min: 160, ideal: 160)
         } detail: {
             if selectedItem == .programmerInfo {
                 ProgrammerInfoView(programmerInfo: $model.programmerInfo)
