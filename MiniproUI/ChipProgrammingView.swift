@@ -24,7 +24,7 @@ struct ChipProgrammingView: View {
                 HStack {
                     VStack {
                         BinaryDataView(data: $buffer)
-                            .frame(minWidth: 658)
+                            .frame(minWidth: 678)
                         HStack {
                             OpenFileButton(caption: "Open File") { url in
                                 buffer = try Data(contentsOf: url)
