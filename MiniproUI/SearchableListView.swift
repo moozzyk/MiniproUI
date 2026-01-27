@@ -16,6 +16,7 @@ struct SearchableListView: View {
     @State var applyAdditionalFilter = true
     let isCollapsible: Bool
     let additionalFilter: (([String]) -> [String])?
+    @Environment(\.colorScheme) private var colorScheme
 
     func prefilterItems() -> [String] {
         if additionalFilter != nil && applyAdditionalFilter {
@@ -33,14 +34,22 @@ struct SearchableListView: View {
         }
     }
 
+    private var listHeight: CGFloat {
+        let rowHeight: CGFloat = 24
+        let headerHeight: CGFloat = 44
+        // Allow a few more rows before scrolling so the dropdown feels less cramped.
+        let maxHeight: CGFloat = 320
+        return min(maxHeight, headerHeight + CGFloat(max(filteredItems.count - 1, 0)) * rowHeight)
+    }
+
     var body: some View {
-        VStack {
-            HStack {
-                Text("Select IC").font(.headline)
+        VStack(spacing: 8) {
+            HStack(spacing: 12) {
+                Text("Select IC")
+                    .font(.headline)
                     .padding(.leading, 8)
                 Spacer()
                 SearchBar(searchText: $searchText)
-                    .padding(.leading, 32)
                 if additionalFilter != nil {
                     Toggle("Apply favorite chips filter", isOn: $applyAdditionalFilter)
                         .labelsHidden()
@@ -49,9 +58,22 @@ struct SearchableListView: View {
             }
             if shouldShowList && filteredItems.count > 0 {
                 List(filteredItems, id: \.self, selection: $selectedListItem) { item in
-                    Text("  " + item)
+                    Text(item)
+                        .padding(.leading, 6)
+                        .listRowBackground(Color.clear)
                 }
-                .frame(maxHeight: CGFloat(44 + (filteredItems.count - 1) * 24))
+                .listStyle(.plain)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(nsColor: .controlBackgroundColor))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color(nsColor: .separatorColor), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(colorScheme == .dark ? 0.25 : 0.08), radius: 6, x: 0, y: 2)
+                .frame(maxHeight: listHeight)
+                .padding(.horizontal, 6)
             }
             Spacer()
         }.onChange(of: selectedListItem) {
@@ -75,29 +97,40 @@ struct SearchBar: View {
     @Binding var searchText: String
 
     var body: some View {
-        ZStack {
-            HStack {
-                Spacer()
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                TextField("Search", text: $searchText)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(height: 30)
-                    .cornerRadius(6)
+        HStack(spacing: 6) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+            TextField("Search", text: $searchText)
+                .textFieldStyle(.plain)
+                .frame(height: 22)
+            if !searchText.isEmpty {
                 Button {
                     searchText = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.red)
+                        .foregroundColor(.secondary)
                 }
                 .buttonStyle(.borderless)
-                .padding(.trailing, 8)
             }
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color(nsColor: .separatorColor), lineWidth: 1)
+        )
     }
 }
 
 #Preview {
     SearchableListView(
-        items: ["apple", "orange", "banana"], selectedItem: .constant(nil), isCollapsible: false, additionalFilter: nil)
+        items: ["apple", "orange", "banana"],
+        selectedItem: .constant(nil),
+        isCollapsible: false,
+        additionalFilter: nil
+    )
 }
