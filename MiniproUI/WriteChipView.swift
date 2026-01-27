@@ -81,49 +81,54 @@ struct WriteOptionsView: View {
     @Binding var writeOptions: WriteOptions
 
     var body: some View {
-        Form {
-            Section("Write Options") {
-                VStack(alignment: .leading, spacing: 0) {
-                    OptionToggleRow(
-                        title: "Ignore file size mismatch",
-                        isOn: $writeOptions.ignoreFileSizeMismatch,
-                        showWarning: true
-                    )
-                    Divider()
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Write Options")
+                .font(.headline)
+            VStack(alignment: .leading, spacing: 0) {
+                OptionToggleRow(
+                    title: "Ignore file size mismatch",
+                    isOn: $writeOptions.ignoreFileSizeMismatch,
+                    showWarning: true
+                )
+                Divider()
 
-                    OptionToggleRow(
-                        title: "Ignore chip ID mismatch",
-                        isOn: $writeOptions.ignoreChipIdMismatch,
-                        showWarning: true
-                    )
-                    Divider()
+                OptionToggleRow(
+                    title: "Ignore chip ID mismatch",
+                    isOn: $writeOptions.ignoreChipIdMismatch,
+                    showWarning: true
+                )
+                Divider()
 
-                    OptionToggleRow(
-                        title: "Skip verification after writing",
-                        isOn: $writeOptions.skipVerification,
-                        showWarning: true
-                    )
-                    Divider()
+                OptionToggleRow(
+                    title: "Skip verification after writing",
+                    isOn: $writeOptions.skipVerification,
+                    showWarning: true
+                )
+                Divider()
 
-                    OptionToggleRow(
-                        title: "Unprotect chip before writing",
-                        isOn: $writeOptions.unprotectBeforeWrite,
-                        showWarning: false
-                    )
-                    Divider()
+                OptionToggleRow(
+                    title: "Unprotect chip before writing",
+                    isOn: $writeOptions.unprotectBeforeWrite,
+                    showWarning: false
+                )
+                Divider()
 
-                    OptionToggleRow(
-                        title: "Protect chip after writing",
-                        isOn: $writeOptions.protectAfterWrite,
-                        showWarning: false
-                    )
-                }
+                OptionToggleRow(
+                    title: "Protect chip after writing",
+                    isOn: $writeOptions.protectAfterWrite,
+                    showWarning: false
+                )
             }
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color(nsColor: .separatorColor), lineWidth: 1)
+            )
         }
-        .toggleStyle(.checkbox)
-        .formStyle(.grouped)
-        .padding(.vertical, 2)
-        .scrollContentBackground(.hidden)
-        .background(Color(.windowBackgroundColor))
+        .padding(16)
     }
 }

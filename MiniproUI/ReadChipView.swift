@@ -78,21 +78,26 @@ struct ReadOptionsView: View {
     @Binding var readOptions: ReadOptions
 
     var body: some View {
-        Form {
-            Section("Read Options") {
-                VStack(alignment: .leading, spacing: 0) {
-                    OptionToggleRow(
-                        title: "Ignore chip ID mismatch",
-                        isOn: $readOptions.ignoreChipIdMismatch,
-                        showWarning: true
-                    )
-                }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Read Options")
+                .font(.headline)
+            VStack(alignment: .leading, spacing: 0) {
+                OptionToggleRow(
+                    title: "Ignore chip ID mismatch",
+                    isOn: $readOptions.ignoreChipIdMismatch,
+                    showWarning: true
+                )
             }
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color(nsColor: .separatorColor), lineWidth: 1)
+            )
         }
-        .toggleStyle(.checkbox)
-        .formStyle(.grouped)
-        .padding(.vertical, 2)
-        .scrollContentBackground(.hidden)
-        .background(Color(.windowBackgroundColor))
+        .padding(16)
     }
 }
