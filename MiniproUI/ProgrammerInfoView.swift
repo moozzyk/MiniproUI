@@ -18,7 +18,7 @@ struct ProgrammerInfoView: View {
         let model = programmerInfo?.model ?? ""
         // firmware update not supported for TL866A and TL866CS
         // due to an additional prompt in the firmware update handler
-        return model == "T48" || model == "T56" || model == "TL866II+"
+        return model == "T48" || model == "T56" || model == "TL866II+" || model == "T76"
     }
 
     func getProgrammerName(_ programmerInfo: ProgrammerInfo?) -> String {
