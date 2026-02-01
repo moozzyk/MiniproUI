@@ -42,63 +42,23 @@ enum InvocationError: Error {
 }
 
 class MiniproInvoker {
-    private static let queue = DispatchQueue(label: "MiniproInvokeQueue")
-
     public static func invoke(
         arguments: [String], stdinData: Data? = nil, onProgress: @escaping ((Data) -> Void) = ({ _ in })
     )
         async throws
         -> InvocationResult
     {
-        return try await withCheckedThrowingContinuation { continuation in
-            let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "MiniproInvoker")
-            guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro")
-            else {
-                logger.error("minipro executable not found")
-                continuation.resume(throwing: InvocationError.executableNotFound)
-                return
-            }
-            queue.async {
-                do {
-                    logger.notice("invoking minipro with arguments: \(arguments, privacy: .public)")
-                    var stdout = Data()
-                    var stderr = Data()
-                    let stdoutPipe = Pipe()
-                    let stderrPipe = Pipe()
-                    let stdInPipe = Pipe()
-                    stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
-                        stdout.append(handle.availableData)
-                    }
-                    stderrPipe.fileHandleForReading.readabilityHandler = { handle in
-                        let data = handle.availableData
-                        stderr.append(data)
-                        onProgress(data)
-                    }
-
-                    let process = Process()
-                    process.executableURL = URL(fileURLWithPath: executablePath)
-                    process.currentDirectoryURL = Bundle.main.resourceURL
-                    process.arguments = arguments
-                    process.standardOutput = stdoutPipe
-                    process.standardError = stderrPipe
-                    process.standardInput = stdInPipe
-                    try process.run()
-                    if let stdinData = stdinData {
-                        try stdInPipe.fileHandleForWriting.write(contentsOf: stdinData)
-                        stdInPipe.fileHandleForWriting.closeFile()
-                    }
-                    process.waitUntilExit()
-                    let invocationResult = InvocationResult(
-                        exitCode: process.terminationStatus,
-                        stdOut: stdout,
-                        stdErr: String(data: stderr, encoding: .utf8) ?? ""
-                    )
-                    logger.notice("invocation completed \(String(describing: invocationResult), privacy: .public)")
-                    continuation.resume(returning: invocationResult)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
+        let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "MiniproInvoker")
+        guard let executablePath = Bundle.main.path(forAuxiliaryExecutable: "minipro") else {
+            logger.error("minipro executable not found")
+            throw InvocationError.executableNotFound
         }
+        return try await ProcessInvoker.invoke(
+            executableURL: URL(fileURLWithPath: executablePath),
+            arguments: arguments,
+            stdinData: stdinData,
+            currentDirectoryURL: Bundle.main.resourceURL,
+            onProgress: onProgress
+        )
     }
 }
