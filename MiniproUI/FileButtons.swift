@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
-
+import UniformTypeIdentifiers
 
 struct OpenFileButton: View {
     @State private var errorMessage: DialogErrorMessage?
     private let caption: String
+    private let fileTypes: [String]?
     private let action: (URL) throws -> Void
 
-    init(caption: String, action: @escaping (URL) throws -> Void) {
+    init(caption: String, fileTypes: [String]? = nil, action: @escaping (URL) throws -> Void) {
         self.caption = caption
+        self.fileTypes = fileTypes
         self.action = action
     }
 
@@ -22,6 +24,14 @@ struct OpenFileButton: View {
         Button(caption) {
             let openPanel = NSOpenPanel()
             openPanel.allowsMultipleSelection = false
+            if let fileTypes {
+                let allowedTypes = fileTypes.compactMap {
+                    UTType(tag: $0, tagClass: .filenameExtension, conformingTo: .data)
+                }
+                if !allowedTypes.isEmpty {
+                    openPanel.allowedContentTypes = allowedTypes
+                }
+            }
             if openPanel.runModal() == .OK {
                 do {
                     try action(openPanel.url!)
@@ -31,8 +41,10 @@ struct OpenFileButton: View {
             }
         }.alert(item: $errorMessage) {
             Alert(
-                title: Text("Error opening file"), message: Text($0.message),
-                dismissButton: .default(Text("OK")))
+                title: Text("Error opening file"),
+                message: Text($0.message),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
@@ -60,8 +72,10 @@ struct SaveFileButton: View {
         }
         .alert(item: $errorMessage) {
             Alert(
-                title: Text("Error saving file"), message: Text($0.message),
-                dismissButton: .default(Text("OK")))
+                title: Text("Error saving file"),
+                message: Text($0.message),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
