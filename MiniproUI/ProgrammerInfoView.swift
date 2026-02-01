@@ -74,7 +74,7 @@ struct ProgrammerInfoView: View {
                             HStack {
                                 Text("Firmware ")
                                 Spacer()
-                                OpenFileButton(caption: "Select Firmware...") { url in
+                                OpenFileButton(caption: "Select Firmware...", fileTypes: ["dat"]) { url in
                                     firmwareFileUrl = url
                                 }
                             }
