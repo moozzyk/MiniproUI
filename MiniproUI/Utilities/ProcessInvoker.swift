@@ -23,9 +23,10 @@ class ProcessInvoker {
     {
         return try await withCheckedThrowingContinuation { continuation in
             let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "ProcessInvoker")
+            let executableName = executableURL.lastPathComponent
             queue.async {
                 do {
-                    logger.notice("invoking tool with arguments: \(arguments, privacy: .public)")
+                    logger.notice("invoking \(executableName, privacy: .public) with arguments: \(arguments, privacy: .public)")
                     var stdout = Data()
                     var stderr = Data()
                     let stdoutPipe = Pipe()
