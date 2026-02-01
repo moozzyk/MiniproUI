@@ -20,6 +20,13 @@ struct ProgrammerInfoView: View {
         // due to an additional prompt in the firmware update handler
         return model == "T48" || model == "T56" || model == "TL866II+" || model == "T76"
     }
+    private var firmwareFileTypes: [String] {
+        let model = programmerInfo?.model ?? ""
+        if model == "T56" || model == "T76" {
+            return ["dat", "rar"]
+        }
+        return ["dat"]
+    }
 
     func getProgrammerName(_ programmerInfo: ProgrammerInfo?) -> String {
         let programmerModel = programmerInfo?.model
@@ -74,7 +81,7 @@ struct ProgrammerInfoView: View {
                             HStack {
                                 Text("Firmware ")
                                 Spacer()
-                                OpenFileButton(caption: "Select Firmware...", fileTypes: ["dat"]) { url in
+                                OpenFileButton(caption: "Select Firmware...", fileTypes: firmwareFileTypes) { url in
                                     firmwareFileUrl = url
                                 }
                             }
