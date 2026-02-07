@@ -113,32 +113,39 @@ struct UpdateFirmwareButton: View {
     @State private var progressUpdate: ProgressUpdate?
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
+    @State private var progressMessage: String?
+
+    private func updateFirmware(using firmwareUrl: URL) async {
+        do {
+            try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path()) {
+                progressUpdate = $0
+            }
+            progressUpdate = ProgressUpdate(operation: "", percentage: 100)
+            await Task.yield()
+            programmerInfo = try await MiniproAPI.getProgrammerInfo()
+            try await Task.sleep(nanoseconds: 500 * 1_000_000)
+        } catch {
+            errorMessage = .init(message: error.localizedDescription)
+        }
+        isPresented = false
+        progressUpdate = nil
+        progressMessage = nil
+    }
 
     var body: some View {
         Button("Update...") {
             if let firmwareUrl = firmwareUrl {
                 isPresented = true
                 Task {
-                    do {
-                        try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path()) {
-                            progressUpdate = $0
-                        }
-                        progressUpdate = ProgressUpdate(operation: "", percentage: 100)
-                        await Task.yield()
-                        programmerInfo = try await MiniproAPI.getProgrammerInfo()
-                        try await Task.sleep(nanoseconds: 500 * 1_000_000)
-                    } catch {
-                        errorMessage = .init(message: error.localizedDescription)
-                    }
-                    isPresented = false
-                    progressUpdate = nil
+                    progressMessage = "Updating firmware..."
+                    await updateFirmware(using: firmwareUrl)
                 }
             }
         }
         .disabled(firmwareUrl == nil)
         .sheet(isPresented: $isPresented) {
             ModalDialogView {
-                ProgressBarView(label: .constant("Updating firmware..."), progressUpdate: $progressUpdate)
+                ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
         .alert(item: $errorMessage) {
