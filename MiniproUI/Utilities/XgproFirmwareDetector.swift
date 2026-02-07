@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os
 
 enum XgproFirmwareDetectorError: Error {
     case firmwareNotFound
@@ -14,6 +15,10 @@ enum XgproFirmwareDetectorError: Error {
 class XgproFirmwareDetector {
     private static let t56FileName = "updatet56.dat"
     private static let t76FileName = "updatet76.dat"
+    private static let logger = Logger(
+        subsystem: "com.3d-logic.visualminipro",
+        category: "XgproFirmwareDetector"
+    )
 
     enum FirmwareTarget {
         case t56(file: URL)
@@ -39,11 +44,14 @@ class XgproFirmwareDetector {
         }
 
         if let t76Match {
+            logger.notice("Detected T76 firmware file at \(t76Match.path, privacy: .public)")
             return .t76(file: t76Match)
         }
         if let t56Match {
+            logger.notice("Detected T56 firmware file at \(t56Match.path, privacy: .public)")
             return .t56(file: t56Match)
         }
+        logger.notice("No firmware file found in \(folder.path, privacy: .public)")
         throw XgproFirmwareDetectorError.firmwareNotFound
     }
 }

@@ -142,7 +142,8 @@ struct UpdateFirmwareButton: View {
     private func processRarFirmware(at firmwareUrl: URL) async {
         progressMessage = "Extracting firmware..."
         do {
-            _ = try await unpackFirmwareArchive(at: firmwareUrl)
+            let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
+            _ = try XgproFirmwareDetector.detectFirmwareTarget(in: outputDirectory)
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
