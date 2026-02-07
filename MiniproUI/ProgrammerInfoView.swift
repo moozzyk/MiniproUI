@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import os
 
 struct ProgrammerInfoView: View {
     @Binding var programmerInfo: ProgrammerInfo?
@@ -42,7 +43,8 @@ struct ProgrammerInfoView: View {
                 TabHeaderView(
                     caption: "Programmer: " + getProgrammerName(programmerInfo),
                     secondaryCaption: programmerInfo?.firmwareVersion,
-                    systemImageName: "cpu.fill")
+                    systemImageName: "cpu.fill"
+                )
                 Form {
                     if programmerInfo?.model == nil {
                         ProgrammerNotConnected()
@@ -53,7 +55,9 @@ struct ProgrammerInfoView: View {
                             PropertyRow(label: "Device Code ", value: programmerInfo?.deviceCode ?? "Unknown")
                             PropertyRow(label: "Serial Number ", value: programmerInfo?.serialNumber ?? "Unknown")
                             PropertyRow(
-                                label: "Manufactured Date", value: programmerInfo?.dateManufactured ?? "Unknown")
+                                label: "Manufactured Date",
+                                value: programmerInfo?.dateManufactured ?? "Unknown"
+                            )
                             PropertyRow(label: "USB Speed", value: programmerInfo?.usbSpeed ?? "Unknown")
                             PropertyRow(label: "Supply Voltage", value: programmerInfo?.supplyVoltage ?? "Unknown")
                         }
@@ -93,7 +97,9 @@ struct ProgrammerInfoView: View {
                             Link(
                                 "Learn more about downloading firmware",
                                 destination: URL(
-                                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware")!)
+                                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
+                                )!
+                            )
                         }
                     }
                 }
@@ -114,6 +120,7 @@ struct UpdateFirmwareButton: View {
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
     @State private var progressMessage: String?
+    private let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "UpdateFirmwareButton")
 
     private func updateFirmware(using firmwareUrl: URL) async {
         do {
@@ -132,13 +139,38 @@ struct UpdateFirmwareButton: View {
         progressMessage = nil
     }
 
+    private func unpackFirmwareArchive(at firmwareUrl: URL) async -> URL? {
+        do {
+            let outputDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(
+                "xgpro-firmware-\(UUID().uuidString)",
+                isDirectory: true
+            )
+            logger.notice("Extracting firmware archive to \(outputDirectory.path, privacy: .public)")
+            try await XgproSoftwareExtractor.extractRar(
+                inputURL: firmwareUrl,
+                outputDirectory: outputDirectory
+            )
+            return outputDirectory
+        } catch {
+            errorMessage = .init(message: error.localizedDescription)
+        }
+        isPresented = false
+        progressMessage = nil
+        return nil
+    }
+
     var body: some View {
         Button("Update...") {
             if let firmwareUrl = firmwareUrl {
                 isPresented = true
                 Task {
-                    progressMessage = "Updating firmware..."
-                    await updateFirmware(using: firmwareUrl)
+                    if firmwareUrl.pathExtension.lowercased() == "rar" {
+                        progressMessage = "Extracting firmware..."
+                        _ = await unpackFirmwareArchive(at: firmwareUrl)
+                    } else {
+                        progressMessage = "Updating firmware..."
+                        await updateFirmware(using: firmwareUrl)
+                    }
                 }
             }
         }
@@ -152,7 +184,8 @@ struct UpdateFirmwareButton: View {
             Alert(
                 title: Text("Firmware Update Failure"),
                 message: Text($0.message),
-                dismissButton: .default(Text("OK")))
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
@@ -168,5 +201,8 @@ struct UpdateFirmwareButton: View {
                 dateManufactured: "2024-06-28 16:55",
                 usbSpeed: "480Mbps (USB 2.0)",
                 supplyVoltage: "5.11 V",
-                warnings: ["T48 support is experimental"])))
+                warnings: ["T48 support is experimental"]
+            )
+        )
+    )
 }
