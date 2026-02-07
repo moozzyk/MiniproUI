@@ -139,24 +139,28 @@ struct UpdateFirmwareButton: View {
         progressMessage = nil
     }
 
-    private func unpackFirmwareArchive(at firmwareUrl: URL) async -> URL? {
+    private func processRarFirmware(at firmwareUrl: URL) async {
+        progressMessage = "Extracting firmware..."
         do {
-            let outputDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(
-                "xgpro-firmware-\(UUID().uuidString)",
-                isDirectory: true
-            )
-            logger.notice("Extracting firmware archive to \(outputDirectory.path, privacy: .public)")
-            try await XgproSoftwareExtractor.extractRar(
-                inputURL: firmwareUrl,
-                outputDirectory: outputDirectory
-            )
-            return outputDirectory
+            _ = try await unpackFirmwareArchive(at: firmwareUrl)
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
         isPresented = false
         progressMessage = nil
-        return nil
+    }
+
+    private func unpackFirmwareArchive(at firmwareUrl: URL) async throws -> URL {
+        let outputDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(
+            "xgpro-firmware-\(UUID().uuidString)",
+            isDirectory: true
+        )
+        logger.notice("Extracting firmware archive to \(outputDirectory.path, privacy: .public)")
+        try await XgproSoftwareExtractor.extractRar(
+            inputURL: firmwareUrl,
+            outputDirectory: outputDirectory
+        )
+        return outputDirectory
     }
 
     var body: some View {
@@ -165,8 +169,7 @@ struct UpdateFirmwareButton: View {
                 isPresented = true
                 Task {
                     if firmwareUrl.pathExtension.lowercased() == "rar" {
-                        progressMessage = "Extracting firmware..."
-                        _ = await unpackFirmwareArchive(at: firmwareUrl)
+                        await processRarFirmware(at: firmwareUrl)
                     } else {
                         progressMessage = "Updating firmware..."
                         await updateFirmware(using: firmwareUrl)
