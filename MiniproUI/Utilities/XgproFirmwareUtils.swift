@@ -14,6 +14,12 @@ enum XgproFirmwareUtilsError: Error {
     case readFailed
 }
 
+struct FirmwareInfo {
+    let programmerType: String
+    let fileURL: URL
+    let firmwareVersion: String
+}
+
 class XgproFirmwareUtils {
     private static let t56FileName = "updatet56.dat"
     private static let t76FileName = "updatet76.dat"
@@ -22,12 +28,7 @@ class XgproFirmwareUtils {
         category: "XgproFirmwareUtils"
     )
 
-    enum FirmwareTarget {
-        case t56(file: URL)
-        case t76(file: URL)
-    }
-
-    public static func detectFirmwareTarget(in folder: URL) throws -> FirmwareTarget {
+    public static func getFirmwareInfo(in folder: URL) throws -> FirmwareInfo {
         let entries = try FileManager.default.contentsOfDirectory(
             at: folder,
             includingPropertiesForKeys: nil,
@@ -46,18 +47,20 @@ class XgproFirmwareUtils {
         }
 
         if let t76Match {
+            let version = try extractFirmwareVersion(from: t76Match)
             logger.notice("Detected T76 firmware file at \(t76Match.path, privacy: .public)")
-            return .t76(file: t76Match)
+            return FirmwareInfo(programmerType: "T76", fileURL: t76Match, firmwareVersion: version)
         }
         if let t56Match {
+            let version = try extractFirmwareVersion(from: t56Match)
             logger.notice("Detected T56 firmware file at \(t56Match.path, privacy: .public)")
-            return .t56(file: t56Match)
+            return FirmwareInfo(programmerType: "T56", fileURL: t56Match, firmwareVersion: version)
         }
         logger.notice("No firmware file found in \(folder.path, privacy: .public)")
         throw XgproFirmwareUtilsError.firmwareNotFound
     }
 
-    public static func extractFirmwareVersion(from fileURL: URL) throws -> String {
+    private static func extractFirmwareVersion(from fileURL: URL) throws -> String {
         let handle = try FileHandle(forReadingFrom: fileURL)
         defer { try? handle.close() }
         guard let headerData = try handle.read(upToCount: 8) else {
