@@ -143,7 +143,13 @@ struct UpdateFirmwareButton: View {
         progressMessage = "Extracting firmware..."
         do {
             let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
-            _ = try XgproFirmwareDetector.detectFirmwareTarget(in: outputDirectory)
+            let target = try XgproFirmwareUtils.detectFirmwareTarget(in: outputDirectory)
+            let firmwareUrl: URL
+            switch target {
+            case .t56(let file), .t76(let file):
+                firmwareUrl = file
+            }
+            _ = try XgproFirmwareUtils.extractFirmwareVersion(from: firmwareUrl)
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }

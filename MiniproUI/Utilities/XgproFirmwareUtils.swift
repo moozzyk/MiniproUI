@@ -1,5 +1,5 @@
 //
-//  XgproFirmwareDetector.swift
+//  XgproFirmwareUtils.swift
 //  MiniproUI
 //
 //  Created by Pawel Kadluczka on 2/1/26.
@@ -8,18 +8,18 @@
 import Foundation
 import os
 
-enum XgproFirmwareDetectorError: Error {
+enum XgproFirmwareUtilsError: Error {
     case firmwareNotFound
     case fileTooSmall
     case readFailed
 }
 
-class XgproFirmwareDetector {
+class XgproFirmwareUtils {
     private static let t56FileName = "updatet56.dat"
     private static let t76FileName = "updatet76.dat"
     private static let logger = Logger(
         subsystem: "com.3d-logic.visualminipro",
-        category: "XgproFirmwareDetector"
+        category: "XgproFirmwareUtils"
     )
 
     enum FirmwareTarget {
@@ -54,7 +54,7 @@ class XgproFirmwareDetector {
             return .t56(file: t56Match)
         }
         logger.notice("No firmware file found in \(folder.path, privacy: .public)")
-        throw XgproFirmwareDetectorError.firmwareNotFound
+        throw XgproFirmwareUtilsError.firmwareNotFound
     }
 
     public static func extractFirmwareVersion(from fileURL: URL) throws -> String {
@@ -62,11 +62,11 @@ class XgproFirmwareDetector {
         defer { try? handle.close() }
         guard let headerData = try handle.read(upToCount: 8) else {
             logger.notice("Failed to read firmware header from \(fileURL.path, privacy: .public)")
-            throw XgproFirmwareDetectorError.readFailed
+            throw XgproFirmwareUtilsError.readFailed
         }
         if headerData.count < 8 {
             logger.notice("Firmware file too small: \(fileURL.path, privacy: .public)")
-            throw XgproFirmwareDetectorError.fileTooSmall
+            throw XgproFirmwareUtilsError.fileTooSmall
         }
         let versionField = try readUInt32LE(from: headerData, offset: 4)
         let maskedVersion = versionField & 0x0000ffff
@@ -76,7 +76,7 @@ class XgproFirmwareDetector {
 
     private static func readUInt32LE(from data: Data, offset: Int) throws -> UInt32 {
         if data.count < offset + 4 {
-            throw XgproFirmwareDetectorError.fileTooSmall
+            throw XgproFirmwareUtilsError.fileTooSmall
         }
         let base = data.startIndex + offset
         return
