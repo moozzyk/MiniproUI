@@ -17,7 +17,7 @@ enum XgproFirmwareUtilsError: Error {
 struct FirmwareInfo {
     let programmerType: String
     let fileURL: URL
-    let firmwareVersion: String
+    let firmwareVersion: UInt16
 }
 
 class XgproFirmwareUtils {
@@ -60,7 +60,7 @@ class XgproFirmwareUtils {
         throw XgproFirmwareUtilsError.firmwareNotFound
     }
 
-    private static func extractFirmwareVersion(from fileURL: URL) throws -> String {
+    private static func extractFirmwareVersion(from fileURL: URL) throws -> UInt16 {
         let handle = try FileHandle(forReadingFrom: fileURL)
         defer { try? handle.close() }
         guard let headerData = try handle.read(upToCount: 2) else {
@@ -73,7 +73,7 @@ class XgproFirmwareUtils {
         }
         let versionField = try readUInt16(from: headerData)
         logger.notice("Extracted firmware version \(versionField, privacy: .public) from \(fileURL.path, privacy: .public)")
-        return String(versionField)
+        return versionField
     }
 
     private static func readUInt16(from data: Data) throws -> UInt16 {
