@@ -101,6 +101,9 @@ class XgproFirmwareUtils {
                 logger.notice(
                     "Firmware folder entry for \(programmerType, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
                 )
+                if programmerType == "T76" {
+                    try processAlgorithmFileT76(path: entry)
+                }
             }
         }
     }
@@ -115,5 +118,42 @@ class XgproFirmwareUtils {
             logger.notice("Unsupported programmer type: \(programmerType, privacy: .public)")
             throw XgproFirmwareUtilsError.unsupportedProgrammerType
         }
+    }
+
+    private static func processAlgorithmFileT76(path: URL) throws {
+        logger.notice("Processing T76 algorithm file at \(path.path, privacy: .public)")
+        let algorithmFile = try Data(contentsOf: path)
+        let requiredSize = 16 + 4080
+        if algorithmFile.count < requiredSize {
+            logger.notice("T76 algorithm file too small: \(path.path, privacy: .public)")
+            throw XgproFirmwareUtilsError.fileTooSmall
+        }
+        let algorithmDescription = algorithmFile.subdata(in: 16..<requiredSize)
+        let strings = extractStrings(from: algorithmDescription, minimumLength: 4)
+        let description = strings.joined(separator: " ")
+        logger.notice("T76 algorithm description: \(description, privacy: .public)")
+    }
+
+    private static func extractStrings(from data: Data, minimumLength: Int) -> [String] {
+        var results: [String] = []
+        var current: [UInt8] = []
+        current.reserveCapacity(64)
+
+        for byte in data {
+            if byte >= 0x20 && byte <= 0x7e {
+                current.append(byte)
+            } else if current.count >= minimumLength {
+                if let string = String(bytes: current, encoding: .ascii) {
+                    results.append(string)
+                }
+                current.removeAll(keepingCapacity: true)
+            } else {
+                current.removeAll(keepingCapacity: true)
+            }
+        }
+        if current.count >= minimumLength, let string = String(bytes: current, encoding: .ascii) {
+            results.append(string)
+        }
+        return results
     }
 }
