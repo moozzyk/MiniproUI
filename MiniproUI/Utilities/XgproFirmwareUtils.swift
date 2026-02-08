@@ -63,29 +63,28 @@ class XgproFirmwareUtils {
     private static func extractFirmwareVersion(from fileURL: URL) throws -> String {
         let handle = try FileHandle(forReadingFrom: fileURL)
         defer { try? handle.close() }
-        guard let headerData = try handle.read(upToCount: 8) else {
+        guard let headerData = try handle.read(upToCount: 2) else {
             logger.notice("Failed to read firmware header from \(fileURL.path, privacy: .public)")
             throw XgproFirmwareUtilsError.readFailed
         }
-        if headerData.count < 8 {
+        if headerData.count < 2 {
             logger.notice("Firmware file too small: \(fileURL.path, privacy: .public)")
             throw XgproFirmwareUtilsError.fileTooSmall
         }
-        let versionField = try readUInt32LE(from: headerData, offset: 4)
-        let maskedVersion = versionField & 0x0000ffff
-        logger.notice("Extracted firmware version \(maskedVersion, privacy: .public) from \(fileURL.path, privacy: .public)")
-        return String(maskedVersion)
+        let versionField = try readUInt16(from: headerData)
+        logger.notice("Extracted firmware version \(versionField, privacy: .public) from \(fileURL.path, privacy: .public)")
+        return String(versionField)
     }
 
-    private static func readUInt32LE(from data: Data, offset: Int) throws -> UInt32 {
-        if data.count < offset + 4 {
+    private static func readUInt16(from data: Data) throws -> UInt16 {
+        if data.count < 2 {
             throw XgproFirmwareUtilsError.fileTooSmall
         }
-        let base = data.startIndex + offset
-        return
-            UInt32(data[base]) |
-            (UInt32(data[base + 1]) << 8) |
-            (UInt32(data[base + 2]) << 16) |
-            (UInt32(data[base + 3]) << 24)
+        return try data.withUnsafeBytes { rawBuffer in
+            guard let baseAddress = rawBuffer.baseAddress else {
+                throw XgproFirmwareUtilsError.readFailed
+            }
+            return baseAddress.load(as: UInt16.self)
+        }
     }
 }
