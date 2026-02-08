@@ -12,6 +12,7 @@ enum XgproFirmwareUtilsError: Error {
     case firmwareNotFound
     case fileTooSmall
     case readFailed
+    case unsupportedProgrammerType
 }
 
 struct FirmwareInfo {
@@ -85,6 +86,34 @@ class XgproFirmwareUtils {
                 throw XgproFirmwareUtilsError.readFailed
             }
             return baseAddress.load(as: UInt16.self)
+        }
+    }
+
+    public static func createAlgorithmXml(in baseFolder: URL, programmerType: String) throws {
+        let algorithmFolder = try resolveAlgorithmDirectory(baseFolder: baseFolder, programmerType: programmerType)
+        let entries = try FileManager.default.contentsOfDirectory(
+            at: algorithmFolder,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        )
+        for entry in entries {
+            if entry.pathExtension.lowercased() == "alg" {
+                logger.notice(
+                    "Firmware folder entry for \(programmerType, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
+                )
+            }
+        }
+    }
+
+    private static func resolveAlgorithmDirectory(baseFolder: URL, programmerType: String) throws -> URL {
+        switch programmerType {
+        case "T76":
+            return baseFolder.appendingPathComponent("algoT76", isDirectory: true)
+        case "T56":
+            return baseFolder.appendingPathComponent("algorithm", isDirectory: true)
+        default:
+            logger.notice("Unsupported programmer type: \(programmerType, privacy: .public)")
+            throw XgproFirmwareUtilsError.unsupportedProgrammerType
         }
     }
 }
