@@ -157,7 +157,7 @@ class XgproFirmwareUtils {
     }
 
     private static func algorithmNameT76(for path: URL) -> String {
-        let fileName = path.lastPathComponent
+        let fileName = path.deletingPathExtension().lastPathComponent
         return fileName.replacingOccurrences(of: "T7_", with: "")
     }
 

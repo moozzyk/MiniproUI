@@ -144,10 +144,13 @@ struct UpdateFirmwareButton: View {
         do {
             let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
             let firmwareInfo = try XgproFirmwareUtils.getFirmwareInfo(in: outputDirectory)
-            _ = try await XgproFirmwareUtils.createAlgorithmXml(
+            let algorithmsXml = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: outputDirectory,
                 programmerType: firmwareInfo.programmerType
             )
+            let algorithmsUrl = FileManager.default.temporaryDirectory.appendingPathComponent("algorithms.xml")
+            try algorithmsXml.write(to: algorithmsUrl, atomically: true, encoding: .utf8)
+            logger.notice("Saved algorithms XML to \(algorithmsUrl.path, privacy: .public)")
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
