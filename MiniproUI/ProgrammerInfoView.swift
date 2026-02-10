@@ -144,7 +144,7 @@ struct UpdateFirmwareButton: View {
         do {
             let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
             let firmwareInfo = try XgproFirmwareUtils.getFirmwareInfo(in: outputDirectory)
-            try XgproFirmwareUtils.createAlgorithmXml(
+            _ = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: outputDirectory,
                 programmerType: firmwareInfo.programmerType
             )

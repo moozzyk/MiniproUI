@@ -74,7 +74,9 @@ class XgproFirmwareUtils {
             throw XgproFirmwareUtilsError.fileTooSmall
         }
         let versionField = try readUInt16(from: headerData)
-        logger.notice("Extracted firmware version \(versionField, privacy: .public) from \(fileURL.path, privacy: .public)")
+        logger.notice(
+            "Extracted firmware version \(versionField, privacy: .public) from \(fileURL.path, privacy: .public)"
+        )
         return versionField
     }
 
@@ -90,23 +92,38 @@ class XgproFirmwareUtils {
         }
     }
 
-    public static func createAlgorithmXml(in baseFolder: URL, programmerType: String) throws {
+    public static func createAlgorithmXml(in baseFolder: URL, programmerType: String) async throws -> String {
         let algorithmFolder = try resolveAlgorithmDirectory(baseFolder: baseFolder, programmerType: programmerType)
         let entries = try FileManager.default.contentsOfDirectory(
             at: algorithmFolder,
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
         )
-        for entry in entries {
-            if entry.pathExtension.lowercased() == "alg" {
-                logger.notice(
-                    "Firmware folder entry for \(programmerType, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
-                )
-                if programmerType == "T76" {
-                    try processAlgorithmFileT76(path: entry)
-                }
+        var algorithmElements: [String] = []
+        for entry in entries where entry.pathExtension.lowercased() == "alg" {
+            logger.notice(
+                "Firmware folder entry for \(programmerType, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
+            )
+            if programmerType == "T76" {
+                let element = try await buildAlgorithmElementT76(path: entry)
+                algorithmElements.append(element)
             }
         }
+        let xml = buildAlgorithmsXml(programmerType: programmerType, algorithmElements: algorithmElements)
+        logger.notice("Built algorithms XML with \(algorithmElements.count, privacy: .public) entries")
+        return xml
+    }
+
+    private static func buildAlgorithmsXml(programmerType: String, algorithmElements: [String]) -> String {
+        return """
+            <root>
+            <database type="ALGORITHMS">
+            <algorithms_\(programmerType)>
+            \(algorithmElements.joined(separator: "\n"))
+            </algorithms_\(programmerType)>
+            </database>
+            </root>
+            """
     }
 
     private static func resolveAlgorithmDirectory(baseFolder: URL, programmerType: String) throws -> URL {
@@ -121,7 +138,7 @@ class XgproFirmwareUtils {
         }
     }
 
-    private static func processAlgorithmFileT76(path: URL) throws {
+    private static func buildAlgorithmElementT76(path: URL) async throws -> String {
         logger.notice("Processing T76 algorithm file at \(path.path, privacy: .public)")
         let algorithmFile = try Data(contentsOf: path)
         let requiredSize = 16 + 4080
@@ -133,6 +150,10 @@ class XgproFirmwareUtils {
         let strings = extractStrings(from: algorithmDescription, minimumLength: 4)
         let description = strings.joined(separator: " ")
         logger.notice("T76 algorithm description: \(description, privacy: .public)")
+        let bitstream = try await createAlgorithmBitstreamT76(algorithmFile)
+        let algorithmName = "28F32P78"
+        return
+            "<algorithm name=\"\(algorithmName)\" description=\"\(description)\" bitstream=\"\(bitstream)\" />"
     }
 
     public static func createAlgorithmBitstreamT76(_ data: Data) async throws -> String {
