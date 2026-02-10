@@ -13,6 +13,7 @@ enum XgproFirmwareUtilsError: Error {
     case fileTooSmall
     case readFailed
     case unsupportedProgrammerType
+    case compressionFailed
 }
 
 struct FirmwareInfo {
@@ -132,6 +133,53 @@ class XgproFirmwareUtils {
         let strings = extractStrings(from: algorithmDescription, minimumLength: 4)
         let description = strings.joined(separator: " ")
         logger.notice("T76 algorithm description: \(description, privacy: .public)")
+    }
+
+    public static func createAlgorithmBitstreamT76(_ data: Data) async throws -> String {
+        let algorithmOffset = 4096
+        let headerOffset = 4
+        let headerLength = 8
+        let requiredSize = max(headerOffset + headerLength, algorithmOffset)
+        if data.count < requiredSize {
+            logger.notice("Algorithm data too small for bitstream: \(data.count, privacy: .public) bytes")
+            throw XgproFirmwareUtilsError.fileTooSmall
+        }
+
+        let payload = prepareBitstreamPayload(
+            data,
+            headerOffset: headerOffset,
+            headerLength: headerLength,
+            algorithmOffset: algorithmOffset
+        )
+        let gzipData = try await gzipData(payload)
+        return gzipData.base64EncodedString()
+    }
+
+    private static func prepareBitstreamPayload(
+        _ data: Data,
+        headerOffset: Int,
+        headerLength: Int,
+        algorithmOffset: Int
+    ) -> Data {
+        var payload = Data()
+        payload.reserveCapacity(headerLength + max(0, data.count - algorithmOffset))
+        payload.append(data.subdata(in: headerOffset..<(headerOffset + headerLength)))
+        payload.append(data.subdata(in: algorithmOffset..<data.count))
+        return payload
+    }
+
+    private static func gzipData(_ data: Data) async throws -> Data {
+        let gzipURL = URL(fileURLWithPath: "/usr/bin/gzip")
+        let result = try await ProcessInvoker.invoke(
+            executableURL: gzipURL,
+            arguments: ["-c"],
+            stdinData: data
+        )
+        if result.exitCode != 0 {
+            logger.notice("gzip failed with exit code \(result.exitCode, privacy: .public)")
+            throw XgproFirmwareUtilsError.compressionFailed
+        }
+        return result.stdOut
     }
 
     private static func extractStrings(from data: Data, minimumLength: Int) -> [String] {
