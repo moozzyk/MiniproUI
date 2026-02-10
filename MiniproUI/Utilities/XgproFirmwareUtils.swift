@@ -146,14 +146,28 @@ class XgproFirmwareUtils {
             logger.notice("T76 algorithm file too small: \(path.path, privacy: .public)")
             throw XgproFirmwareUtilsError.fileTooSmall
         }
+        let algorithmName = algorithmNameT76(for: path)
+        let algorithmDescriptionText = algorithmDescriptionT76(from: algorithmFile, fileURL: path)
+        let bitstream = try await createAlgorithmBitstreamT76(algorithmFile)
+        return """
+            <algorithm name="\(algorithmName)"
+            description="\(algorithmDescriptionText)"
+            bitstream="\(bitstream)" />
+            """
+    }
+
+    private static func algorithmNameT76(for path: URL) -> String {
+        let fileName = path.lastPathComponent
+        return fileName.replacingOccurrences(of: "T7_", with: "")
+    }
+
+    private static func algorithmDescriptionT76(from algorithmFile: Data, fileURL: URL) -> String {
+        let requiredSize = 16 + 4080
         let algorithmDescription = algorithmFile.subdata(in: 16..<requiredSize)
         let strings = extractStrings(from: algorithmDescription, minimumLength: 4)
         let description = strings.joined(separator: " ")
         logger.notice("T76 algorithm description: \(description, privacy: .public)")
-        let bitstream = try await createAlgorithmBitstreamT76(algorithmFile)
-        let algorithmName = "28F32P78"
-        return
-            "<algorithm name=\"\(algorithmName)\" description=\"\(description)\" bitstream=\"\(bitstream)\" />"
+        return description
     }
 
     public static func createAlgorithmBitstreamT76(_ data: Data) async throws -> String {
