@@ -148,7 +148,11 @@ struct UpdateFirmwareButton: View {
                 in: outputDirectory,
                 programmerType: firmwareInfo.programmerType
             )
-            let algorithmsUrl = FileManager.default.temporaryDirectory.appendingPathComponent("algorithms.xml")
+            let algorithmsUrl = try resolveAlgorithmXmlPath(for: firmwareInfo)
+            try FileManager.default.createDirectory(
+                at: algorithmsUrl.deletingLastPathComponent(),
+                withIntermediateDirectories: true
+            )
             try algorithmsXml.write(to: algorithmsUrl, atomically: true, encoding: .utf8)
             logger.notice("Saved algorithms XML to \(algorithmsUrl.path, privacy: .public)")
         } catch {
@@ -169,6 +173,20 @@ struct UpdateFirmwareButton: View {
             outputDirectory: outputDirectory
         )
         return outputDirectory
+    }
+
+    private func resolveAlgorithmXmlPath(for firmwareInfo: FirmwareInfo) throws -> URL {
+        let baseDirectory = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: false
+        )
+        let versionFolderName = String(format: "0x%x", firmwareInfo.firmwareVersion)
+        return baseDirectory
+            .appendingPathComponent(firmwareInfo.programmerType.uppercased(), isDirectory: true)
+            .appendingPathComponent(versionFolderName, isDirectory: true)
+            .appendingPathComponent("algorithm.xml")
     }
 
     var body: some View {
