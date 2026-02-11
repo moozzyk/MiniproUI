@@ -143,6 +143,16 @@ struct UpdateFirmwareButton: View {
         progressMessage = "Extracting firmware..."
         do {
             let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
+            defer {
+                do {
+                    try FileManager.default.removeItem(at: outputDirectory)
+                    logger.notice("Removed extracted firmware directory at \(outputDirectory.path, privacy: .public)")
+                } catch {
+                    logger.notice(
+                        "Failed to remove extracted firmware directory at \(outputDirectory.path, privacy: .public): \(error.localizedDescription, privacy: .public)"
+                    )
+                }
+            }
             let firmwareInfo = try XgproFirmwareUtils.getFirmwareInfo(in: outputDirectory)
             let algorithmsXml = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: outputDirectory,
