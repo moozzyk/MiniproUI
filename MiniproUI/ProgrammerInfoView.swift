@@ -158,7 +158,10 @@ struct UpdateFirmwareButton: View {
                 in: outputDirectory,
                 programmerType: firmwareInfo.programmerType
             )
-            let algorithmsUrl = try resolveAlgorithmXmlPath(for: firmwareInfo)
+            let algorithmsUrl = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+                programmerType: firmwareInfo.programmerType,
+                firmwareVersion: firmwareInfo.firmwareVersion
+            )
             try FileManager.default.createDirectory(
                 at: algorithmsUrl.deletingLastPathComponent(),
                 withIntermediateDirectories: true
@@ -185,19 +188,6 @@ struct UpdateFirmwareButton: View {
         return outputDirectory
     }
 
-    private func resolveAlgorithmXmlPath(for firmwareInfo: FirmwareInfo) throws -> URL {
-        let baseDirectory = try FileManager.default.url(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: false
-        )
-        let versionFolderName = String(format: "0x%x", firmwareInfo.firmwareVersion)
-        return baseDirectory
-            .appendingPathComponent(firmwareInfo.programmerType.uppercased(), isDirectory: true)
-            .appendingPathComponent(versionFolderName, isDirectory: true)
-            .appendingPathComponent("algorithm.xml")
-    }
 
     var body: some View {
         Button("Update...") {
