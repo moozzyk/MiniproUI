@@ -43,7 +43,7 @@ struct MiniproAPITests {
     }
 
     @Test func testTestLogicIC() async throws {
-        let logicICTestResult = try await MiniproAPI.testLogicIC(device: "7400")
+        let logicICTestResult = try await MiniproAPI.testLogicIC(device: "7400", algorithmXmlPath: nil)
         #expect(logicICTestResult.device == "7400")
         #expect(logicICTestResult.isSuccess || logicICTestResult.numErrors > 0)
         #expect(logicICTestResult.testVectors.count == 4)

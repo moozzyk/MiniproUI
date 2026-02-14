@@ -39,7 +39,9 @@ struct LogicICTestView: View {
                                 Task {
                                     do {
                                         logicICTestResult = try await MiniproAPI.testLogicIC(
-                                            device: logicICDetails!.name)
+                                            device: logicICDetails!.name,
+                                            algorithmXmlPath: nil
+                                        )
                                     } catch {
                                         errorMessage = .init(message: error.localizedDescription)
                                         logicICTestResult = nil

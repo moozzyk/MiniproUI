@@ -40,8 +40,12 @@ class MiniproAPI {
         return try DeviceDetailsProcessor.run(result)
     }
 
-    static func testLogicIC(device: String) async throws -> LogicICTestResult {
-        let result = try await MiniproInvoker.invoke(arguments: ["--logic_test", "--device", device])
+    static func testLogicIC(device: String, algorithmXmlPath: URL?) async throws -> LogicICTestResult {
+        var arguments = ["--logic_test", "--device", device]
+        if let algorithmXmlPath {
+            arguments.append(contentsOf: ["--algorithms", algorithmXmlPath.path])
+        }
+        let result = try await MiniproInvoker.invoke(arguments: arguments)
         return try LogicICTestProcessor.run(result, device: device)
     }
 
