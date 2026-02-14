@@ -16,6 +16,14 @@ struct ProgrammerInfo {
     let usbSpeed: String
     let supplyVoltage: String
     let warnings: [String]
+
+    func getFirmwareVersionNumber() -> Int? {
+        let hexRegex = /0x[0-9a-fA-F]+/
+        if let match = try? hexRegex.firstMatch(in: firmwareVersion) {
+            return Int(match.0.dropFirst(2), radix: 16)
+        }
+        return nil
+    }
 }
 
 class ProgrammerInfoProcessor {
