@@ -41,7 +41,7 @@ struct ProgrammerInfoProcessorTests {
         let result = try ProgrammerInfoProcessor.run(miniproResult)
         #expect(result.model == "T48")
         #expect(result.firmwareVersion == "00.1.30 (0x11e)")
-        #expect(result.getFirmwareVersionNumber() == 0x11e)
+        #expect(result.getFirmwareVersionNumber() == UInt16(0x11e))
         #expect(result.deviceCode == "46A16257")
         #expect(result.serialNumber == "HSSCVO9LARFMOYKYOMVE5123")
         #expect(result.dateManufactured == "2024-06-28 16:55")

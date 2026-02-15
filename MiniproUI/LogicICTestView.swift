@@ -11,6 +11,7 @@ struct LogicICTestView: View {
     @Binding var supportedDevices: SupportedDevices?
     @Binding var logicICDetails: DeviceDetails?
     @Binding var logicICTestResult: LogicICTestResult?
+    @Binding var programmerInfo: ProgrammerInfo?
     @State private var selectedDevice: String? = nil
     @State private var errorMessage: DialogErrorMessage? = nil
 
@@ -38,10 +39,9 @@ struct LogicICTestView: View {
                             Button("Test") {
                                 Task {
                                     do {
+                                        let algorithmXmlPath = try? getAlgorithmXmlPath()
                                         logicICTestResult = try await MiniproAPI.testLogicIC(
-                                            device: logicICDetails!.name,
-                                            algorithmXmlPath: nil
-                                        )
+                                            device: logicICDetails!.name, algorithmXmlPath: algorithmXmlPath)
                                     } catch {
                                         errorMessage = .init(message: error.localizedDescription)
                                         logicICTestResult = nil
@@ -74,10 +74,22 @@ struct LogicICTestView: View {
                 dismissButton: .default(Text("OK")))
         }
     }
+
+    private func getAlgorithmXmlPath() throws -> URL? {
+        guard let programmerInfo,
+              let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
+        else {
+            throw MiniproAPIError.programmerInfoUnavailable
+        }
+        return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+            programmerType: programmerInfo.model,
+            firmwareVersion: firmwareVersion
+        )
+    }
 }
 
 #Preview {
     LogicICTestView(
         supportedDevices: .constant(nil), logicICDetails: .constant(nil),
-        logicICTestResult: .constant(nil))
+        logicICTestResult: .constant(nil), programmerInfo: .constant(nil))
 }

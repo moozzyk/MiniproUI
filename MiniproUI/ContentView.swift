@@ -47,7 +47,7 @@ struct ContentView: View {
             } else if selectedItem == .logicIcTest {
                 LogicICTestView(
                     supportedDevices: $model.supportedDevices, logicICDetails: $model.logicICDetails,
-                    logicICTestResult: $model.logicICTestResult
+                    logicICTestResult: $model.logicICTestResult, programmerInfo: $model.programmerInfo
                 )
                 .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .epromProgramming {
