@@ -106,7 +106,7 @@ struct WriteProcessorTests {
         }
     }
 
-    @Test func writeProcessorIncorrectFileSize() async throws {
+    @Test func writeProcessorIncorrectFileSizeT48() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -129,7 +129,35 @@ struct WriteProcessorTests {
         }
     }
 
-    @Test func writeProcessorInvalidChipId() async throws {
+    @Test func writeProcessorIncorrectFileSizeT76() async throws {
+        let miniproResult = InvocationResult(
+            exitCode: 0,
+            stdOut:
+                Data(),
+            stdErr:
+                """
+                Found T76 00.1.13 (0x10d)
+                Warning: T76 support is experimental!
+                Device code: 58A02670
+                Serial code: 5M55O5G378PD0XBAXPXD3032
+                Manufactured: 2025-08-1817:22
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.25 V (USB)
+
+                Using overridden database file /Users/moozzyk/Library/Containers/com.moozzyk.MiniproUI/Data/Library/Application Support/T76/0x10d/algorithm.xml
+                Using T76 ROM28P31 algorithm..
+                Chip ID: 0xDA08  OK
+                Incorrect file size: 16384 (needed 65536, use -s/S to ignore)
+                FPGA Reset  OK
+                """
+        )
+
+        #expect(throws: MiniproAPIError.incorrectFileSize(65536, 16384)) {
+            try WriteProcessor.run(miniproResult, WriteOptions())
+        }
+    }
+
+    @Test func writeProcessorInvalidChipIdT48() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -154,7 +182,34 @@ struct WriteProcessorTests {
         }
     }
 
-    @Test func writeProcessorChipMismatchSizeMismatchIgnoredSkipVerify() async throws {
+    @Test func writeProcessorInvalidChipIdT76() async throws {
+        let miniproResult = InvocationResult(
+            exitCode: 0,
+            stdOut:
+                Data(),
+            stdErr:
+                """
+                Found T76 00.1.13 (0x10d)
+                Warning: T76 support is experimental!
+                Device code: 58A02670
+                Serial code: 5M55O5G378PD0XBAXPXD3032
+                Manufactured: 2025-08-1817:22
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.25 V (USB)
+
+                Using overridden database file /Users...zyk/Library/Containers/com.moozzyk.MiniproUI/Data/Library/Application Support/T76/0x10d/algorithm.xml
+                Using T76 ROM32P11 algorithm..
+                Invalid Chip ID: expected 0xDA01, got 0x0000 (unknown)
+                (use '-y' to continue anyway at your own risk)
+                FPGA Reset  OK
+                """)
+
+        #expect(throws: MiniproAPIError.invalidChip("0xDA01", "0x0000")) {
+            try WriteProcessor.run(miniproResult, WriteOptions())
+        }
+    }
+
+    @Test func writeProcessorChipMismatchSizeMismatchIgnoredSkipVerifyT48() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -184,6 +239,52 @@ struct WriteProcessorTests {
                     ignoreFileSizeMismatch: true, ignoreChipIdMismatch: true, skipVerification: true))
         }
     }
+
+    @Test func writeProcessorChipMismatchSizeMismatchIgnoredSkipVerifyT76() async throws {
+        let miniproResult = InvocationResult(
+            exitCode: 0,
+            stdOut:
+                Data(),
+            stdErr:
+                """
+                Found T76 00.1.13 (0x10d)
+                Warning: T76 support is experimental!
+                Device code: 58A02670
+                Serial code: 5M55O5G378PD0XBAXPXD3032
+                Manufactured: 2025-08-1817:22
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.25 V (USB)
+
+                Using overridden database file /Users...gorithm.xml
+                Using T76 ROM28P31 algorithm..
+                WARNING: Chip ID mismatch: expected 0xDA08, got 0x0000 (unknown)
+                Warning: Incorrect file size: 16384 (needed 65536)
+                
+                \u{1b}[KErasing... 
+                \u{1b}[KErasing... 5.23 Sec  OK
+                
+                \u{1b}[KWriting Code...  
+                \u{1b}[KWriting Code...   0%
+                \u{1b}[KWriting Code...  87%
+                \u{1b}[KWriting Code...  89%
+                \u{1b}[KWriting Code...  90%
+                \u{1b}[KWriting Code...  92%
+                \u{1b}[KWriting Code...  93%
+                \u{1b}[KWriting Code...  95%
+                \u{1b}[KWriting Code...  96%
+                \u{1b}[KWriting Code...  98%
+                \u{1b}[KWriting Code...  183.9 ms  OK
+                FPGA Reset  OK
+                """)
+
+        #expect(throws: Never.self) {
+            try WriteProcessor.run(
+                miniproResult,
+                WriteOptions(
+                    ignoreFileSizeMismatch: true, ignoreChipIdMismatch: true, skipVerification: true))
+        }
+    }
+
 
     @Test func writeProcessorOvercurrentProtection() async throws {
         // When trying to program a Logic Chip
