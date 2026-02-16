@@ -49,8 +49,12 @@ class MiniproAPI {
         return try LogicICTestProcessor.run(result, device: device)
     }
 
-    static func readDeviceId(device: String) async throws -> String {
-        let result = try await MiniproInvoker.invoke(arguments: ["--device", device, "--read_id"])
+    static func readDeviceId(device: String, algorithmXmlPath: URL?) async throws -> String {
+        var arguments = ["--device", device, "--read_id"]
+        if let algorithmXmlPath {
+            arguments.append(contentsOf: ["--algorithms", algorithmXmlPath.path])
+        }
+        let result = try await MiniproInvoker.invoke(arguments: arguments)
         return try DeviceIdProcessor.run(result)
     }
 

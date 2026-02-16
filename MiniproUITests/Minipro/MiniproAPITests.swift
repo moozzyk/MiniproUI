@@ -12,7 +12,7 @@ import Testing
 
 struct MiniproAPITests {
     @Sendable static func isW27C512Present() async throws -> Bool {
-        return (try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28")) == "0xDA08"
+        return (try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: nil)) == "0xDA08"
     }
 
     @Test func testGetProgrammerInfo() async throws {
@@ -51,7 +51,7 @@ struct MiniproAPITests {
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdReturnsDeviceId() async throws {
-        let deviceId = try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28")
+        let deviceId = try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: nil)
         #expect(deviceId == "0xDA08")
     }
 
@@ -60,7 +60,7 @@ struct MiniproAPITests {
         await #expect(
             throws: MiniproAPIError.chipIdMismatch("0x97D6", "0x0000")
         ) {
-            try await MiniproAPI.readDeviceId(device: "SMJ27C010A@TSOP32")
+            try await MiniproAPI.readDeviceId(device: "SMJ27C010A@TSOP32", algorithmXmlPath: nil)
         }
     }
 
