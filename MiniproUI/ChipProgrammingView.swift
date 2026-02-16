@@ -44,7 +44,12 @@ struct ChipProgrammingView: View {
                             readOptions: $readOptions,
                             programmerInfo: $programmerInfo
                         )
-                        WriteChipButton(device: deviceDetails, buffer: buffer, writeOptions: $writeOptions)
+                        WriteChipButton(
+                            device: deviceDetails,
+                            buffer: buffer,
+                            writeOptions: $writeOptions,
+                            programmerInfo: $programmerInfo
+                        )
                     }
                     let supportedEEPROMs = supportedDevices?.eepromICs ?? []
                     if supportedEEPROMs.isEmpty {
@@ -138,6 +143,7 @@ struct WriteChipButton: View {
     let device: DeviceDetails?
     let buffer: Data?
     @Binding var writeOptions: WriteOptions
+    @Binding var programmerInfo: ProgrammerInfo?
     @State private var isPresented = false
     @State private var errorMessage: DialogErrorMessage?
 
@@ -150,7 +156,7 @@ struct WriteChipButton: View {
             ModalDialogView {
                 WriteChipView(
                     device: device!, buffer: buffer!, isPresented: $isPresented, writeOptions: $writeOptions,
-                    errorMessage: $errorMessage
+                    programmerInfo: $programmerInfo, errorMessage: $errorMessage
                 )
             }
         }

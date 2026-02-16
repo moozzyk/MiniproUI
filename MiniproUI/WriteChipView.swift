@@ -17,6 +17,7 @@ struct WriteChipView: View {
     let buffer: Data
     @Binding var isPresented: Bool
     @Binding var writeOptions: WriteOptions
+    @Binding var programmerInfo: ProgrammerInfo?
     @Binding var errorMessage: DialogErrorMessage?
     @State private var writeChipState = WriteChipState.writeOptions
     @State private var progressUpdate: ProgressUpdate?
@@ -25,12 +26,13 @@ struct WriteChipView: View {
 
     init(
         device: DeviceDetails, buffer: Data, isPresented: Binding<Bool>, writeOptions: Binding<WriteOptions>,
-        errorMessage: Binding<DialogErrorMessage?>
+        programmerInfo: Binding<ProgrammerInfo?>, errorMessage: Binding<DialogErrorMessage?>
     ) {
         self.device = device
         self.buffer = buffer
         self._isPresented = isPresented
         self._writeOptions = writeOptions
+        self._programmerInfo = programmerInfo
         self._errorMessage = errorMessage
         newWriteOptions = writeOptions.wrappedValue
     }
@@ -50,10 +52,11 @@ struct WriteChipView: View {
                         progressMessage = "Writing Chip Contents..."
                         Task {
                             do {
+                                let algorithmXmlPath = try getAlgorithmXmlPath()
                                 try await MiniproAPI.write(
                                     device: device.name,
                                     data: buffer,
-                                    algorithmXmlPath: nil,
+                                    algorithmXmlPath: algorithmXmlPath,
                                     writeOptions: writeOptions
                                 ) {
                                     if $0.operation.contains("Reading") {
@@ -79,6 +82,18 @@ struct WriteChipView: View {
                 ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
+    }
+
+    private func getAlgorithmXmlPath() throws -> URL? {
+        guard let programmerInfo,
+              let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
+        else {
+            throw MiniproAPIError.programmerInfoUnavailable
+        }
+        return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+            programmerType: programmerInfo.model,
+            firmwareVersion: firmwareVersion
+        )
     }
 }
 
