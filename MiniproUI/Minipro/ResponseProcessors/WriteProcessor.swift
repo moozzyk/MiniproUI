@@ -11,19 +11,17 @@ class WriteProcessor {
     public static func run(_ result: InvocationResult, _ writeOptions: WriteOptions) throws {
         try ensureNoError(invocationResult: result, ignoreInvalidChipId: writeOptions.ignoreChipIdMismatch)
 
-        let stdErr = result.stdErr
+        let stdErr = result.stdErr.replacingOccurrences(of: "FPGA Reset  OK\n", with: "") // T76 specific - ignore
         if writeOptions.skipVerification {
             if stdErr.contains(/Writing .* OK/) {
                 return
             }
         } else {
-            if stdErr.hasSuffix("Verification OK\n")
-                || stdErr.hasSuffix("Verification OK\nFPGA Reset  OK\n")
-            {
+            if stdErr.hasSuffix("Verification OK\n") {
                 return
             }
 
-            let verificationFailedRegex = /Verification failed at address.*$/
+            let verificationFailedRegex = /Verification failed at address.*/
             let verificationFailedMatch = try? verificationFailedRegex.firstMatch(in: stdErr)
             if let verificationFailedMatch = verificationFailedMatch {
                 throw MiniproAPIError.verificationFailed(String(verificationFailedMatch.0))
@@ -40,6 +38,6 @@ class WriteProcessor {
         }
 
         throw MiniproAPIError.unknownError(
-            "\(stdErr.split(separator: "\n").last ?? "") Exit code: \(result.exitCode)")
+            "\(result.stdErr.split(separator: "\n").last ?? "") Exit code: \(result.exitCode)")
     }
 }

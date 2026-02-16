@@ -40,7 +40,7 @@ struct WriteProcessorTests {
         }
     }
 
-    @Test func writeProcessorVerificationFailed() async throws {
+    @Test func writeProcessorVerificationFailedT48() async throws {
         // non-matching chip + ignore chip ID mismatch + ignore file size mismatch
         let miniproResult = InvocationResult(
             exitCode: 0,
@@ -66,6 +66,40 @@ struct WriteProcessorTests {
                 """)
         #expect(
             throws: MiniproAPIError.verificationFailed("Verification failed at address 0x0000: File=0xF3, Device=0xFD")
+        ) {
+            try WriteProcessor.run(
+                miniproResult, WriteOptions(ignoreFileSizeMismatch: true, ignoreChipIdMismatch: true))
+        }
+    }
+
+    @Test func writeProcessorVerificationFailedT76() async throws {
+        // non-matching chip + ignore chip ID mismatch + ignore file size mismatch
+        let miniproResult = InvocationResult(
+            exitCode: 0,
+            stdOut:
+                Data(),
+            stdErr:
+                """
+                Found T76 00.1.13 (0x10d)
+                Warning: T76 support is experimental!
+                Device code: 58A02670
+                Serial code: 5M55O5G378PD0XBAXPXD3032
+                Manufactured: 2025-08-1817:22
+                USB speed: 480Mbps (USB 2.0)
+                Supply voltage: 5.25 V (USB)
+
+                Using overridden database file /Users...Reading Code...  90%
+                \u{1b}[KReading Code...  92%
+                \u{1b}[KReading Code...  93%
+                \u{1b}[KReading Code...  95%
+                \u{1b}[KReading Code...  96%
+                \u{1b}[KReading Code...  98%
+                \u{1b}[KReading Code...  59.9 ms  OK
+                Verification failed at address 0x0001: File=0x01, Device=0x00
+                FPGA Reset  OK
+                """)
+        #expect(
+            throws: MiniproAPIError.verificationFailed("Verification failed at address 0x0001: File=0x01, Device=0x00")
         ) {
             try WriteProcessor.run(
                 miniproResult, WriteOptions(ignoreFileSizeMismatch: true, ignoreChipIdMismatch: true))
