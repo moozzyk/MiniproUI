@@ -13,7 +13,7 @@ struct MiniproInvokerTests {
     @Test func testInvokeNoError() async throws {
         let result = try await MiniproInvoker.invoke(arguments: ["-k"])
         #expect(result.exitCode == 0)
-        #expect(result.stdErr == "t48: T48\n")
+        #expect(result.stdErr == "t48: T48\n" || result.stdErr == "t76: T76\n")
         #expect(result.stdOutString == "")
     }
 

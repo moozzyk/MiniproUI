@@ -11,13 +11,22 @@ import Testing
 @testable import Visual_Minipro
 
 struct MiniproAPITests {
+    private static func getAlgorithmXmlPath() -> URL? {
+        return try? AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+            programmerType: "T76",
+            firmwareVersion: 0x10d
+        )
+    }
+
     @Sendable static func isW27C512Present() async throws -> Bool {
-        return (try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: nil)) == "0xDA08"
+        let algorithmXmlPath = Self.getAlgorithmXmlPath()
+        return (try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: algorithmXmlPath))
+            == "0xDA08"
     }
 
     @Test func testGetProgrammerInfo() async throws {
         let result = try await MiniproAPI.getProgrammerInfo()
-        #expect(result.model == "T48")
+        #expect(result.model == "T48" || result.model == "T76")
         #expect(!result.firmwareVersion.isEmpty)
         #expect(!result.deviceCode.isEmpty)
         #expect(!result.serialNumber.isEmpty)
@@ -43,7 +52,11 @@ struct MiniproAPITests {
     }
 
     @Test func testTestLogicIC() async throws {
-        let logicICTestResult = try await MiniproAPI.testLogicIC(device: "7400", algorithmXmlPath: nil)
+        let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+            programmerType: "T76",
+            firmwareVersion: 0x10d
+        )
+        let logicICTestResult = try await MiniproAPI.testLogicIC(device: "7400", algorithmXmlPath: algorithmXmlPath)
         #expect(logicICTestResult.device == "7400")
         #expect(logicICTestResult.isSuccess || logicICTestResult.numErrors > 0)
         #expect(logicICTestResult.testVectors.count == 4)
@@ -51,28 +64,31 @@ struct MiniproAPITests {
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdReturnsDeviceId() async throws {
-        let deviceId = try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: nil)
+        let algorithmXmlPath = Self.getAlgorithmXmlPath()
+        let deviceId = try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: algorithmXmlPath)
         #expect(deviceId == "0xDA08")
     }
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdThrowsForChipMismatch() async throws {
+        let algorithmXmlPath = Self.getAlgorithmXmlPath()
         await #expect(
             throws: MiniproAPIError.chipIdMismatch("0x97D6", "0x0000")
         ) {
-            try await MiniproAPI.readDeviceId(device: "SMJ27C010A@TSOP32", algorithmXmlPath: nil)
+            try await MiniproAPI.readDeviceId(device: "SMJ27C010A@TSOP32", algorithmXmlPath: algorithmXmlPath)
         }
     }
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testWriteReadRoundTrip() async throws {
+        let algorithmXmlPath = Self.getAlgorithmXmlPath()
         let data = Data((0..<1024).map { UInt8($0 & 0xff) })
         var writeProgressUpdates = 0
         await #expect(throws: Never.self) {
             try await MiniproAPI.write(
                 device: "W27C512@DIP28",
                 data: data,
-                algorithmXmlPath: nil,
+                algorithmXmlPath: algorithmXmlPath,
                 writeOptions: WriteOptions(ignoreFileSizeMismatch: true)
             ) { _ in
                 writeProgressUpdates += 1
@@ -83,7 +99,7 @@ struct MiniproAPITests {
         var readProgressUpdates = 0
         let readData = try await MiniproAPI.read(
             device: "W27C512@DIP28",
-            algorithmXmlPath: nil,
+            algorithmXmlPath: algorithmXmlPath,
             readOptions: ReadOptions()
         ) {
             _ in readProgressUpdates += 1
