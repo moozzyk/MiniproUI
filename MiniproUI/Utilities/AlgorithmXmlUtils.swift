@@ -8,7 +8,7 @@
 import Foundation
 
 class AlgorithmXmlUtils {
-    public static func resolveAlgorithmXmlPath(programmerInfo: ProgrammerInfo?) throws -> URL? {
+    public static func resolveAlgorithmXmlPath(programmerInfo: ProgrammerInfo?) throws -> URL {
         guard let programmerInfo,
             let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
         else {

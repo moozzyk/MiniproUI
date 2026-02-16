@@ -42,7 +42,7 @@ struct LogicICTestView: View {
                             Button("Test") {
                                 Task {
                                     do {
-                                        let algorithmXmlPath = try? AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+                                        let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
                                             programmerInfo: programmerInfo
                                         )
                                         logicICTestResult = try await MiniproAPI.testLogicIC(
