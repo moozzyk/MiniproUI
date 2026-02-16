@@ -19,7 +19,8 @@ struct LogicICTestView: View {
         VStack(alignment: .leading, spacing: 16) {
             TabHeaderView(
                 caption: "Selected Logic IC: " + (logicICDetails?.name ?? "None"),
-                systemImageName: "flask.fill")
+                systemImageName: "flask.fill"
+            )
             let supportedLogicICs = supportedDevices?.logicICs ?? []
             if supportedLogicICs.isEmpty {
                 Form {
@@ -28,7 +29,9 @@ struct LogicICTestView: View {
             } else {
                 HStack {
                     SearchableListView(
-                        items: supportedLogicICs, selectedItem: $selectedDevice, isCollapsible: false,
+                        items: supportedLogicICs,
+                        selectedItem: $selectedDevice,
+                        isCollapsible: false,
                         additionalFilter: nil
                     )
                     .frame(maxWidth: 300)
@@ -39,9 +42,13 @@ struct LogicICTestView: View {
                             Button("Test") {
                                 Task {
                                     do {
-                                        let algorithmXmlPath = try? getAlgorithmXmlPath()
+                                        let algorithmXmlPath = try? AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+                                            programmerInfo: programmerInfo
+                                        )
                                         logicICTestResult = try await MiniproAPI.testLogicIC(
-                                            device: logicICDetails!.name, algorithmXmlPath: algorithmXmlPath)
+                                            device: logicICDetails!.name,
+                                            algorithmXmlPath: algorithmXmlPath
+                                        )
                                     } catch {
                                         errorMessage = .init(message: error.localizedDescription)
                                         logicICTestResult = nil
@@ -71,25 +78,17 @@ struct LogicICTestView: View {
             Alert(
                 title: Text("Logic IC Test Error"),
                 message: Text($0.message),
-                dismissButton: .default(Text("OK")))
+                dismissButton: .default(Text("OK"))
+            )
         }
-    }
-
-    private func getAlgorithmXmlPath() throws -> URL? {
-        guard let programmerInfo,
-              let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
-        else {
-            throw MiniproAPIError.programmerInfoUnavailable
-        }
-        return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-            programmerType: programmerInfo.model,
-            firmwareVersion: firmwareVersion
-        )
     }
 }
 
 #Preview {
     LogicICTestView(
-        supportedDevices: .constant(nil), logicICDetails: .constant(nil),
-        logicICTestResult: .constant(nil), programmerInfo: .constant(nil))
+        supportedDevices: .constant(nil),
+        logicICDetails: .constant(nil),
+        logicICTestResult: .constant(nil),
+        programmerInfo: .constant(nil)
+    )
 }

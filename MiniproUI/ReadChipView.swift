@@ -25,8 +25,12 @@ struct ReadChipView: View {
     @State private var newReadOptions: ReadOptions
 
     init(
-        device: DeviceDetails, buffer: Binding<Data?>, isPresented: Binding<Bool>, readOptions: Binding<ReadOptions>,
-        programmerInfo: Binding<ProgrammerInfo?>, errorMessage: Binding<DialogErrorMessage?>
+        device: DeviceDetails,
+        buffer: Binding<Data?>,
+        isPresented: Binding<Bool>,
+        readOptions: Binding<ReadOptions>,
+        programmerInfo: Binding<ProgrammerInfo?>,
+        errorMessage: Binding<DialogErrorMessage?>
     ) {
         self.device = device
         self._buffer = buffer
@@ -52,7 +56,9 @@ struct ReadChipView: View {
                         progressMessage = "Reading Chip Contents..."
                         Task {
                             do {
-                                let algorithmXmlPath = try getAlgorithmXmlPath()
+                                let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+                                    programmerInfo: programmerInfo
+                                )
                                 buffer = try await MiniproAPI.read(
                                     device: device.name,
                                     algorithmXmlPath: algorithmXmlPath,
@@ -80,17 +86,6 @@ struct ReadChipView: View {
         }
     }
 
-    private func getAlgorithmXmlPath() throws -> URL? {
-        guard let programmerInfo,
-              let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
-        else {
-            throw MiniproAPIError.programmerInfoUnavailable
-        }
-        return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-            programmerType: programmerInfo.model,
-            firmwareVersion: firmwareVersion
-        )
-    }
 }
 
 struct ReadOptionsView: View {

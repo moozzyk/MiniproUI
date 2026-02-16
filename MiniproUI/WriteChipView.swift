@@ -25,8 +25,12 @@ struct WriteChipView: View {
     @State private var newWriteOptions: WriteOptions
 
     init(
-        device: DeviceDetails, buffer: Data, isPresented: Binding<Bool>, writeOptions: Binding<WriteOptions>,
-        programmerInfo: Binding<ProgrammerInfo?>, errorMessage: Binding<DialogErrorMessage?>
+        device: DeviceDetails,
+        buffer: Data,
+        isPresented: Binding<Bool>,
+        writeOptions: Binding<WriteOptions>,
+        programmerInfo: Binding<ProgrammerInfo?>,
+        errorMessage: Binding<DialogErrorMessage?>
     ) {
         self.device = device
         self.buffer = buffer
@@ -52,7 +56,9 @@ struct WriteChipView: View {
                         progressMessage = "Writing Chip Contents..."
                         Task {
                             do {
-                                let algorithmXmlPath = try getAlgorithmXmlPath()
+                                let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+                                    programmerInfo: programmerInfo
+                                )
                                 try await MiniproAPI.write(
                                     device: device.name,
                                     data: buffer,
@@ -82,18 +88,6 @@ struct WriteChipView: View {
                 ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
-    }
-
-    private func getAlgorithmXmlPath() throws -> URL? {
-        guard let programmerInfo,
-              let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
-        else {
-            throw MiniproAPIError.programmerInfoUnavailable
-        }
-        return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-            programmerType: programmerInfo.model,
-            firmwareVersion: firmwareVersion
-        )
     }
 }
 

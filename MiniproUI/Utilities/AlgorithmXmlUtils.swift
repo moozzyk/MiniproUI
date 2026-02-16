@@ -8,6 +8,18 @@
 import Foundation
 
 class AlgorithmXmlUtils {
+    public static func resolveAlgorithmXmlPath(programmerInfo: ProgrammerInfo?) throws -> URL? {
+        guard let programmerInfo,
+            let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
+        else {
+            throw MiniproAPIError.programmerInfoUnavailable
+        }
+        return try resolveAlgorithmXmlPath(
+            programmerType: programmerInfo.model,
+            firmwareVersion: firmwareVersion
+        )
+    }
+
     public static func resolveAlgorithmXmlPath(
         programmerType: String,
         firmwareVersion: UInt16
@@ -19,7 +31,8 @@ class AlgorithmXmlUtils {
             create: false
         )
         let versionFolderName = String(format: "0x%x", firmwareVersion)
-        return baseDirectory
+        return
+            baseDirectory
             .appendingPathComponent(programmerType.uppercased(), isDirectory: true)
             .appendingPathComponent(versionFolderName, isDirectory: true)
             .appendingPathComponent("algorithm.xml")
