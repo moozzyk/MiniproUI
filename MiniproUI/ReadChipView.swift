@@ -50,7 +50,11 @@ struct ReadChipView: View {
                         progressMessage = "Reading Chip Contents..."
                         Task {
                             do {
-                                buffer = try await MiniproAPI.read(device: device.name, readOptions: readOptions) {
+                                buffer = try await MiniproAPI.read(
+                                    device: device.name,
+                                    algorithmXmlPath: nil,
+                                    readOptions: readOptions
+                                ) {
                                     progressUpdate = $0
                                 }
                             } catch {

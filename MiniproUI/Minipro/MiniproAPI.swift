@@ -55,10 +55,13 @@ class MiniproAPI {
     }
 
     static func read(
-        device: String, readOptions: ReadOptions,
+        device: String, algorithmXmlPath: URL?, readOptions: ReadOptions,
         progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws -> Data {
         var arguments = ["--device", device, "--read", "-"]
+        if let algorithmXmlPath {
+            arguments.append(contentsOf: ["--algorithms", algorithmXmlPath.path])
+        }
         if readOptions.ignoreChipIdMismatch {
             arguments.append("--no_id_error")
         }
@@ -71,9 +74,13 @@ class MiniproAPI {
     }
 
     static func write(
-        device: String, data: Data, writeOptions: WriteOptions, progressUpdate: @escaping ((ProgressUpdate) -> Void)
+        device: String, data: Data, algorithmXmlPath: URL?, writeOptions: WriteOptions,
+        progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws {
         var arguments = ["--device", device, "--write", "-"]
+        if let algorithmXmlPath {
+            arguments.append(contentsOf: ["--algorithms", algorithmXmlPath.path])
+        }
         if writeOptions.ignoreFileSizeMismatch {
             arguments.append("--no_size_error")
         }

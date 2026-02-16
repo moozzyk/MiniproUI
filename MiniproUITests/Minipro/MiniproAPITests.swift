@@ -70,7 +70,10 @@ struct MiniproAPITests {
         var writeProgressUpdates = 0
         await #expect(throws: Never.self) {
             try await MiniproAPI.write(
-                device: "W27C512@DIP28", data: data, writeOptions: WriteOptions(ignoreFileSizeMismatch: true)
+                device: "W27C512@DIP28",
+                data: data,
+                algorithmXmlPath: nil,
+                writeOptions: WriteOptions(ignoreFileSizeMismatch: true)
             ) { _ in
                 writeProgressUpdates += 1
             }
@@ -78,7 +81,11 @@ struct MiniproAPITests {
         #expect(writeProgressUpdates > 0)
 
         var readProgressUpdates = 0
-        let readData = try await MiniproAPI.read(device: "W27C512@DIP28", readOptions: ReadOptions()) {
+        let readData = try await MiniproAPI.read(
+            device: "W27C512@DIP28",
+            algorithmXmlPath: nil,
+            readOptions: ReadOptions()
+        ) {
             _ in readProgressUpdates += 1
         }
         #expect(readData.subdata(in: 0..<1024) == data)
