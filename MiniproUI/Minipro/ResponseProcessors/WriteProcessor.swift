@@ -17,7 +17,9 @@ class WriteProcessor {
                 return
             }
         } else {
-            if stdErr.hasSuffix("Verification OK\n") {
+            if stdErr.hasSuffix("Verification OK\n")
+                || stdErr.hasSuffix("Verification OK\nFPGA Reset  OK\n")
+            {
                 return
             }
 

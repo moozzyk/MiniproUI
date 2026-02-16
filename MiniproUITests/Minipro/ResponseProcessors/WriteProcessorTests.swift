@@ -12,13 +12,27 @@ import Testing
 
 struct WriteProcessorTests {
 
-    @Test func writeProcessorSuccessuflResponse() async throws {
+    @Test func writeProcessorSuccessfulResponseT48() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
                 Data(),
             stdErr:
                 "Found T48 00.1.31 (0x11f)\nWarning: T48 support is experimental!\nDevice code: 46A16257\nSerial code: HSSCVO9LARFMOYKYOMVE5123\nManufactured: 2024-06-2816:55\nUSB speed: 480Mbps (USB 2.0)\nSupply voltage: 5.13 V\nChip ID: 0xDA08  OK\nWarning: Incorrect file size: 1024 (needed 65536)\nErasing... 0.30Sec OK\n\r\u{1b}[KWriting  Code...   0%\r\u{1b}[KWriting  Code...  12%\r\u{1b}[KWriting  Code...  25%\r\u{1b}[KWriting  Code...  37%\r\u{1b}[KWriting  Code...  50%\r\u{1b}[KWriting  Code...  62%\r\u{1b}[KWriting  Code...  75%\r\u{1b}[KWriting  Code...  87%\r\u{1b}[KWriting Code...  0.35Sec  OK\n\r\u{1b}[KReading Code...   0%\r\u{1b}[KReading Code...  0.01Sec  OK\nVerification OK\n"
+        )
+
+        #expect(throws: Never.self) {
+            try WriteProcessor.run(miniproResult, WriteOptions())
+        }
+    }
+
+    @Test func writeProcessorSuccessfulResponseT76() async throws {
+        let miniproResult = InvocationResult(
+            exitCode: 0,
+            stdOut:
+                Data(),
+            stdErr:
+                "Found T76 00.1.13 (0x10d)\nWarning: T76 support is experimental!\nDevice code: 58A02670\nSerial code: 5M55O5G378PD0XBAXPXD3032\nManufactured: 2025-08-1817:22\nUSB speed: 480Mbps (USB 2.0)\nSupply voltage: 5.25 V (USB)\n\nUsing overridden database file /Users...ading Code...  87%\n\r\u{1b}[KReading Code...  89%\n\r\u{1b}[KReading Code...  90%\n\r\u{1b}[KReading Code...  92%\n\r\u{1b}[KReading Code...  93%\n\r\u{1b}[KReading Code...  95%\n\r\u{1b}[KReading Code...  96%\n\r\u{1b}[KReading Code...  98%\n\r\u{1b}[KReading Code...  46.6 ms  OK\nVerification OK\nFPGA Reset  OK\n"
         )
 
         #expect(throws: Never.self) {
