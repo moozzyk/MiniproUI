@@ -55,7 +55,8 @@ struct ContentView: View {
                     supportedDevices: $model.supportedDevices, deviceDetails: $model.deviceDetails,
                     buffer: $model.buffer,
                     readOptions: $model.readOptions,
-                    writeOptions: $model.writeOptions
+                    writeOptions: $model.writeOptions,
+                    programmerInfo: $model.programmerInfo
                 )
                 .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {

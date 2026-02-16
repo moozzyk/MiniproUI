@@ -13,6 +13,7 @@ struct ChipProgrammingView: View {
     @Binding var buffer: Data?
     @Binding var readOptions: ReadOptions
     @Binding var writeOptions: WriteOptions
+    @Binding var programmerInfo: ProgrammerInfo?
     @State private var selectedDevice: String?
 
     var body: some View {
@@ -37,7 +38,12 @@ struct ChipProgrammingView: View {
                         Spacer()
                     }
                     VStack {
-                        ReadChipButton(device: deviceDetails, buffer: $buffer, readOptions: $readOptions)
+                        ReadChipButton(
+                            device: deviceDetails,
+                            buffer: $buffer,
+                            readOptions: $readOptions,
+                            programmerInfo: $programmerInfo
+                        )
                         WriteChipButton(device: deviceDetails, buffer: buffer, writeOptions: $writeOptions)
                     }
                     let supportedEEPROMs = supportedDevices?.eepromICs ?? []
@@ -102,6 +108,7 @@ struct ReadChipButton: View {
     let device: DeviceDetails?
     @Binding var buffer: Data?
     @Binding var readOptions: ReadOptions
+    @Binding var programmerInfo: ProgrammerInfo?
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
 
@@ -114,7 +121,7 @@ struct ReadChipButton: View {
             ModalDialogView {
                 ReadChipView(
                     device: device!, buffer: $buffer, isPresented: $isPresented, readOptions: $readOptions,
-                    errorMessage: $errorMessage
+                    programmerInfo: $programmerInfo, errorMessage: $errorMessage
                 )
             }
         }
@@ -159,5 +166,6 @@ struct WriteChipButton: View {
 #Preview {
     ChipProgrammingView(
         supportedDevices: .constant(nil), deviceDetails: .constant(nil), buffer: .constant(nil),
-        readOptions: .constant(ReadOptions()), writeOptions: .constant(WriteOptions()))
+        readOptions: .constant(ReadOptions()), writeOptions: .constant(WriteOptions()),
+        programmerInfo: .constant(nil))
 }
