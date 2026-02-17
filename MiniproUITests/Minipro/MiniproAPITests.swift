@@ -11,15 +11,15 @@ import Testing
 @testable import Visual_Minipro
 
 struct MiniproAPITests {
-    private static func getAlgorithmXmlPath() -> URL? {
-        return try? AlgorithmXmlUtils.resolveAlgorithmXmlPath(
+    private static func getAlgorithmXmlPath() throws -> URL {
+        return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
             programmerType: "T76",
             firmwareVersion: 0x10d
         )
     }
 
     @Sendable static func isW27C512Present() async throws -> Bool {
-        let algorithmXmlPath = Self.getAlgorithmXmlPath()
+        let algorithmXmlPath = try Self.getAlgorithmXmlPath()
         return (try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: algorithmXmlPath))
             == "0xDA08"
     }
@@ -64,14 +64,14 @@ struct MiniproAPITests {
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdReturnsDeviceId() async throws {
-        let algorithmXmlPath = Self.getAlgorithmXmlPath()
+        let algorithmXmlPath = try Self.getAlgorithmXmlPath()
         let deviceId = try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: algorithmXmlPath)
         #expect(deviceId == "0xDA08")
     }
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdThrowsForChipMismatch() async throws {
-        let algorithmXmlPath = Self.getAlgorithmXmlPath()
+        let algorithmXmlPath = try Self.getAlgorithmXmlPath()
         await #expect(
             throws: MiniproAPIError.chipIdMismatch("0x97D6", "0x0000")
         ) {
@@ -81,7 +81,7 @@ struct MiniproAPITests {
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testWriteReadRoundTrip() async throws {
-        let algorithmXmlPath = Self.getAlgorithmXmlPath()
+        let algorithmXmlPath = try Self.getAlgorithmXmlPath()
         let data = Data((0..<1024).map { UInt8($0 & 0xff) })
         var writeProgressUpdates = 0
         await #expect(throws: Never.self) {
