@@ -42,7 +42,7 @@ func ensureNoError(invocationResult: InvocationResult, ignoreInvalidChipId: Bool
         throw MiniproAPIError.unknownError(stdErr.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 
-    if stdErr.contains("Unsupported device!") || stdErr.contains("NAND chips not supported yet.") {
+    if stdErr.contains("This chip is not supported yet.") {
         throw MiniproAPIError.unsupportedChip
     }
 

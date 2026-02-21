@@ -13,6 +13,7 @@ import Testing
 struct DeviceDetailsProcessorTest {
     private static let testCases: [(String, DeviceDetails)] = [
         (
+            // command: minipro --get_info 7404
             """
             Found T48 00.1.35 (0x123)
             Warning: T48 support is not yet complete!
@@ -41,6 +42,7 @@ struct DeviceDetailsProcessorTest {
                 ], programmingInfo: [], isLogicChip: true)
         ),
         (
+            // command: minipro --get_info AM29F040B@DIP32
             """
             Found T48 00.1.35 (0x123)
             Warning: T48 support is not yet complete!
@@ -73,6 +75,7 @@ struct DeviceDetailsProcessorTest {
                 ], programmingInfo: [], isLogicChip: false)
         ),
         (
+            // command: minipro --get_info JS28F640P30TF@TSOP56
             """
             Found T48 00.1.35 (0x123)
             Warning: T48 support is not yet complete!
@@ -103,6 +106,7 @@ struct DeviceDetailsProcessorTest {
                 ], programmingInfo: [], isLogicChip: false)
         ),
         (
+            // command: minipro --get_info AT27LV512R@PLCC32
             """
             Found T48 00.1.35 (0x123)
             Warning: T48 support is not yet complete!
@@ -170,6 +174,7 @@ struct DeviceDetailsProcessorTest {
     }
 
     @Test func testDeviceDetailsProcessorThrowsForUnknownDevice() {
+        // command: minipro --get_info 'AT45DB161D[Page512]'
         #expect(throws: MiniproAPIError.deviceNotFound("AT45DB161D[Page512]")) {
             try DeviceDetailsProcessor.run(
                 InvocationResult(

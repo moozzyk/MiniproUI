@@ -12,6 +12,8 @@ import Foundation
 
 struct ProgrammerInfoProcessorTests {
     @Test func testProgrammerInfoProcessorHappyPath() throws {
+        // command: minipro --version
+        // condition: firmware out of date
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:

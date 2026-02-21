@@ -58,6 +58,8 @@ struct VisualMiniproInfoProcessorTest {
 
     // Programmer not connected - no device details
     @Test func visualMiniproInfoSuccessfulShortResponse() async throws {
+        // command: minipro --version
+        // condition: programmer not connected
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:

@@ -13,6 +13,7 @@ import Testing
 struct WriteProcessorTests {
 
     @Test func writeProcessorSuccessfulResponseT48() async throws {
+        // command: minipro --device W27C512@DIP28 --write {file}
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -27,6 +28,7 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorSuccessfulResponseT76() async throws {
+        // command: minipro --device W27C512@DIP28 --write {file}
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -41,7 +43,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorVerificationFailedT48() async throws {
-        // non-matching chip + ignore chip ID mismatch + ignore file size mismatch
+        // command: minipro --device AM27128A@DIP28 --no_id_error --no_size_error --write {file}
+        // condition: non-matching chip, non-matching file size
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -73,7 +76,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorVerificationFailedT76() async throws {
-        // non-matching chip + ignore chip ID mismatch + ignore file size mismatch
+        // command: minipro --device AM27128A@DIP28 --no_id_error --no_size_error --write {file}
+        // condition: non-matching chip, non-matching file size
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -107,6 +111,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorIncorrectFileSizeT48() async throws {
+        // command: minipro --device AM27128A@DIP28 --no_id_error --write {file}
+        // condition: non-matching chip, non-matching file size
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -130,6 +136,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorIncorrectFileSizeT76() async throws {
+        // command: minipro --device AM27128A@DIP28 --no_id_error --write {file}
+        // condition: non-matching chip, non-matching file size
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -158,6 +166,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorInvalidChipIdT48() async throws {
+        // command: minipro --device AM27128A@DIP28 --write {file}
+        // condition: non-matching chip, non-matching file size
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -183,6 +193,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorInvalidChipIdT76() async throws {
+        // command: minipro --device AM27128A@DIP28 --write {file}
+        // condition: non-matching chip, non-matching file size
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -210,6 +222,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorChipMismatchSizeMismatchIgnoredSkipVerifyT48() async throws {
+        // command: minipro --device W27C512@DIP28 --skip_verify --no_size_error --write
+        // condition: invalid file size, skip verify
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -241,6 +255,8 @@ struct WriteProcessorTests {
     }
 
     @Test func writeProcessorChipMismatchSizeMismatchIgnoredSkipVerifyT76() async throws {
+        // command: minipro --device W27C512@DIP28 --skip_verify --no_size_error --write
+        // condition: invalid file size, skip verify
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -287,7 +303,8 @@ struct WriteProcessorTests {
 
 
     @Test func writeProcessorOvercurrentProtection() async throws {
-        // When trying to program a Logic Chip
+        // command: ??
+        // When trying to program a Logic Chip (no longer reproduces but still can happen)
         let miniproResult = InvocationResult(
             exitCode: 1,
             stdOut:

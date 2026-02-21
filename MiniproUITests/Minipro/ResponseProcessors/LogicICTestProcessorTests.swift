@@ -13,6 +13,8 @@ import Testing
 struct LogicICTestProcessorTests {
 
     @Test func testLogicICTestProcessorSuccessResponse() async throws {
+        // command: minipro --logic_test --device '7400'
+        // condition: 7400 inserted
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut:
@@ -53,6 +55,8 @@ struct LogicICTestProcessorTests {
     }
 
     @Test func testLogicICTestProcessorErrorResponse() async throws {
+        // command: minipro --logic_test --device '7400'
+        // condition: no chip inserted
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut: Data(
@@ -88,6 +92,8 @@ struct LogicICTestProcessorTests {
     }
 
     @Test func testLogicICTestErrorRunningFirstStep() async throws {
+        // command: minipro --logic_test --device '7400'
+        // condition: logic chip (7403) inserted upside-down
         let miniproResult = InvocationResult(
             exitCode: 1,
             stdOut: Data(),

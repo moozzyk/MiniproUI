@@ -13,6 +13,7 @@ import Foundation
 struct DeviceIdProcessorTests {
 
     @Test func readDeviceIdSuccessfulResponse() async throws {
+        // command: minipro --device 'W27C512@DIP28' --read_id
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:
@@ -31,6 +32,9 @@ struct DeviceIdProcessorTests {
     }
 
     @Test func readDeviceIdChipMismatchResponse() async throws {
+        // command: minipro --device 'W27C512@DIP28' --read_id
+        // condition: no/wrong chip inserted
+
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:

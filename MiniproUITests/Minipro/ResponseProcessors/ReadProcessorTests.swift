@@ -37,6 +37,8 @@ struct ReadProcessorTests {
     }
 
     @Test func readProcessorInvalidChip() async throws {
+        // minipro --device W27C512@DIP28 --read -
+        // condition: no chip/invalid chip
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:
@@ -58,39 +60,44 @@ struct ReadProcessorTests {
         }
     }
 
-    @Test func readProcessorUnsupportedChip() async throws {
+    @Test func readProcessorDeviceNotFound() async throws {
+        // command: minipro --device W27C512@DI --read -
+        // condition: mangled/chopped name
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:
                 """
-                Found T48 00.1.31 (0x11f)
-                Warning: T48 support is experimental!
-                Device code: 46A16257
-                Serial code: HSSCVO9LARFMOYKYOMVE5123
-                Manufactured: 2024-06-2816:55
+                Found T76 00.1.13 (0x10d)
+                Warning: T76 support is experimental!
+                Device code: 58A02670
+                Serial code: 5M55O5G378PD0XBAXPXD3032
+                Manufactured: 2025-08-1817:22
                 USB speed: 480Mbps (USB 2.0)
-                Supply voltage: 5.13 V
-                Unsupported device!
+                Supply voltage: 5.25 V (USB)
+
+
+                Device W27C512@DI not found!
                 """)
-        #expect(throws: MiniproAPIError.unsupportedChip) {
+        #expect(throws: MiniproAPIError.deviceNotFound("W27C512@DI")) {
             try ReadProcessor.run(miniproResult)
         }
     }
 
     @Test func readProcessorUnsupportedNANDChip() async throws {
-        // W25M02GV(x4)@WSON8
+        // command: minipro --device "W25M02GV(x4)@WSON8" --read -
         let miniproResult = InvocationResult(
             exitCode: 0, stdOut: Data(),
             stdErr:
                 """
-                Found T48 00.1.31 (0x11f)
-                Warning: T48 support is experimental!
-                Device code: 46A16257
-                Serial code: HSSCVO9LARFMOYKYOMVE5123
-                Manufactured: 2024-06-2816:55
+                Found T76 00.1.13 (0x10d)
+                Warning: T76 support is experimental!
+                Device code: 58A02670
+                Serial code: 5M55O5G378PD0XBAXPXD3032
+                Manufactured: 2025-08-1817:22
                 USB speed: 480Mbps (USB 2.0)
-                Supply voltage: 5.12 V
-                NAND chips not supported yet.
+                Supply voltage: 5.25 V (USB)
+
+                This chip is not supported yet.
                 """)
         #expect(throws: MiniproAPIError.unsupportedChip) {
             try ReadProcessor.run(miniproResult)

@@ -13,6 +13,8 @@ import Testing
 struct ResponseProcessorUtilsTest {
 
     @Test func testEnsureNoErrorThrowsIfProgrammerNotConnected() {
+        // command: minipro --version
+        // condition: programmer not connected
         #expect(throws: MiniproAPIError.programmerNotFound) {
             try ensureNoError(
                 invocationResult: InvocationResult(exitCode: 1, stdOut: Data(), stdErr: "No programmer found.\n"))
@@ -20,6 +22,7 @@ struct ResponseProcessorUtilsTest {
     }
 
     @Test func testEnsureNoErrorProcessorThrowsOnErrors() {
+        // generic error
         #expect(throws: MiniproAPIError.unknownError("Error: something went wrong.")) {
             try ensureNoError(
                 invocationResult:
@@ -28,6 +31,7 @@ struct ResponseProcessorUtilsTest {
     }
 
     @Test func testEnsureNoErrorThrowsWhenForIncorrectDevice() {
+        // command: minipro --device "AT45DB161D[Page512]" --read_id
         #expect(throws: MiniproAPIError.deviceNotFound("AT45DB161D[Page512]")) {
             try ensureNoError(
                 invocationResult:
@@ -35,7 +39,6 @@ struct ResponseProcessorUtilsTest {
         }
     }
 
-    // Happens randomly when using FEMC004GTTG7-T24-10_8Bit@BGA153 as a device with w27c512@DIP8 chip
     @Test func testIOError() {
         #expect(throws: MiniproAPIError.ioError("bulk_transfer: LIBUSB_ERROR_TIMEOUT")) {
             try ensureNoError(
@@ -77,6 +80,8 @@ struct ResponseProcessorUtilsTest {
 
     @Test func testInvalidChipID() {
         #expect(throws: MiniproAPIError.invalidChip("0xDA01", "0xFDFD")) {
+            // minipro --device W27C512@DIP28 --read -
+            // condition: no chip/invalid chip
             try ensureNoError(
                 invocationResult: InvocationResult(
                     exitCode: 1, stdOut: Data(),
@@ -99,6 +104,8 @@ struct ResponseProcessorUtilsTest {
     }
 
     @Test func testInvalidChipIDIgnoredIfRequested() {
+        // minipro --device W27C512@DIP28 --read -
+        // condition: no chip/invalid chip
         #expect(throws: Never.self) {
             try ensureNoError(
                 invocationResult: InvocationResult(
