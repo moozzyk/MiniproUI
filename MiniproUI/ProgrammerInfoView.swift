@@ -24,7 +24,7 @@ struct ProgrammerInfoView: View {
     private var firmwareFileTypes: [String] {
         let model = programmerInfo?.model ?? ""
         if model == "T56" || model == "T76" {
-            return ["dat", "rar"]
+            return ["rar"]
         }
         return ["dat"]
     }
