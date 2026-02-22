@@ -37,4 +37,20 @@ class AlgorithmXmlUtils {
             .appendingPathComponent(versionFolderName, isDirectory: true)
             .appendingPathComponent("algorithm.xml")
     }
+
+    public static func needsAlgorithmInstallation(programmerInfo: ProgrammerInfo?) -> Bool {
+        guard
+            let programmerInfo,
+            ["T56", "T76"].contains(programmerInfo.model.uppercased()),
+            let firmwareVersion = programmerInfo.getFirmwareVersionNumber(),
+            let algorithmXmlPath = try? resolveAlgorithmXmlPath(
+                programmerType: programmerInfo.model,
+                firmwareVersion: firmwareVersion
+            )
+        else {
+            return false
+        }
+
+        return !FileManager.default.fileExists(atPath: algorithmXmlPath.path)
+    }
 }
