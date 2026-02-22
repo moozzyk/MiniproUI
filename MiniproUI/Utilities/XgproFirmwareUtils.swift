@@ -5,6 +5,7 @@
 //  Created by Pawel Kadluczka on 2/1/26.
 //
 
+import CryptoKit
 import Foundation
 import os
 
@@ -14,6 +15,7 @@ enum XgproFirmwareUtilsError: Error {
     case readFailed
     case unsupportedProgrammerType
     case compressionFailed
+    case unknownUpdateFile(String)
 }
 
 struct FirmwareInfo {
@@ -29,6 +31,15 @@ class XgproFirmwareUtils {
         subsystem: "com.3d-logic.visualminipro",
         category: "XgproFirmwareUtils"
     )
+
+    private static let updateChecksums: [String: String] = [
+        "xgpro_T76_V1303A.rar": "493024ac8951f733e34b42cac66d873ef77f9e12e3547c6f1e5e295d0061f1aa",
+        "xgpro_T76_V1309.rar": "72164362cc986742b101eab1a93e884b93f280f9fc0e2e8b6077fd0ca2ab9745",
+        "xgpro_T76_V1311.rar": "aad3cc7678676da2e1b2bb0505d7c58e0c74ca1612f805a994eebe6c11473ea8",
+        "xgproV1304_T48_T56_T866II_Setup.rar": "821db3ef1cc2b335d8a1e50ad37161032f804c8626cd3c1e7d03695d9aa75b1d",
+        "xgproV1306_T48_T56_T866_Setup.rar": "2110b1af7b8f0274032cef006c7be23d2c28d375e3392040dc9de09f5d35eba6",
+        "xgproV1310_T48_T56_T866II_Setup.rar": "f3fb94d483c20e0e28d8a53ffd5e0930ef285cfeea008f23691ed097c8dcd0c9",
+    ]
 
     public static func getFirmwareInfo(in folder: URL) throws -> FirmwareInfo {
         let entries = try FileManager.default.contentsOfDirectory(
@@ -238,5 +249,21 @@ class XgproFirmwareUtils {
             results.append(string)
         }
         return results
+    }
+
+    public static func isKnownUpdate(fileURL: URL) -> Bool {
+        let fileName = fileURL.lastPathComponent.lowercased()
+        return updateChecksums.keys.contains { $0.lowercased() == fileName }
+    }
+
+    public static func verifyUpdateSHA(fileURL: URL) throws -> Bool {
+        let fileName = fileURL.lastPathComponent.lowercased()
+        guard let expectedChecksum = updateChecksums.first(where: { $0.key.lowercased() == fileName })?.value else {
+            throw XgproFirmwareUtilsError.unknownUpdateFile(fileURL.lastPathComponent)
+        }
+        let fileData = try Data(contentsOf: fileURL)
+        let digest = SHA256.hash(data: fileData)
+        let actualChecksum = digest.map { String(format: "%02x", $0) }.joined()
+        return actualChecksum == expectedChecksum
     }
 }
