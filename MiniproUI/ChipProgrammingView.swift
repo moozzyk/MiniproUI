@@ -17,6 +17,7 @@ struct ChipProgrammingView: View {
     @State private var selectedDevice: String?
 
     var body: some View {
+        let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: programmerInfo)
         ZStack {
             VStack(alignment: .leading, spacing: 16) {
                 TabHeaderView(
@@ -52,7 +53,15 @@ struct ChipProgrammingView: View {
                         )
                     }
                     let supportedEEPROMs = supportedDevices?.eepromICs ?? []
-                    if supportedEEPROMs.isEmpty {
+                    if needsAlgorithms {
+                        VStack {
+                            Form {
+                                MissingAlgorithms()
+                            }
+                            .formStyle(.grouped)
+                            .padding(.top, 32)
+                        }
+                    } else if supportedEEPROMs.isEmpty {
                         VStack {
                             Form {
                                 ProgrammerNotConnected()

@@ -16,13 +16,18 @@ struct LogicICTestView: View {
     @State private var errorMessage: DialogErrorMessage? = nil
 
     var body: some View {
+        let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: programmerInfo)
+        let supportedLogicICs = supportedDevices?.logicICs ?? []
         VStack(alignment: .leading, spacing: 16) {
             TabHeaderView(
                 caption: "Selected Logic IC: " + (logicICDetails?.name ?? "None"),
                 systemImageName: "flask.fill"
             )
-            let supportedLogicICs = supportedDevices?.logicICs ?? []
-            if supportedLogicICs.isEmpty {
+            if needsAlgorithms {
+                Form {
+                    MissingAlgorithms()
+                }.formStyle(.grouped)
+            } else if supportedLogicICs.isEmpty {
                 Form {
                     ProgrammerNotConnected()
                 }.formStyle(.grouped)
