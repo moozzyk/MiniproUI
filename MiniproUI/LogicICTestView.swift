@@ -71,6 +71,7 @@ struct LogicICTestView: View {
                 }
             }
         }.task {
+            programmerInfo = try? await MiniproAPI.getProgrammerInfo()
             supportedDevices = try? await MiniproAPI.getSupportedDevices()
         }.onChange(of: selectedDevice) {
             Task {
