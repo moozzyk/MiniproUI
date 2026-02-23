@@ -156,10 +156,10 @@ struct UpdateFirmwareButton: View {
             let firmwareInfo = try XgproFirmwareUtils.getFirmwareInfo(in: outputDirectory)
             let algorithmsXml = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: outputDirectory,
-                programmerType: firmwareInfo.programmerType
+                programmerModel: firmwareInfo.programmerModel
             )
             let algorithmsUrl = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-                programmerType: firmwareInfo.programmerType,
+                programmerModel: firmwareInfo.programmerModel,
                 firmwareVersion: firmwareInfo.firmwareVersion
             )
             try FileManager.default.createDirectory(

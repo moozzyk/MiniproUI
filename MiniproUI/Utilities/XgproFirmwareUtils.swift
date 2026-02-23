@@ -19,7 +19,7 @@ enum XgproFirmwareUtilsError: Error {
 }
 
 struct FirmwareInfo {
-    let programmerType: String
+    let programmerModel: String
     let firmwareVersion: UInt16
 }
 
@@ -32,12 +32,12 @@ class XgproFirmwareUtils {
     )
 
     private static let firmwareInfoBySoftwareName: [String: FirmwareInfo] = [
-        "xgpro_T76_V1303A.rar": FirmwareInfo(programmerType: "T76", firmwareVersion: 0x10d),
-        "xgpro_T76_V1309.rar": FirmwareInfo(programmerType: "T76", firmwareVersion: 0x10e),
-        "xgpro_T76_V1311.rar": FirmwareInfo(programmerType: "T76", firmwareVersion: 0x10f),
-        "xgproV1304_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerType: "T56", firmwareVersion: 0x149),
-        "xgproV1306_T48_T56_T866_Setup.rar": FirmwareInfo(programmerType: "T56", firmwareVersion: 0x149),
-        "xgproV1310_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerType: "T56", firmwareVersion: 0x149),
+        "xgpro_T76_V1303A.rar": FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10d),
+        "xgpro_T76_V1309.rar": FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10e),
+        "xgpro_T76_V1311.rar": FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10f),
+        "xgproV1304_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+        "xgproV1306_T48_T56_T866_Setup.rar": FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+        "xgproV1310_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
     ]
 
     private static let softwareChecksums: [String: String] = [
@@ -70,12 +70,12 @@ class XgproFirmwareUtils {
         if let t76Match {
             let version = try extractFirmwareVersion(from: t76Match)
             logger.notice("Detected T76 firmware file at \(t76Match.path, privacy: .public)")
-            return FirmwareInfo(programmerType: "T76", firmwareVersion: version)
+            return FirmwareInfo(programmerModel: "T76", firmwareVersion: version)
         }
         if let t56Match {
             let version = try extractFirmwareVersion(from: t56Match)
             logger.notice("Detected T56 firmware file at \(t56Match.path, privacy: .public)")
-            return FirmwareInfo(programmerType: "T56", firmwareVersion: version)
+            return FirmwareInfo(programmerModel: "T56", firmwareVersion: version)
         }
         logger.notice("No firmware file found in \(folder.path, privacy: .public)")
         throw XgproFirmwareUtilsError.firmwareNotFound
@@ -111,8 +111,8 @@ class XgproFirmwareUtils {
         }
     }
 
-    public static func createAlgorithmXml(in baseFolder: URL, programmerType: String) async throws -> String {
-        let algorithmFolder = try resolveAlgorithmDirectory(baseFolder: baseFolder, programmerType: programmerType)
+    public static func createAlgorithmXml(in baseFolder: URL, programmerModel: String) async throws -> String {
+        let algorithmFolder = try resolveAlgorithmDirectory(baseFolder: baseFolder, programmerModel: programmerModel)
         let entries = try FileManager.default.contentsOfDirectory(
             at: algorithmFolder,
             includingPropertiesForKeys: nil,
@@ -121,38 +121,38 @@ class XgproFirmwareUtils {
         var algorithmElements: [String] = []
         for entry in entries where entry.pathExtension.lowercased() == "alg" {
             logger.notice(
-                "Firmware folder entry for \(programmerType, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
+                "Firmware folder entry for \(programmerModel, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
             )
-            if programmerType == "T76" {
+            if programmerModel == "T76" {
                 let element = try await buildAlgorithmElementT76(path: entry)
                 algorithmElements.append(element)
             }
         }
-        let xml = buildAlgorithmsXml(programmerType: programmerType, algorithmElements: algorithmElements)
+        let xml = buildAlgorithmsXml(programmerModel: programmerModel, algorithmElements: algorithmElements)
         logger.notice("Built algorithms XML with \(algorithmElements.count, privacy: .public) entries")
         return xml
     }
 
-    private static func buildAlgorithmsXml(programmerType: String, algorithmElements: [String]) -> String {
+    private static func buildAlgorithmsXml(programmerModel: String, algorithmElements: [String]) -> String {
         return """
             <root>
             <database type="ALGORITHMS">
-            <algorithms_\(programmerType)>
+            <algorithms_\(programmerModel)>
             \(algorithmElements.joined(separator: "\n"))
-            </algorithms_\(programmerType)>
+            </algorithms_\(programmerModel)>
             </database>
             </root>
             """
     }
 
-    private static func resolveAlgorithmDirectory(baseFolder: URL, programmerType: String) throws -> URL {
-        switch programmerType {
+    private static func resolveAlgorithmDirectory(baseFolder: URL, programmerModel: String) throws -> URL {
+        switch programmerModel {
         case "T76":
             return baseFolder.appendingPathComponent("algoT76", isDirectory: true)
         case "T56":
             return baseFolder.appendingPathComponent("algorithm", isDirectory: true)
         default:
-            logger.notice("Unsupported programmer type: \(programmerType, privacy: .public)")
+            logger.notice("Unsupported programmer model: \(programmerModel, privacy: .public)")
             throw XgproFirmwareUtilsError.unsupportedProgrammerType
         }
     }
@@ -275,12 +275,12 @@ class XgproFirmwareUtils {
         return actualChecksum == expectedChecksum
     }
 
-    public static func getSoftwareName(programmerType: String, firmwareVersion: UInt16) -> String? {
-        let normalizedProgrammerType = programmerType.uppercased()
+    public static func getSoftwareName(programmerModel: String, firmwareVersion: UInt16) -> String? {
+        let normalizedProgrammerModel = programmerModel.uppercased()
         let matches = firmwareInfoBySoftwareName.compactMap { entry -> String? in
             let (softwareName, firmwareInfo) = entry
             guard
-                firmwareInfo.programmerType == normalizedProgrammerType,
+                firmwareInfo.programmerModel == normalizedProgrammerModel,
                 firmwareInfo.firmwareVersion == firmwareVersion
             else {
                 return nil

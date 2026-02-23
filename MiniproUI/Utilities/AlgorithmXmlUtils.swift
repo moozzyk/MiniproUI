@@ -15,13 +15,13 @@ class AlgorithmXmlUtils {
             throw MiniproAPIError.programmerInfoUnavailable
         }
         return try resolveAlgorithmXmlPath(
-            programmerType: programmerInfo.model,
+            programmerModel: programmerInfo.model,
             firmwareVersion: firmwareVersion
         )
     }
 
     public static func resolveAlgorithmXmlPath(
-        programmerType: String,
+        programmerModel: String,
         firmwareVersion: UInt16
     ) throws -> URL {
         let baseDirectory = try FileManager.default.url(
@@ -33,7 +33,7 @@ class AlgorithmXmlUtils {
         let versionFolderName = String(format: "0x%x", firmwareVersion)
         return
             baseDirectory
-            .appendingPathComponent(programmerType.uppercased(), isDirectory: true)
+            .appendingPathComponent(programmerModel.uppercased(), isDirectory: true)
             .appendingPathComponent(versionFolderName, isDirectory: true)
             .appendingPathComponent("algorithm.xml")
     }
@@ -44,7 +44,7 @@ class AlgorithmXmlUtils {
             ["T56", "T76"].contains(programmerInfo.model.uppercased()),
             let firmwareVersion = programmerInfo.getFirmwareVersionNumber(),
             let algorithmXmlPath = try? resolveAlgorithmXmlPath(
-                programmerType: programmerInfo.model,
+                programmerModel: programmerInfo.model,
                 firmwareVersion: firmwareVersion
             )
         else {

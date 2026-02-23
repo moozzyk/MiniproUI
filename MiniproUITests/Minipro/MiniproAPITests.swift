@@ -13,7 +13,7 @@ import Testing
 struct MiniproAPITests {
     private static func getAlgorithmXmlPath() throws -> URL {
         return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-            programmerType: "T76",
+            programmerModel: "T76",
             firmwareVersion: 0x10d
         )
     }
@@ -53,7 +53,7 @@ struct MiniproAPITests {
 
     @Test func testTestLogicIC() async throws {
         let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-            programmerType: "T76",
+            programmerModel: "T76",
             firmwareVersion: 0x10d
         )
         let logicICTestResult = try await MiniproAPI.testLogicIC(device: "7400", algorithmXmlPath: algorithmXmlPath)
