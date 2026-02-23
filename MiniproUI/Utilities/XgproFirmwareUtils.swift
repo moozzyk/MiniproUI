@@ -289,4 +289,16 @@ class XgproFirmwareUtils {
         }
         return matches.sorted().last
     }
+
+    public static func getLatestSoftwareName(programmerModel: String) -> String? {
+        let normalizedProgrammerModel = programmerModel.uppercased()
+        let matches = firmwareInfoBySoftwareName.compactMap { entry -> String? in
+            let (softwareName, firmwareInfo) = entry
+            guard firmwareInfo.programmerModel == normalizedProgrammerModel else {
+                return nil
+            }
+            return softwareName
+        }
+        return matches.sorted().last
+    }
 }

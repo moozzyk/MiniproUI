@@ -15,18 +15,19 @@ struct ProgrammerInfoView: View {
     @State var progressMessage: String?
 
     private var showProgress: Bool { progressMessage != nil }
+
+    private var isAlgoBasedProgrammer: Bool {
+        guard let model = programmerInfo?.model else {
+            return false
+        }
+        return ["T56", "T76"].contains(model.uppercased())
+    }
+
     private var isFirmwareUpdateSupported: Bool {
         let model = programmerInfo?.model ?? ""
         // firmware update not supported for TL866A and TL866CS
         // due to an additional prompt in the firmware update handler
         return model == "T48" || model == "T56" || model == "TL866II+" || model == "T76"
-    }
-    private var firmwareFileTypes: [String] {
-        let model = programmerInfo?.model ?? ""
-        if model == "T56" || model == "T76" {
-            return ["rar"]
-        }
-        return ["dat"]
     }
 
     func getProgrammerName(_ programmerInfo: ProgrammerInfo?) -> String {
@@ -77,29 +78,13 @@ struct ProgrammerInfoView: View {
                         }
                     }
                     if isFirmwareUpdateSupported {
-                        Section(
-                            header: HStack {
-                                Text("Firmware Update")
-                            }
-                        ) {
-                            HStack {
-                                Text("Firmware ")
-                                Spacer()
-                                OpenFileButton(caption: "Select Firmware...", fileTypes: firmwareFileTypes) { url in
-                                    firmwareFileUrl = url
-                                }
-                            }
-                            HStack {
-                                Text("Firmware file: \(firmwareFileUrl?.path ?? "N/A")")
-                                Spacer()
-                                UpdateFirmwareButton(firmwareUrl: $firmwareFileUrl, programmerInfo: $programmerInfo)
-                            }.disabled(firmwareFileUrl == nil)
-                            Link(
-                                "Learn more about downloading firmware",
-                                destination: URL(
-                                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
-                                )!
+                        if isAlgoBasedProgrammer {
+                            SoftwareUpdateSection(
+                                firmwareUrl: $firmwareFileUrl,
+                                programmerInfo: $programmerInfo
                             )
+                        } else {
+                            FirmwareUpdateSection(firmwareUrl: $firmwareFileUrl, programmerInfo: $programmerInfo)
                         }
                     }
                 }
@@ -113,9 +98,108 @@ struct ProgrammerInfoView: View {
     }
 }
 
+struct FirmwareUpdateSection: View {
+    @Binding var firmwareUrl: URL?
+    @Binding var programmerInfo: ProgrammerInfo?
+
+    var body: some View {
+        Section(
+            header: HStack {
+                Text("Firmware Update")
+            }
+        ) {
+            HStack {
+                Text("Firmware")
+                Spacer()
+                OpenFileButton(caption: "Select Firmware...", fileTypes: ["dat"]) { url in
+                    firmwareUrl = url
+                }
+            }
+            HStack {
+                Text("Firmware file: \(firmwareUrl?.path ?? "N/A")")
+                Spacer()
+                UpdateFirmwareButton(
+                    firmwareUrl: $firmwareUrl,
+                    programmerInfo: $programmerInfo,
+                    buttonCaption: "Update..."
+                )
+            }.disabled(firmwareUrl == nil)
+            Link(
+                "Learn more about downloading firmware",
+                destination: URL(
+                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
+                )!
+            )
+        }
+    }
+}
+
+struct SoftwareUpdateSection: View {
+    @Binding var firmwareUrl: URL?
+    @Binding var programmerInfo: ProgrammerInfo?
+
+    private var missingAlgorithmsMessage: String? {
+        guard
+            AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: programmerInfo),
+            let programmerInfo,
+            let firmwareVersion = programmerInfo.getFirmwareVersionNumber()
+        else {
+            return nil
+        }
+
+        if let softwareName = XgproFirmwareUtils.getSoftwareName(
+            programmerModel: programmerInfo.model,
+            firmwareVersion: firmwareVersion
+        ) {
+            return "Missing algorithms for installed firmware. Install \(softwareName)."
+        }
+
+        if let latestSoftwareName = XgproFirmwareUtils.getLatestSoftwareName(programmerModel: programmerInfo.model) {
+            return "Missing algorithms for installed firmware. Install software matching your firmware version, or the latest known version: \(latestSoftwareName)."
+        }
+
+        return "Missing algorithms for installed firmware. Install software matching your firmware version."
+    }
+
+    var body: some View {
+        Section(
+            header: HStack {
+                Text("Software Installation")
+            }
+        ) {
+            if let missingAlgorithmsMessage {
+                ErrorBanner(errorMessage: missingAlgorithmsMessage)
+            }
+            HStack {
+                Text("Software")
+                Spacer()
+                OpenFileButton(caption: "Select Software...", fileTypes: ["rar"]) { url in
+                    firmwareUrl = url
+                }
+            }
+            HStack {
+                Text("Software file: \(firmwareUrl?.path ?? "N/A")")
+                Spacer()
+                UpdateFirmwareButton(
+                    firmwareUrl: $firmwareUrl,
+                    programmerInfo: $programmerInfo,
+                    buttonCaption: "Install..."
+                )
+            }.disabled(firmwareUrl == nil)
+            Link(
+                "Learn more about downloading software",
+                destination: URL(
+                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
+                )!
+            )
+        }
+    }
+}
+
 struct UpdateFirmwareButton: View {
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
+    let buttonCaption: String
     @State private var progressUpdate: ProgressUpdate?
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
@@ -188,9 +272,8 @@ struct UpdateFirmwareButton: View {
         return outputDirectory
     }
 
-
     var body: some View {
-        Button("Update...") {
+        Button(buttonCaption) {
             if let firmwareUrl = firmwareUrl {
                 isPresented = true
                 Task {
