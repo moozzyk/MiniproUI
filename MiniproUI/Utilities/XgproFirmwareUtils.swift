@@ -15,12 +15,11 @@ enum XgproFirmwareUtilsError: Error {
     case readFailed
     case unsupportedProgrammerType
     case compressionFailed
-    case unknownUpdateFile(String)
+    case unknownSoftwareFile(String)
 }
 
 struct FirmwareInfo {
     let programmerType: String
-    let fileURL: URL
     let firmwareVersion: UInt16
 }
 
@@ -32,7 +31,16 @@ class XgproFirmwareUtils {
         category: "XgproFirmwareUtils"
     )
 
-    private static let updateChecksums: [String: String] = [
+    private static let firmwareInfoBySoftwareName: [String: FirmwareInfo] = [
+        "xgpro_T76_V1303A.rar": FirmwareInfo(programmerType: "T76", firmwareVersion: 0x10d),
+        "xgpro_T76_V1309.rar": FirmwareInfo(programmerType: "T76", firmwareVersion: 0x10e),
+        "xgpro_T76_V1311.rar": FirmwareInfo(programmerType: "T76", firmwareVersion: 0x10f),
+        "xgproV1304_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerType: "T56", firmwareVersion: 0x149),
+        "xgproV1306_T48_T56_T866_Setup.rar": FirmwareInfo(programmerType: "T56", firmwareVersion: 0x149),
+        "xgproV1310_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerType: "T56", firmwareVersion: 0x149),
+    ]
+
+    private static let softwareChecksums: [String: String] = [
         "xgpro_T76_V1303A.rar": "493024ac8951f733e34b42cac66d873ef77f9e12e3547c6f1e5e295d0061f1aa",
         "xgpro_T76_V1309.rar": "72164362cc986742b101eab1a93e884b93f280f9fc0e2e8b6077fd0ca2ab9745",
         "xgpro_T76_V1311.rar": "aad3cc7678676da2e1b2bb0505d7c58e0c74ca1612f805a994eebe6c11473ea8",
@@ -62,12 +70,12 @@ class XgproFirmwareUtils {
         if let t76Match {
             let version = try extractFirmwareVersion(from: t76Match)
             logger.notice("Detected T76 firmware file at \(t76Match.path, privacy: .public)")
-            return FirmwareInfo(programmerType: "T76", fileURL: t76Match, firmwareVersion: version)
+            return FirmwareInfo(programmerType: "T76", firmwareVersion: version)
         }
         if let t56Match {
             let version = try extractFirmwareVersion(from: t56Match)
             logger.notice("Detected T56 firmware file at \(t56Match.path, privacy: .public)")
-            return FirmwareInfo(programmerType: "T56", fileURL: t56Match, firmwareVersion: version)
+            return FirmwareInfo(programmerType: "T56", firmwareVersion: version)
         }
         logger.notice("No firmware file found in \(folder.path, privacy: .public)")
         throw XgproFirmwareUtilsError.firmwareNotFound
@@ -251,19 +259,34 @@ class XgproFirmwareUtils {
         return results
     }
 
-    public static func isKnownUpdate(fileURL: URL) -> Bool {
+    public static func isKnownSoftware(fileURL: URL) -> Bool {
         let fileName = fileURL.lastPathComponent.lowercased()
-        return updateChecksums.keys.contains { $0.lowercased() == fileName }
+        return softwareChecksums.keys.contains { $0.lowercased() == fileName }
     }
 
-    public static func verifyUpdateSHA(fileURL: URL) throws -> Bool {
+    public static func verifySoftwareSHA(fileURL: URL) throws -> Bool {
         let fileName = fileURL.lastPathComponent.lowercased()
-        guard let expectedChecksum = updateChecksums.first(where: { $0.key.lowercased() == fileName })?.value else {
-            throw XgproFirmwareUtilsError.unknownUpdateFile(fileURL.lastPathComponent)
+        guard let expectedChecksum = softwareChecksums.first(where: { $0.key.lowercased() == fileName })?.value else {
+            throw XgproFirmwareUtilsError.unknownSoftwareFile(fileURL.lastPathComponent)
         }
         let fileData = try Data(contentsOf: fileURL)
         let digest = SHA256.hash(data: fileData)
         let actualChecksum = digest.map { String(format: "%02x", $0) }.joined()
         return actualChecksum == expectedChecksum
+    }
+
+    public static func getSoftwareName(programmerType: String, firmwareVersion: UInt16) -> String? {
+        let normalizedProgrammerType = programmerType.uppercased()
+        let matches = firmwareInfoBySoftwareName.compactMap { entry -> String? in
+            let (softwareName, firmwareInfo) = entry
+            guard
+                firmwareInfo.programmerType == normalizedProgrammerType,
+                firmwareInfo.firmwareVersion == firmwareVersion
+            else {
+                return nil
+            }
+            return softwareName
+        }
+        return matches.sorted().last
     }
 }
