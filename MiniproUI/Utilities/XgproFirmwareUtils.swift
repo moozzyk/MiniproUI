@@ -23,6 +23,11 @@ struct FirmwareInfo {
     let firmwareVersion: UInt16
 }
 
+private struct SoftwareBundleInfo {
+    let firmwareInfo: FirmwareInfo
+    let checksum: String
+}
+
 public enum SoftwareBundleVerificationStatus {
     case checksumMatch
     case checksumMismatch
@@ -39,22 +44,31 @@ class XgproFirmwareUtils {
         category: "XgproFirmwareUtils"
     )
 
-    private static let firmwareInfoBySoftwareName: [String: FirmwareInfo] = [
-        "xgpro_T76_V1303A.rar": FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10d),
-        "xgpro_T76_V1309.rar": FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10e),
-        "xgpro_T76_V1311.rar": FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10f),
-        "xgproV1304_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
-        "xgproV1306_T48_T56_T866_Setup.rar": FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
-        "xgproV1310_T48_T56_T866II_Setup.rar": FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
-    ]
-
-    private static let softwareChecksums: [String: String] = [
-        "xgpro_T76_V1303A.rar": "493024ac8951f733e34b42cac66d873ef77f9e12e3547c6f1e5e295d0061f1aa",
-        "xgpro_T76_V1309.rar": "72164362cc986742b101eab1a93e884b93f280f9fc0e2e8b6077fd0ca2ab9745",
-        "xgpro_T76_V1311.rar": "aad3cc7678676da2e1b2bb0505d7c58e0c74ca1612f805a994eebe6c11473ea8",
-        "xgproV1304_T48_T56_T866II_Setup.rar": "821db3ef1cc2b335d8a1e50ad37161032f804c8626cd3c1e7d03695d9aa75b1d",
-        "xgproV1306_T48_T56_T866_Setup.rar": "2110b1af7b8f0274032cef006c7be23d2c28d375e3392040dc9de09f5d35eba6",
-        "xgproV1310_T48_T56_T866II_Setup.rar": "f3fb94d483c20e0e28d8a53ffd5e0930ef285cfeea008f23691ed097c8dcd0c9",
+    private static let softwareInfo: [String: SoftwareBundleInfo] = [
+        "xgpro_T76_V1303A.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10d),
+            checksum: "493024ac8951f733e34b42cac66d873ef77f9e12e3547c6f1e5e295d0061f1aa"
+        ),
+        "xgpro_T76_V1309.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10e),
+            checksum: "72164362cc986742b101eab1a93e884b93f280f9fc0e2e8b6077fd0ca2ab9745"
+        ),
+        "xgpro_T76_V1311.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10f),
+            checksum: "aad3cc7678676da2e1b2bb0505d7c58e0c74ca1612f805a994eebe6c11473ea8"
+        ),
+        "xgproV1304_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+            checksum: "821db3ef1cc2b335d8a1e50ad37161032f804c8626cd3c1e7d03695d9aa75b1d"
+        ),
+        "xgproV1306_T48_T56_T866_Setup.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+            checksum: "2110b1af7b8f0274032cef006c7be23d2c28d375e3392040dc9de09f5d35eba6"
+        ),
+        "xgproV1310_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+            checksum: "f3fb94d483c20e0e28d8a53ffd5e0930ef285cfeea008f23691ed097c8dcd0c9"
+        ),
     ]
 
     public static func getFirmwareInfo(in folder: URL) throws -> FirmwareInfo {
@@ -267,45 +281,33 @@ class XgproFirmwareUtils {
         return results
     }
 
-    private static func isKnownSoftware(fileURL: URL) -> Bool {
-        let fileName = fileURL.lastPathComponent.lowercased()
-        return softwareChecksums.keys.contains { $0.lowercased() == fileName }
-    }
-
-    private static func verifySoftwareSHA(fileURL: URL) throws -> Bool {
-        let fileName = fileURL.lastPathComponent.lowercased()
-        guard let expectedChecksum = softwareChecksums.first(where: { $0.key.lowercased() == fileName })?.value else {
-            throw XgproFirmwareUtilsError.unknownSoftwareFile(fileURL.lastPathComponent)
-        }
+    private static func verifySoftwareSHA(fileURL: URL, expectedChecksum: String) throws -> Bool {
         let fileData = try Data(contentsOf: fileURL)
         let digest = SHA256.hash(data: fileData)
         let actualChecksum = digest.map { String(format: "%02x", $0) }.joined()
         return actualChecksum == expectedChecksum
     }
 
-    private static func firmwareInfoForSoftware(fileURL: URL) -> FirmwareInfo? {
+    private static func softwareInfoFor(fileURL: URL) -> SoftwareBundleInfo? {
         let fileName = fileURL.lastPathComponent.lowercased()
-        return firmwareInfoBySoftwareName.first(where: { $0.key.lowercased() == fileName })?.value
+        return softwareInfo.first(where: { $0.key.lowercased() == fileName })?.value
     }
 
     public static func verifySoftwareBundle(
         fileURL: URL,
         programmerModel: String
     ) -> SoftwareBundleVerificationStatus {
-        guard let softwareFirmwareInfo = firmwareInfoForSoftware(fileURL: fileURL) else {
+        guard let softwareInfo = softwareInfoFor(fileURL: fileURL) else {
             return .checksumNotAvailable
         }
 
-        guard softwareFirmwareInfo.programmerModel == programmerModel.uppercased() else {
+        guard softwareInfo.firmwareInfo.programmerModel == programmerModel.uppercased() else {
             return .programmerModelMismatch
         }
 
-        guard isKnownSoftware(fileURL: fileURL) else {
-            return .checksumNotAvailable
-        }
-
         do {
-            return try verifySoftwareSHA(fileURL: fileURL) ? .checksumMatch : .checksumMismatch
+            return try verifySoftwareSHA(fileURL: fileURL, expectedChecksum: softwareInfo.checksum)
+                ? .checksumMatch : .checksumMismatch
         } catch {
             return .verificationFailed
         }
@@ -313,11 +315,11 @@ class XgproFirmwareUtils {
 
     public static func getSoftwareName(programmerModel: String, firmwareVersion: UInt16) -> String? {
         let normalizedProgrammerModel = programmerModel.uppercased()
-        let matches = firmwareInfoBySoftwareName.compactMap { entry -> String? in
-            let (softwareName, firmwareInfo) = entry
+        let matches = softwareInfo.compactMap { entry -> String? in
+            let (softwareName, softwareInfo) = entry
             guard
-                firmwareInfo.programmerModel == normalizedProgrammerModel,
-                firmwareInfo.firmwareVersion == firmwareVersion
+                softwareInfo.firmwareInfo.programmerModel == normalizedProgrammerModel,
+                softwareInfo.firmwareInfo.firmwareVersion == firmwareVersion
             else {
                 return nil
             }
@@ -328,9 +330,9 @@ class XgproFirmwareUtils {
 
     public static func getLatestSoftwareName(programmerModel: String) -> String? {
         let normalizedProgrammerModel = programmerModel.uppercased()
-        let matches = firmwareInfoBySoftwareName.compactMap { entry -> String? in
-            let (softwareName, firmwareInfo) = entry
-            guard firmwareInfo.programmerModel == normalizedProgrammerModel else {
+        let matches = softwareInfo.compactMap { entry -> String? in
+            let (softwareName, softwareInfo) = entry
+            guard softwareInfo.firmwareInfo.programmerModel == normalizedProgrammerModel else {
                 return nil
             }
             return softwareName
