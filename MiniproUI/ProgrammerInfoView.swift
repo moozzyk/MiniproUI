@@ -137,6 +137,7 @@ struct FirmwareUpdateSection: View {
 struct SoftwareUpdateSection: View {
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
+    @State private var softwareChecksumStatus: SoftwareBundleVerificationStatus?
 
     private var missingAlgorithmsMessage: String? {
         guard
@@ -161,6 +162,28 @@ struct SoftwareUpdateSection: View {
         return "Missing algorithms for installed firmware. Install software matching your firmware version."
     }
 
+    private func checksumIcon(for status: SoftwareBundleVerificationStatus) -> String {
+        switch status {
+        case .checksumMatch:
+            return "checkmark.circle.fill"
+        case .checksumNotAvailable:
+            return "exclamationmark.triangle.fill"
+        case .checksumMismatch, .programmerModelMismatch, .verificationFailed:
+            return "xmark.circle.fill"
+        }
+    }
+
+    private func checksumColor(for status: SoftwareBundleVerificationStatus) -> Color {
+        switch status {
+        case .checksumMatch:
+            return .green
+        case .checksumNotAvailable:
+            return .yellow
+        case .checksumMismatch, .programmerModelMismatch, .verificationFailed:
+            return .red
+        }
+    }
+
     var body: some View {
         Section(
             header: HStack {
@@ -175,11 +198,19 @@ struct SoftwareUpdateSection: View {
                 Spacer()
                 OpenFileButton(caption: "Select Software...", fileTypes: ["rar"]) { url in
                     firmwareUrl = url
+                    softwareChecksumStatus = XgproFirmwareUtils.verifySoftwareBundle(
+                        fileURL: url,
+                        programmerModel: programmerInfo?.model ?? ""
+                    )
                 }
             }
             HStack {
                 Text("Software file: \(firmwareUrl?.path ?? "N/A")")
                 Spacer()
+                if let softwareChecksumStatus {
+                    Image(systemName: checksumIcon(for: softwareChecksumStatus))
+                        .foregroundColor(checksumColor(for: softwareChecksumStatus))
+                }
                 UpdateFirmwareButton(
                     firmwareUrl: $firmwareUrl,
                     programmerInfo: $programmerInfo,

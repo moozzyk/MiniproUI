@@ -23,6 +23,14 @@ struct FirmwareInfo {
     let firmwareVersion: UInt16
 }
 
+public enum SoftwareBundleVerificationStatus {
+    case checksumMatch
+    case checksumMismatch
+    case programmerModelMismatch
+    case checksumNotAvailable
+    case verificationFailed
+}
+
 class XgproFirmwareUtils {
     private static let t56FileName = "updatet56.dat"
     private static let t76FileName = "updatet76.dat"
@@ -259,12 +267,12 @@ class XgproFirmwareUtils {
         return results
     }
 
-    public static func isKnownSoftware(fileURL: URL) -> Bool {
+    private static func isKnownSoftware(fileURL: URL) -> Bool {
         let fileName = fileURL.lastPathComponent.lowercased()
         return softwareChecksums.keys.contains { $0.lowercased() == fileName }
     }
 
-    public static func verifySoftwareSHA(fileURL: URL) throws -> Bool {
+    private static func verifySoftwareSHA(fileURL: URL) throws -> Bool {
         let fileName = fileURL.lastPathComponent.lowercased()
         guard let expectedChecksum = softwareChecksums.first(where: { $0.key.lowercased() == fileName })?.value else {
             throw XgproFirmwareUtilsError.unknownSoftwareFile(fileURL.lastPathComponent)
@@ -273,6 +281,34 @@ class XgproFirmwareUtils {
         let digest = SHA256.hash(data: fileData)
         let actualChecksum = digest.map { String(format: "%02x", $0) }.joined()
         return actualChecksum == expectedChecksum
+    }
+
+    private static func firmwareInfoForSoftware(fileURL: URL) -> FirmwareInfo? {
+        let fileName = fileURL.lastPathComponent.lowercased()
+        return firmwareInfoBySoftwareName.first(where: { $0.key.lowercased() == fileName })?.value
+    }
+
+    public static func verifySoftwareBundle(
+        fileURL: URL,
+        programmerModel: String
+    ) -> SoftwareBundleVerificationStatus {
+        guard let softwareFirmwareInfo = firmwareInfoForSoftware(fileURL: fileURL) else {
+            return .checksumNotAvailable
+        }
+
+        guard softwareFirmwareInfo.programmerModel == programmerModel.uppercased() else {
+            return .programmerModelMismatch
+        }
+
+        guard isKnownSoftware(fileURL: fileURL) else {
+            return .checksumNotAvailable
+        }
+
+        do {
+            return try verifySoftwareSHA(fileURL: fileURL) ? .checksumMatch : .checksumMismatch
+        } catch {
+            return .verificationFailed
+        }
     }
 
     public static func getSoftwareName(programmerModel: String, firmwareVersion: UInt16) -> String? {
