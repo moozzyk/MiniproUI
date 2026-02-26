@@ -136,11 +136,17 @@ struct FirmwareUpdateSection: View {
 }
 
 struct SoftwareUpdateSection: View {
+    private enum MissingAlgorithmsInfo {
+        case matchingBundle(String)
+        case latestKnownBundle(String)
+        case unknownBundle
+    }
+
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
     @State private var softwareChecksumStatus: SoftwareBundleVerificationStatus?
 
-    private var missingAlgorithmsMessage: String? {
+    private var missingAlgorithmsInfo: MissingAlgorithmsInfo? {
         guard
             AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: programmerInfo),
             let programmerInfo,
@@ -153,14 +159,14 @@ struct SoftwareUpdateSection: View {
             programmerModel: programmerInfo.model,
             firmwareVersion: firmwareVersion
         ) {
-            return "Missing algorithms for installed firmware. Matching bundle: \(softwareName).\nInstalling any other bundle will update the programmer firmware."
+            return .matchingBundle(softwareName)
         }
 
         if let latestSoftwareName = XgproFirmwareUtils.getLatestSoftwareName(programmerModel: programmerInfo.model) {
-            return "Missing algorithms for installed firmware. Install software matching your firmware version, or the latest known version: \(latestSoftwareName)."
+            return .latestKnownBundle(latestSoftwareName)
         }
 
-        return "Missing algorithms for installed firmware. Install software matching your firmware version."
+        return .unknownBundle
     }
 
     private func checksumIcon(for status: SoftwareBundleVerificationStatus) -> String {
@@ -191,9 +197,27 @@ struct SoftwareUpdateSection: View {
                 Text("Software Bundle Installation")
             }
         ) {
-            if let missingAlgorithmsMessage {
+            if let missingAlgorithmsInfo {
                 ErrorBanner {
-                    Text(missingAlgorithmsMessage)
+                    VStack(alignment: .leading, spacing: 6) {
+                        switch missingAlgorithmsInfo {
+                        case .matchingBundle(let softwareName):
+                            HStack(spacing: 4) {
+                                Text("Missing algorithms for installed firmware. Matching bundle:")
+                                Text(softwareName)
+                                    .font(.system(.body, design: .monospaced))
+                            }
+                            Text("Installing any other bundle may update the programmer firmware.")
+                        case .latestKnownBundle(let latestSoftwareName):
+                            Text(
+                                "Missing algorithms for installed firmware. Install software matching your firmware version, or the latest known version: \(latestSoftwareName)."
+                            )
+                        case .unknownBundle:
+                            Text(
+                                "Missing algorithms for installed firmware. Install software matching your firmware version."
+                            )
+                        }
+                    }
                 }
             }
             HStack {
