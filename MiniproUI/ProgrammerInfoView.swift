@@ -188,16 +188,16 @@ struct SoftwareUpdateSection: View {
     var body: some View {
         Section(
             header: HStack {
-                Text("Software Installation")
+                Text("Software Bundle Installation")
             }
         ) {
             if let missingAlgorithmsMessage {
                 ErrorBanner(errorMessage: missingAlgorithmsMessage)
             }
             HStack {
-                Text("Software")
+                Text("Software Bundle")
                 Spacer()
-                OpenFileButton(caption: "Select Software...", fileTypes: ["rar"]) { url in
+                OpenFileButton(caption: "Select Bundle...", fileTypes: ["rar"]) { url in
                     firmwareUrl = url
                     softwareChecksumStatus = XgproFirmwareUtils.verifySoftwareBundle(
                         fileURL: url,
@@ -206,7 +206,7 @@ struct SoftwareUpdateSection: View {
                 }
             }
             HStack {
-                Text("Software file: \(firmwareUrl?.lastPathComponent ?? "N/A")")
+                Text("Software Bundle file: \(firmwareUrl?.lastPathComponent ?? "N/A")")
                     .help(firmwareUrl?.path ?? "")
                 Spacer()
                 if let softwareChecksumStatus {
