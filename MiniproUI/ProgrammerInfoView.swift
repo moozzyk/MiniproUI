@@ -116,7 +116,8 @@ struct FirmwareUpdateSection: View {
                 }
             }
             HStack {
-                Text("Firmware file: \(firmwareUrl?.path ?? "N/A")")
+                Text("Firmware file: \(firmwareUrl?.lastPathComponent ?? "N/A")")
+                    .help(firmwareUrl?.path ?? "")
                 Spacer()
                 UpdateFirmwareButton(
                     firmwareUrl: $firmwareUrl,
@@ -205,7 +206,8 @@ struct SoftwareUpdateSection: View {
                 }
             }
             HStack {
-                Text("Software file: \(firmwareUrl?.path ?? "N/A")")
+                Text("Software file: \(firmwareUrl?.lastPathComponent ?? "N/A")")
+                    .help(firmwareUrl?.path ?? "")
                 Spacer()
                 if let softwareChecksumStatus {
                     Image(systemName: checksumIcon(for: softwareChecksumStatus))
