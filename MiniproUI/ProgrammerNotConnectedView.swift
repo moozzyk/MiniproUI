@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ProgrammerNotConnected: View {
     var body: some View {
-        ErrorBanner(errorMessage: "No programmer connected.")
+        ErrorBanner {
+            Text("No programmer connected.")
+        }
     }
 }
 

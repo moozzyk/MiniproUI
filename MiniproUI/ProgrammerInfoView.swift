@@ -153,7 +153,7 @@ struct SoftwareUpdateSection: View {
             programmerModel: programmerInfo.model,
             firmwareVersion: firmwareVersion
         ) {
-            return "Missing algorithms for installed firmware. Install \(softwareName)."
+            return "Missing algorithms for installed firmware. Matching bundle: \(softwareName).\nInstalling any other bundle will update the programmer firmware."
         }
 
         if let latestSoftwareName = XgproFirmwareUtils.getLatestSoftwareName(programmerModel: programmerInfo.model) {
@@ -192,7 +192,9 @@ struct SoftwareUpdateSection: View {
             }
         ) {
             if let missingAlgorithmsMessage {
-                ErrorBanner(errorMessage: missingAlgorithmsMessage)
+                ErrorBanner {
+                    Text(missingAlgorithmsMessage)
+                }
             }
             HStack {
                 Text("Software Bundle")

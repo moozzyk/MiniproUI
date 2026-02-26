@@ -4,15 +4,19 @@
 //
 import SwiftUI
 
-struct ErrorBanner: View {
-    let errorMessage: String
+struct ErrorBanner<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
 
     var body: some View {
         HStack {
             Spacer()
             Image(systemName: "exclamationmark.circle.fill")
                 .foregroundColor(.red)
-            Text(errorMessage)
+            content
                 .padding()
             Spacer()
         }
@@ -20,5 +24,7 @@ struct ErrorBanner: View {
 }
 
 #Preview {
-    ErrorBanner(errorMessage: "No programmer connected.")
+    ErrorBanner {
+        Text("No programmer connected.")
+    }
 }
