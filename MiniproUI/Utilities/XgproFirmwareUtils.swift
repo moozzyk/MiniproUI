@@ -133,15 +133,26 @@ class XgproFirmwareUtils {
         }
     }
 
-    public static func createAlgorithmXml(in baseFolder: URL, programmerModel: String) async throws -> String {
+    public static func createAlgorithmXml(
+        in baseFolder: URL,
+        programmerModel: String,
+        progressUpdate: ((ProgressUpdate) -> Void)? = nil
+    ) async throws -> String {
         let algorithmFolder = try resolveAlgorithmDirectory(baseFolder: baseFolder, programmerModel: programmerModel)
         let entries = try FileManager.default.contentsOfDirectory(
             at: algorithmFolder,
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
         )
+        let algorithmEntries = entries.filter { $0.pathExtension.lowercased() == "alg" }
         var algorithmElements: [String] = []
-        for entry in entries where entry.pathExtension.lowercased() == "alg" {
+        if algorithmEntries.isEmpty {
+            progressUpdate?(ProgressUpdate(operation: "Preparing Algorithms", percentage: 100))
+        } else {
+            progressUpdate?(ProgressUpdate(operation: "Preparing Algorithms", percentage: 0))
+        }
+
+        for (index, entry) in algorithmEntries.enumerated() {
             logger.notice(
                 "Firmware folder entry for \(programmerModel, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
             )
@@ -149,6 +160,8 @@ class XgproFirmwareUtils {
                 let element = try await buildAlgorithmElementT76(path: entry)
                 algorithmElements.append(element)
             }
+            let percentage = Int((Double(index + 1) / Double(algorithmEntries.count)) * 100.0)
+            progressUpdate?(ProgressUpdate(operation: "Preparing Algorithms", percentage: percentage))
         }
         let xml = buildAlgorithmsXml(programmerModel: programmerModel, algorithmElements: algorithmElements)
         logger.notice("Built algorithms XML with \(algorithmElements.count, privacy: .public) entries")

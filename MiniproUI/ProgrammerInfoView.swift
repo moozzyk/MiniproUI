@@ -357,11 +357,13 @@ struct UpdateFirmwareButton: View {
             guard firmwareInfo.programmerModel.uppercased() == programmerModel.uppercased() else {
                 throw SoftwareBundleValidationError.programmerModelMismatch
             }
-
+            progressMessage = "Preparing Algorithms..."
             let algorithmsXml = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: outputDirectory,
                 programmerModel: firmwareInfo.programmerModel
-            )
+            ) {
+                progressUpdate = $0
+            }
             let algorithmsUrl = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
                 programmerModel: firmwareInfo.programmerModel,
                 firmwareVersion: firmwareInfo.firmwareVersion
