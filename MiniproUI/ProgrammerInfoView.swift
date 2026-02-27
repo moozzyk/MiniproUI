@@ -298,6 +298,20 @@ struct SoftwareUpdateSection: View {
 }
 
 struct UpdateFirmwareButton: View {
+    private enum SoftwareBundleValidationError: LocalizedError {
+        case programmerNotConnected
+        case programmerModelMismatch
+
+        var errorDescription: String? {
+            switch self {
+            case .programmerNotConnected:
+                return "Programmer not connected."
+            case .programmerModelMismatch:
+                return "Selected software bundle does not match the connected programmer."
+            }
+        }
+    }
+
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
     let buttonCaption: String
@@ -319,13 +333,9 @@ struct UpdateFirmwareButton: View {
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
-        isPresented = false
-        progressUpdate = nil
-        progressMessage = nil
     }
 
     private func processRarFirmware(at firmwareUrl: URL) async {
-        progressMessage = "Extracting firmware..."
         do {
             let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
             defer {
@@ -339,6 +349,14 @@ struct UpdateFirmwareButton: View {
                 }
             }
             let firmwareInfo = try XgproFirmwareUtils.getFirmwareInfo(in: outputDirectory)
+            guard let programmerModel = programmerInfo?.model else {
+                throw SoftwareBundleValidationError.programmerNotConnected
+            }
+
+            guard firmwareInfo.programmerModel.uppercased() == programmerModel.uppercased() else {
+                throw SoftwareBundleValidationError.programmerModelMismatch
+            }
+
             let algorithmsXml = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: outputDirectory,
                 programmerModel: firmwareInfo.programmerModel
@@ -356,8 +374,6 @@ struct UpdateFirmwareButton: View {
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
-        isPresented = false
-        progressMessage = nil
     }
 
     private func unpackFirmwareArchive(at firmwareUrl: URL) async throws -> URL {
@@ -378,7 +394,13 @@ struct UpdateFirmwareButton: View {
             if let firmwareUrl = firmwareUrl {
                 isPresented = true
                 Task {
+                    defer {
+                        isPresented = false
+                        progressUpdate = nil
+                        progressMessage = nil
+                    }
                     if firmwareUrl.pathExtension.lowercased() == "rar" {
+                        progressMessage = "Extracting firmware..."
                         await processRarFirmware(at: firmwareUrl)
                     } else {
                         progressMessage = "Updating firmware..."
