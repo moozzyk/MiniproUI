@@ -39,12 +39,12 @@ struct XgproFirmwareUtilsTests {
             updates.append($0)
         }
 
-        #expect(updates.count == 3)
-        #expect(updates.map(\.percentage) == [0, 50, 100])
+        #expect(updates.count == 2)
+        #expect(updates.map(\.percentage) == [50, 100])
         #expect(updates.allSatisfy { $0.operation == "Preparing Algorithms" })
     }
 
-    @Test func createAlgorithmXmlReportsCompletionWhenNoAlgFiles() async throws {
+    @Test func createAlgorithmXmlThrowsWhenNoAlgFiles() async throws {
         let tempDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: tempDirectory) }
@@ -52,16 +52,23 @@ struct XgproFirmwareUtilsTests {
         let algorithmDirectory = tempDirectory.appendingPathComponent("algoT76", isDirectory: true)
         try FileManager.default.createDirectory(at: algorithmDirectory, withIntermediateDirectories: true)
 
-        var updates: [ProgressUpdate] = []
-        _ = try await XgproFirmwareUtils.createAlgorithmXml(
-            in: tempDirectory,
-            programmerModel: "T76"
-        ) {
-            updates.append($0)
+        do {
+            _ = try await XgproFirmwareUtils.createAlgorithmXml(
+                in: tempDirectory,
+                programmerModel: "T76"
+            ) { _ in
+            }
+            #expect(Bool(false), "Expected createAlgorithmXml to throw")
+        } catch let error as XgproFirmwareUtilsError {
+            switch error {
+            case .algorithmsNotFound:
+                #expect(Bool(true))
+            default:
+                #expect(Bool(false), "Unexpected XgproFirmwareUtilsError: \(String(describing: error))")
+            }
+        } catch {
+            #expect(Bool(false), "Unexpected error type: \(String(describing: error))")
         }
-
-        #expect(updates.count == 1)
-        #expect(updates.first == ProgressUpdate(operation: "Preparing Algorithms", percentage: 100))
     }
 
     private func makeTestAlgFile(name: String, in directory: URL) throws {

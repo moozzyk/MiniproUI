@@ -11,6 +11,7 @@ import os
 
 enum XgproFirmwareUtilsError: Error {
     case firmwareNotFound
+    case algorithmsNotFound
     case fileTooSmall
     case readFailed
     case unsupportedProgrammerType
@@ -145,12 +146,10 @@ class XgproFirmwareUtils {
             options: [.skipsHiddenFiles]
         )
         let algorithmEntries = entries.filter { $0.pathExtension.lowercased() == "alg" }
-        var algorithmElements: [String] = []
         if algorithmEntries.isEmpty {
-            progressUpdate?(ProgressUpdate(operation: "Preparing Algorithms", percentage: 100))
-        } else {
-            progressUpdate?(ProgressUpdate(operation: "Preparing Algorithms", percentage: 0))
+            throw XgproFirmwareUtilsError.algorithmsNotFound
         }
+        var algorithmElements: [String] = []
 
         for (index, entry) in algorithmEntries.enumerated() {
             logger.notice(
