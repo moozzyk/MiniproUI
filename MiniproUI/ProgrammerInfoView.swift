@@ -316,6 +316,7 @@ struct UpdateFirmwareButton: View {
     @Binding var programmerInfo: ProgrammerInfo?
     let buttonCaption: String
     @State private var progressUpdate: ProgressUpdate?
+    @State private var errorAlertTitle = "Firmware Update Failed"
     @State private var errorMessage: DialogErrorMessage?
     @State private var isPresented = false
     @State private var progressMessage: String?
@@ -400,9 +401,11 @@ struct UpdateFirmwareButton: View {
                         progressMessage = nil
                     }
                     if firmwareUrl.pathExtension.lowercased() == "rar" {
+                        errorAlertTitle = "Software Install Failed"
                         progressMessage = "Extracting firmware..."
                         await processRarFirmware(at: firmwareUrl)
                     } else {
+                        errorAlertTitle = "Firmware Update Failed"
                         progressMessage = "Updating firmware..."
                         await updateFirmware(using: firmwareUrl)
                     }
@@ -417,7 +420,7 @@ struct UpdateFirmwareButton: View {
         }
         .alert(item: $errorMessage) {
             Alert(
-                title: Text("Firmware Update Failure"),
+                title: Text(errorAlertTitle),
                 message: Text($0.message),
                 dismissButton: .default(Text("OK"))
             )
