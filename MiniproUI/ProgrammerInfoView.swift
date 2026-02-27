@@ -191,6 +191,32 @@ struct SoftwareUpdateSection: View {
         }
     }
 
+    private func verificationDetails(for status: SoftwareBundleVerificationStatus) -> String? {
+        switch status {
+        case .checksumMatch:
+            return nil
+        case .checksumNotAvailable:
+            return "Checksum verification was not possible for this bundle."
+        case .checksumMismatch:
+            return "Bundle checksum does not match expected value."
+        case .programmerModelMismatch:
+            return "This bundle targets a different programmer model."
+        case .verificationFailed:
+            return "Failed to verify bundle checksum."
+        }
+    }
+
+    private func verificationCaptionColor(for status: SoftwareBundleVerificationStatus) -> Color {
+        switch status {
+        case .checksumNotAvailable:
+            return .orange
+        case .checksumMismatch, .programmerModelMismatch, .verificationFailed:
+            return .red
+        case .checksumMatch:
+            return .clear
+        }
+    }
+
     var body: some View {
         Section(
             header: HStack {
@@ -232,12 +258,28 @@ struct SoftwareUpdateSection: View {
                 }
             }
             HStack {
-                Text("Software Bundle file: \(firmwareUrl?.lastPathComponent ?? "N/A")")
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 4) {
+                        Text("Software Bundle file:")
+                        if let fileName = firmwareUrl?.lastPathComponent {
+                            Text(fileName)
+                                .font(.system(.body, design: .monospaced))
+                        } else {
+                            Text("N/A")
+                        }
+                    }
                     .help(firmwareUrl?.path ?? "")
+                    if let softwareChecksumStatus, let verificationDetails = verificationDetails(for: softwareChecksumStatus) {
+                        Text(verificationDetails)
+                            .font(.caption)
+                            .foregroundColor(verificationCaptionColor(for: softwareChecksumStatus))
+                    }
+                }
                 Spacer()
                 if let softwareChecksumStatus {
                     Image(systemName: checksumIcon(for: softwareChecksumStatus))
                         .foregroundColor(checksumColor(for: softwareChecksumStatus))
+                        .help(verificationDetails(for: softwareChecksumStatus) ?? "")
                 }
                 UpdateFirmwareButton(
                     firmwareUrl: $firmwareUrl,
