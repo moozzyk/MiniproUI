@@ -336,6 +336,23 @@ struct UpdateFirmwareButton: View {
         }
     }
 
+    private func createExtractionProgressTask() -> Task<Void, Never> {
+        Task {
+            let totalSteps = 100
+            let maxPercentage = 90
+            for step in 1...totalSteps {
+                try? await Task.sleep(nanoseconds: 100 * 1_000_000)
+                if Task.isCancelled {
+                    return
+                }
+                let percentage = Int((Double(step) / Double(totalSteps)) * Double(maxPercentage))
+                await MainActor.run {
+                    progressUpdate = ProgressUpdate(operation: "Extracting Files", percentage: percentage)
+                }
+            }
+        }
+    }
+
     private func processRarFirmware(at firmwareUrl: URL) async {
         do {
             let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
@@ -357,6 +374,8 @@ struct UpdateFirmwareButton: View {
             guard firmwareInfo.programmerModel.uppercased() == programmerModel.uppercased() else {
                 throw SoftwareBundleValidationError.programmerModelMismatch
             }
+
+            progressUpdate = nil
             progressMessage = "Preparing Algorithms..."
             let algorithmsXml = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: outputDirectory,
@@ -380,6 +399,10 @@ struct UpdateFirmwareButton: View {
     }
 
     private func unpackFirmwareArchive(at firmwareUrl: URL) async throws -> URL {
+        let extractionProgressTask = createExtractionProgressTask()
+        defer {
+            extractionProgressTask.cancel()
+        }
         let outputDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(
             "xgpro-firmware-\(UUID().uuidString)",
             isDirectory: true
@@ -389,6 +412,8 @@ struct UpdateFirmwareButton: View {
             inputURL: firmwareUrl,
             outputDirectory: outputDirectory
         )
+        progressUpdate = ProgressUpdate(operation: "Extracting Files", percentage: 100)
+        await Task.yield()
         return outputDirectory
     }
 
