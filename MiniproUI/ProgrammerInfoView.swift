@@ -20,7 +20,7 @@ struct ProgrammerInfoView: View {
         guard let model = programmerInfo?.model else {
             return false
         }
-        return ["T56", "T76"].contains(model.uppercased())
+        return ["T56", "T76"].contains(model)
     }
 
     private var isFirmwareUpdateSupported: Bool {
@@ -377,7 +377,7 @@ struct UpdateFirmwareButton: View {
                 throw SoftwareBundleValidationError.programmerNotConnected
             }
 
-            guard firmwareInfo.programmerModel.uppercased() == programmerInfo.model.uppercased() else {
+            guard firmwareInfo.programmerModel == programmerInfo.model else {
                 throw SoftwareBundleValidationError.programmerModelMismatch
             }
 

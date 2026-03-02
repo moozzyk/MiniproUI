@@ -346,7 +346,7 @@ class XgproFirmwareUtils {
             return .checksumNotAvailable
         }
 
-        guard softwareInfo.firmwareInfo.programmerModel == programmerModel.uppercased() else {
+        guard softwareInfo.firmwareInfo.programmerModel == programmerModel else {
             return .programmerModelMismatch
         }
 
@@ -359,11 +359,10 @@ class XgproFirmwareUtils {
     }
 
     public static func getSoftwareName(programmerModel: String, firmwareVersion: UInt16) -> String? {
-        let normalizedProgrammerModel = programmerModel.uppercased()
         let matches = softwareInfo.compactMap { entry -> String? in
             let (softwareName, softwareInfo) = entry
             guard
-                softwareInfo.firmwareInfo.programmerModel == normalizedProgrammerModel,
+                softwareInfo.firmwareInfo.programmerModel == programmerModel,
                 softwareInfo.firmwareInfo.firmwareVersion == firmwareVersion
             else {
                 return nil
@@ -374,10 +373,9 @@ class XgproFirmwareUtils {
     }
 
     public static func getLatestSoftwareName(programmerModel: String) -> String? {
-        let normalizedProgrammerModel = programmerModel.uppercased()
         let matches = softwareInfo.compactMap { entry -> String? in
             let (softwareName, softwareInfo) = entry
-            guard softwareInfo.firmwareInfo.programmerModel == normalizedProgrammerModel else {
+            guard softwareInfo.firmwareInfo.programmerModel == programmerModel else {
                 return nil
             }
             return softwareName

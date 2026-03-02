@@ -73,7 +73,7 @@ class ProgrammerInfoProcessor {
         }
 
         return ProgrammerInfo(
-            model: String(model!),
+            model: String(model!).uppercased(),
             firmwareVersion: String(firmwareVersion!),
             deviceCode: String(deviceCode!),
             serialNumber: String(serialNumber!),
