@@ -322,15 +322,21 @@ struct UpdateFirmwareButton: View {
     @State private var progressMessage: String?
     private let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "UpdateFirmwareButton")
 
+    private func installFirmware(using firmwareUrl: URL) async throws {
+        progressUpdate = nil
+        progressMessage = "Updating firmware..."
+        try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path()) {
+            progressUpdate = $0
+        }
+        progressUpdate = ProgressUpdate(operation: "", percentage: 100)
+        await Task.yield()
+        programmerInfo = try await MiniproAPI.getProgrammerInfo()
+        try await Task.sleep(nanoseconds: 500 * 1_000_000)
+    }
+
     private func updateFirmware(using firmwareUrl: URL) async {
         do {
-            try await MiniproAPI.updateFirmware(firmwareFilePath: firmwareUrl.path()) {
-                progressUpdate = $0
-            }
-            progressUpdate = ProgressUpdate(operation: "", percentage: 100)
-            await Task.yield()
-            programmerInfo = try await MiniproAPI.getProgrammerInfo()
-            try await Task.sleep(nanoseconds: 500 * 1_000_000)
+            try await installFirmware(using: firmwareUrl)
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
@@ -367,11 +373,11 @@ struct UpdateFirmwareButton: View {
                 }
             }
             let firmwareInfo = try XgproFirmwareUtils.getFirmwareInfo(in: outputDirectory)
-            guard let programmerModel = programmerInfo?.model else {
+            guard let programmerInfo else {
                 throw SoftwareBundleValidationError.programmerNotConnected
             }
 
-            guard firmwareInfo.programmerModel.uppercased() == programmerModel.uppercased() else {
+            guard firmwareInfo.programmerModel.uppercased() == programmerInfo.model.uppercased() else {
                 throw SoftwareBundleValidationError.programmerModelMismatch
             }
 
@@ -393,6 +399,15 @@ struct UpdateFirmwareButton: View {
             )
             try algorithmsXml.write(to: algorithmsUrl, atomically: true, encoding: .utf8)
             logger.notice("Saved algorithms XML to \(algorithmsUrl.path, privacy: .public)")
+
+            guard let installedFirmwareVersion = programmerInfo.getFirmwareVersionNumber() else {
+                throw MiniproAPIError.programmerInfoUnavailable
+            }
+
+            if installedFirmwareVersion != firmwareInfo.firmwareVersion {
+                let firmwareFile = outputDirectory.appendingPathComponent(firmwareInfo.fileName)
+                try await installFirmware(using: firmwareFile)
+            }
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
@@ -433,7 +448,6 @@ struct UpdateFirmwareButton: View {
                         await processRarFirmware(at: firmwareUrl)
                     } else {
                         errorAlertTitle = "Firmware Update Failed"
-                        progressMessage = "Updating firmware..."
                         await updateFirmware(using: firmwareUrl)
                     }
                 }

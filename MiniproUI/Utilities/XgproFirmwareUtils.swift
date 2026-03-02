@@ -22,6 +22,7 @@ enum XgproFirmwareUtilsError: Error {
 struct FirmwareInfo {
     let programmerModel: String
     let firmwareVersion: UInt16
+    let fileName: String
 }
 
 private struct SoftwareBundleInfo {
@@ -39,7 +40,7 @@ public enum SoftwareBundleVerificationStatus {
 
 class XgproFirmwareUtils {
     private static let t56FileName = "updatet56.dat"
-    private static let t76FileName = "updatet76.dat"
+    private static let t76FileName = "UpdateT76.Dat"
     private static let logger = Logger(
         subsystem: "com.3d-logic.visualminipro",
         category: "XgproFirmwareUtils"
@@ -47,27 +48,51 @@ class XgproFirmwareUtils {
 
     private static let softwareInfo: [String: SoftwareBundleInfo] = [
         "xgpro_T76_V1303A.rar": SoftwareBundleInfo(
-            firmwareInfo: FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10d),
+            firmwareInfo: FirmwareInfo(
+                programmerModel: "T76",
+                firmwareVersion: 0x10d,
+                fileName: t76FileName
+            ),
             checksum: "493024ac8951f733e34b42cac66d873ef77f9e12e3547c6f1e5e295d0061f1aa"
         ),
         "xgpro_T76_V1309.rar": SoftwareBundleInfo(
-            firmwareInfo: FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10e),
+            firmwareInfo: FirmwareInfo(
+                programmerModel: "T76",
+                firmwareVersion: 0x10e,
+                fileName: t76FileName
+            ),
             checksum: "72164362cc986742b101eab1a93e884b93f280f9fc0e2e8b6077fd0ca2ab9745"
         ),
         "xgpro_T76_V1311.rar": SoftwareBundleInfo(
-            firmwareInfo: FirmwareInfo(programmerModel: "T76", firmwareVersion: 0x10f),
+            firmwareInfo: FirmwareInfo(
+                programmerModel: "T76",
+                firmwareVersion: 0x10f,
+                fileName: t76FileName
+            ),
             checksum: "aad3cc7678676da2e1b2bb0505d7c58e0c74ca1612f805a994eebe6c11473ea8"
         ),
         "xgproV1304_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
-            firmwareInfo: FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+            firmwareInfo: FirmwareInfo(
+                programmerModel: "T56",
+                firmwareVersion: 0x149,
+                fileName: t56FileName
+            ),
             checksum: "821db3ef1cc2b335d8a1e50ad37161032f804c8626cd3c1e7d03695d9aa75b1d"
         ),
         "xgproV1306_T48_T56_T866_Setup.rar": SoftwareBundleInfo(
-            firmwareInfo: FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+            firmwareInfo: FirmwareInfo(
+                programmerModel: "T56",
+                firmwareVersion: 0x149,
+                fileName: t56FileName
+            ),
             checksum: "2110b1af7b8f0274032cef006c7be23d2c28d375e3392040dc9de09f5d35eba6"
         ),
         "xgproV1310_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
-            firmwareInfo: FirmwareInfo(programmerModel: "T56", firmwareVersion: 0x149),
+            firmwareInfo: FirmwareInfo(
+                programmerModel: "T56",
+                firmwareVersion: 0x149,
+                fileName: t56FileName
+            ),
             checksum: "f3fb94d483c20e0e28d8a53ffd5e0930ef285cfeea008f23691ed097c8dcd0c9"
         ),
     ]
@@ -93,12 +118,20 @@ class XgproFirmwareUtils {
         if let t76Match {
             let version = try extractFirmwareVersion(from: t76Match)
             logger.notice("Detected T76 firmware file at \(t76Match.path, privacy: .public)")
-            return FirmwareInfo(programmerModel: "T76", firmwareVersion: version)
+            return FirmwareInfo(
+                programmerModel: "T76",
+                firmwareVersion: version,
+                fileName: t76Match.lastPathComponent
+            )
         }
         if let t56Match {
             let version = try extractFirmwareVersion(from: t56Match)
             logger.notice("Detected T56 firmware file at \(t56Match.path, privacy: .public)")
-            return FirmwareInfo(programmerModel: "T56", firmwareVersion: version)
+            return FirmwareInfo(
+                programmerModel: "T56",
+                firmwareVersion: version,
+                fileName: t56Match.lastPathComponent
+            )
         }
         logger.notice("No firmware file found in \(folder.path, privacy: .public)")
         throw XgproFirmwareUtilsError.firmwareNotFound
