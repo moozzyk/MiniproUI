@@ -21,7 +21,7 @@ class AlgorithmXmlUtils {
     }
 
     public static func resolveAlgorithmXmlPath(
-        programmerModel: String,
+        programmerModel: ProgrammerModel,
         firmwareVersion: UInt16
     ) throws -> URL {
         let baseDirectory = try FileManager.default.url(
@@ -33,7 +33,7 @@ class AlgorithmXmlUtils {
         let versionFolderName = String(format: "0x%x", firmwareVersion)
         return
             baseDirectory
-            .appendingPathComponent(programmerModel, isDirectory: true)
+            .appendingPathComponent(programmerModel.rawValue, isDirectory: true)
             .appendingPathComponent(versionFolderName, isDirectory: true)
             .appendingPathComponent("algorithm.xml")
     }
@@ -41,7 +41,7 @@ class AlgorithmXmlUtils {
     public static func needsAlgorithmInstallation(programmerInfo: ProgrammerInfo?) -> Bool {
         guard
             let programmerInfo,
-            ["T56", "T76"].contains(programmerInfo.model),
+            programmerInfo.model.isAlgoBased,
             let firmwareVersion = programmerInfo.getFirmwareVersionNumber(),
             let algorithmXmlPath = try? resolveAlgorithmXmlPath(
                 programmerModel: programmerInfo.model,

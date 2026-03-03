@@ -8,7 +8,7 @@
 import Foundation
 
 struct ProgrammerInfo {
-    let model: String
+    let model: ProgrammerModel
     let firmwareVersion: String
     let deviceCode: String
     let serialNumber: String
@@ -72,8 +72,10 @@ class ProgrammerInfoProcessor {
             throw MiniproAPIError.programmerInfoUnavailable
         }
 
+        let programmerModel = try ProgrammerModel.parse(String(model!))
+
         return ProgrammerInfo(
-            model: String(model!).uppercased(),
+            model: programmerModel,
             firmwareVersion: String(firmwareVersion!),
             deviceCode: String(deviceCode!),
             serialNumber: String(serialNumber!),

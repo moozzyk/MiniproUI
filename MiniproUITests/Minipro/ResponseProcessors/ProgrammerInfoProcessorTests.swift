@@ -41,7 +41,7 @@ struct ProgrammerInfoProcessorTests {
                 Logic:          283 devices, 6 custom
                 """)
         let result = try ProgrammerInfoProcessor.run(miniproResult)
-        #expect(result.model == "T48")
+        #expect(result.model == .t48)
         #expect(result.firmwareVersion == "00.1.30 (0x11e)")
         #expect(result.getFirmwareVersionNumber() == UInt16(0x11e))
         #expect(result.deviceCode == "46A16257")

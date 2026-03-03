@@ -11,13 +11,13 @@ import Foundation
 struct XgproFirmwareUtilsTests {
     @Test func getSoftwareNameReturnsExpectedValueForKnownFirmware() {
         #expect(
-            XgproFirmwareUtils.getSoftwareName(programmerModel: "T76", firmwareVersion: 0x10f)
+            XgproFirmwareUtils.getSoftwareName(programmerModel: .t76, firmwareVersion: 0x10f)
                 == "xgpro_T76_V1311.rar")
         #expect(
-            XgproFirmwareUtils.getSoftwareName(programmerModel: "T56", firmwareVersion: 0x149)
+            XgproFirmwareUtils.getSoftwareName(programmerModel: .t56, firmwareVersion: 0x149)
                 == "xgproV1310_T48_T56_T866II_Setup.rar")
         #expect(
-            XgproFirmwareUtils.getSoftwareName(programmerModel: "T76", firmwareVersion: 0x9999)
+            XgproFirmwareUtils.getSoftwareName(programmerModel: .t76, firmwareVersion: 0x9999)
                 == nil)
     }
 
@@ -34,7 +34,7 @@ struct XgproFirmwareUtilsTests {
         var updates: [ProgressUpdate] = []
         _ = try await XgproFirmwareUtils.createAlgorithmXml(
             in: tempDirectory,
-            programmerModel: "T76"
+            programmerModel: .t76
         ) {
             updates.append($0)
         }
@@ -55,7 +55,7 @@ struct XgproFirmwareUtilsTests {
         do {
             _ = try await XgproFirmwareUtils.createAlgorithmXml(
                 in: tempDirectory,
-                programmerModel: "T76"
+                programmerModel: .t76
             ) { _ in
             }
             #expect(Bool(false), "Expected createAlgorithmXml to throw")

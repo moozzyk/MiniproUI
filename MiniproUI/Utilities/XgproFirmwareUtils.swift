@@ -20,7 +20,7 @@ enum XgproFirmwareUtilsError: Error {
 }
 
 struct FirmwareInfo {
-    let programmerModel: String
+    let programmerModel: ProgrammerModel
     let firmwareVersion: UInt16
     let fileName: String
 }
@@ -49,7 +49,7 @@ class XgproFirmwareUtils {
     private static let softwareInfo: [String: SoftwareBundleInfo] = [
         "xgpro_T76_V1303A.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
-                programmerModel: "T76",
+                programmerModel: .t76,
                 firmwareVersion: 0x10d,
                 fileName: t76FileName
             ),
@@ -57,7 +57,7 @@ class XgproFirmwareUtils {
         ),
         "xgpro_T76_V1309.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
-                programmerModel: "T76",
+                programmerModel: .t76,
                 firmwareVersion: 0x10e,
                 fileName: t76FileName
             ),
@@ -65,7 +65,7 @@ class XgproFirmwareUtils {
         ),
         "xgpro_T76_V1311.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
-                programmerModel: "T76",
+                programmerModel: .t76,
                 firmwareVersion: 0x10f,
                 fileName: t76FileName
             ),
@@ -73,7 +73,7 @@ class XgproFirmwareUtils {
         ),
         "xgproV1304_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
-                programmerModel: "T56",
+                programmerModel: .t56,
                 firmwareVersion: 0x149,
                 fileName: t56FileName
             ),
@@ -81,7 +81,7 @@ class XgproFirmwareUtils {
         ),
         "xgproV1306_T48_T56_T866_Setup.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
-                programmerModel: "T56",
+                programmerModel: .t56,
                 firmwareVersion: 0x149,
                 fileName: t56FileName
             ),
@@ -89,7 +89,7 @@ class XgproFirmwareUtils {
         ),
         "xgproV1310_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
-                programmerModel: "T56",
+                programmerModel: .t56,
                 firmwareVersion: 0x149,
                 fileName: t56FileName
             ),
@@ -108,9 +108,9 @@ class XgproFirmwareUtils {
         var t76Match: URL?
         for entry in entries {
             let name = entry.lastPathComponent.lowercased()
-            if name == t76FileName {
+            if name == t76FileName.lowercased() {
                 t76Match = entry
-            } else if name == t56FileName {
+            } else if name == t56FileName.lowercased() {
                 t56Match = entry
             }
         }
@@ -119,7 +119,7 @@ class XgproFirmwareUtils {
             let version = try extractFirmwareVersion(from: t76Match)
             logger.notice("Detected T76 firmware file at \(t76Match.path, privacy: .public)")
             return FirmwareInfo(
-                programmerModel: "T76",
+                programmerModel: .t76,
                 firmwareVersion: version,
                 fileName: t76Match.lastPathComponent
             )
@@ -128,7 +128,7 @@ class XgproFirmwareUtils {
             let version = try extractFirmwareVersion(from: t56Match)
             logger.notice("Detected T56 firmware file at \(t56Match.path, privacy: .public)")
             return FirmwareInfo(
-                programmerModel: "T56",
+                programmerModel: .t56,
                 firmwareVersion: version,
                 fileName: t56Match.lastPathComponent
             )
@@ -169,7 +169,7 @@ class XgproFirmwareUtils {
 
     public static func createAlgorithmXml(
         in baseFolder: URL,
-        programmerModel: String,
+        programmerModel: ProgrammerModel,
         progressUpdate: ((ProgressUpdate) -> Void)? = nil
     ) async throws -> String {
         let algorithmFolder = try resolveAlgorithmDirectory(baseFolder: baseFolder, programmerModel: programmerModel)
@@ -186,9 +186,9 @@ class XgproFirmwareUtils {
 
         for (index, entry) in algorithmEntries.enumerated() {
             logger.notice(
-                "Firmware folder entry for \(programmerModel, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
+                "Firmware folder entry for \(programmerModel.rawValue, privacy: .public): \(entry.lastPathComponent, privacy: .public)"
             )
-            if programmerModel == "T76" {
+            if programmerModel == .t76 {
                 let element = try await buildAlgorithmElementT76(path: entry)
                 algorithmElements.append(element)
             }
@@ -200,26 +200,26 @@ class XgproFirmwareUtils {
         return xml
     }
 
-    private static func buildAlgorithmsXml(programmerModel: String, algorithmElements: [String]) -> String {
+    private static func buildAlgorithmsXml(programmerModel: ProgrammerModel, algorithmElements: [String]) -> String {
         return """
             <root>
             <database type="ALGORITHMS">
-            <algorithms_\(programmerModel)>
+            <algorithms_\(programmerModel.rawValue)>
             \(algorithmElements.joined(separator: "\n"))
-            </algorithms_\(programmerModel)>
+            </algorithms_\(programmerModel.rawValue)>
             </database>
             </root>
             """
     }
 
-    private static func resolveAlgorithmDirectory(baseFolder: URL, programmerModel: String) throws -> URL {
+    private static func resolveAlgorithmDirectory(baseFolder: URL, programmerModel: ProgrammerModel) throws -> URL {
         switch programmerModel {
-        case "T76":
+        case .t76:
             return baseFolder.appendingPathComponent("algoT76", isDirectory: true)
-        case "T56":
+        case .t56:
             return baseFolder.appendingPathComponent("algorithm", isDirectory: true)
         default:
-            logger.notice("Unsupported programmer model: \(programmerModel, privacy: .public)")
+            logger.notice("Unsupported programmer model: \(programmerModel.rawValue, privacy: .public)")
             throw XgproFirmwareUtilsError.unsupportedProgrammerType
         }
     }
@@ -340,7 +340,7 @@ class XgproFirmwareUtils {
 
     public static func verifySoftwareBundle(
         fileURL: URL,
-        programmerModel: String
+        programmerModel: ProgrammerModel?
     ) -> SoftwareBundleVerificationStatus {
         guard let softwareInfo = softwareInfoFor(fileURL: fileURL) else {
             return .checksumNotAvailable
@@ -358,7 +358,7 @@ class XgproFirmwareUtils {
         }
     }
 
-    public static func getSoftwareName(programmerModel: String, firmwareVersion: UInt16) -> String? {
+    public static func getSoftwareName(programmerModel: ProgrammerModel, firmwareVersion: UInt16) -> String? {
         let matches = softwareInfo.compactMap { entry -> String? in
             let (softwareName, softwareInfo) = entry
             guard
@@ -372,7 +372,7 @@ class XgproFirmwareUtils {
         return matches.sorted().last
     }
 
-    public static func getLatestSoftwareName(programmerModel: String) -> String? {
+    public static func getLatestSoftwareName(programmerModel: ProgrammerModel) -> String? {
         let matches = softwareInfo.compactMap { entry -> String? in
             let (softwareName, softwareInfo) = entry
             guard softwareInfo.firmwareInfo.programmerModel == programmerModel else {

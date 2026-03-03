@@ -20,20 +20,17 @@ struct ProgrammerInfoView: View {
         guard let model = programmerInfo?.model else {
             return false
         }
-        return ["T56", "T76"].contains(model)
+        return model.isAlgoBased
     }
 
     private var isFirmwareUpdateSupported: Bool {
-        let model = programmerInfo?.model ?? ""
-        // firmware update not supported for TL866A and TL866CS
-        // due to an additional prompt in the firmware update handler
-        return model == "T48" || model == "T56" || model == "TL866II+" || model == "T76"
+        programmerInfo?.model.supportsFirmwareUpdate ?? false
     }
 
     func getProgrammerName(_ programmerInfo: ProgrammerInfo?) -> String {
         let programmerModel = programmerInfo?.model
         if let model = programmerModel {
-            return "Minipro \(model)"
+            return "Minipro \(model.rawValue)"
         }
         return "Unknown"
     }
@@ -51,7 +48,7 @@ struct ProgrammerInfoView: View {
                         ProgrammerNotConnected()
                     } else {
                         Section {
-                            PropertyRow(label: "Model ", value: programmerInfo?.model ?? "Unknown")
+                            PropertyRow(label: "Model ", value: programmerInfo?.model.rawValue ?? "Unknown")
                             PropertyRow(label: "Firmware Version ", value: programmerInfo?.firmwareVersion ?? "Unknown")
                             PropertyRow(label: "Device Code ", value: programmerInfo?.deviceCode ?? "Unknown")
                             PropertyRow(label: "Serial Number ", value: programmerInfo?.serialNumber ?? "Unknown")
@@ -253,7 +250,7 @@ struct SoftwareUpdateSection: View {
                     firmwareUrl = url
                     softwareChecksumStatus = XgproFirmwareUtils.verifySoftwareBundle(
                         fileURL: url,
-                        programmerModel: programmerInfo?.model ?? ""
+                        programmerModel: programmerInfo?.model
                     )
                 }
             }
@@ -473,7 +470,7 @@ struct UpdateFirmwareButton: View {
     ProgrammerInfoView(
         programmerInfo: .constant(
             ProgrammerInfo(
-                model: "T48",
+                model: .t48,
                 firmwareVersion: "00.1.31 (0x11f)",
                 deviceCode: "46A16257",
                 serialNumber: "HSSCVO9LARFMOYKYOMVE5123",

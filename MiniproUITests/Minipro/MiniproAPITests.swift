@@ -13,7 +13,7 @@ import Testing
 struct MiniproAPITests {
     private static func getAlgorithmXmlPath() throws -> URL {
         return try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-            programmerModel: "T76",
+            programmerModel: .t76,
             firmwareVersion: 0x10d
         )
     }
@@ -26,7 +26,7 @@ struct MiniproAPITests {
 
     @Test func testGetProgrammerInfo() async throws {
         let result = try await MiniproAPI.getProgrammerInfo()
-        #expect(result.model == "T48" || result.model == "T76")
+        #expect(result.model == .t48 || result.model == .t76)
         #expect(!result.firmwareVersion.isEmpty)
         #expect(!result.deviceCode.isEmpty)
         #expect(!result.serialNumber.isEmpty)
@@ -53,7 +53,7 @@ struct MiniproAPITests {
 
     @Test func testTestLogicIC() async throws {
         let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-            programmerModel: "T76",
+            programmerModel: .t76,
             firmwareVersion: 0x10d
         )
         let logicICTestResult = try await MiniproAPI.testLogicIC(device: "7400", algorithmXmlPath: algorithmXmlPath)
