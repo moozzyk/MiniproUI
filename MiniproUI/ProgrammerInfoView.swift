@@ -96,6 +96,8 @@ struct ProgrammerInfoView: View {
 }
 
 struct FirmwareUpdateSection: View {
+    private let firmwareHelpUrl = "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
+
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
 
@@ -124,10 +126,9 @@ struct FirmwareUpdateSection: View {
             }.disabled(firmwareUrl == nil)
             Link(
                 "Learn more about downloading firmware",
-                destination: URL(
-                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
-                )!
+                destination: URL(string: firmwareHelpUrl)!
             )
+            .help(firmwareHelpUrl)
         }
     }
 }
@@ -138,6 +139,8 @@ struct SoftwareUpdateSection: View {
         case latestKnownBundle(String)
         case unknownBundle
     }
+
+    private let softwareBundleHelpUrl = "https://github.com/moozzyk/MiniproUI/wiki/Software-Bundles-for-T56-and-T76"
 
     @Binding var firmwareUrl: URL?
     @Binding var programmerInfo: ProgrammerInfo?
@@ -266,7 +269,9 @@ struct SoftwareUpdateSection: View {
                         }
                     }
                     .help(firmwareUrl?.path ?? "")
-                    if let softwareChecksumStatus, let verificationDetails = verificationDetails(for: softwareChecksumStatus) {
+                    if let softwareChecksumStatus,
+                        let verificationDetails = verificationDetails(for: softwareChecksumStatus)
+                    {
                         Text(verificationDetails)
                             .font(.caption)
                             .foregroundColor(verificationCaptionColor(for: softwareChecksumStatus))
@@ -285,11 +290,10 @@ struct SoftwareUpdateSection: View {
                 )
             }.disabled(firmwareUrl == nil)
             Link(
-                "Learn more about downloading software",
-                destination: URL(
-                    string: "https://github.com/moozzyk/MiniproUI/wiki/Downloading-Firmware"
-                )!
+                "Learn more about Software Bundles for T56 and T76 programmers",
+                destination: URL(string: softwareBundleHelpUrl)!
             )
+            .help(softwareBundleHelpUrl)
         }
     }
 }
