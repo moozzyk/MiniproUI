@@ -360,9 +360,9 @@ struct UpdateFirmwareButton: View {
         }
     }
 
-    private func processRarFirmware(at firmwareUrl: URL) async {
+    private func processRarFirmware(at url: URL) async {
         do {
-            let outputDirectory = try await unpackFirmwareArchive(at: firmwareUrl)
+            let outputDirectory = try await unpackFirmwareArchive(at: url)
             defer {
                 do {
                     try FileManager.default.removeItem(at: outputDirectory)
@@ -409,6 +409,8 @@ struct UpdateFirmwareButton: View {
                 let firmwareFile = outputDirectory.appendingPathComponent(firmwareInfo.fileName)
                 try await installFirmware(using: firmwareFile)
             }
+            // Trigger re-render to hide missing algorithms banner
+            firmwareUrl = nil
         } catch {
             errorMessage = .init(message: error.localizedDescription)
         }
