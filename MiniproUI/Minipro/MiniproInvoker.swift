@@ -42,6 +42,9 @@ enum InvocationError: Error {
 }
 
 class MiniproInvoker {
+    private static let libusbLogger = Logger(
+        subsystem: "com.3d-logic.visualminipro", category: "libusb")
+
     public static func invoke(
         arguments: [String], stdinData: Data? = nil, onProgress: @escaping ((Data) -> Void) = ({ _ in })
     )
@@ -53,12 +56,34 @@ class MiniproInvoker {
             logger.error("minipro executable not found")
             throw InvocationError.executableNotFound
         }
-        return try await ProcessInvoker.invoke(
+        let result = try await ProcessInvoker.invoke(
             executableURL: URL(fileURLWithPath: executablePath),
             arguments: arguments,
             stdinData: stdinData,
             currentDirectoryURL: Bundle.main.resourceURL,
             onProgress: onProgress
+        )
+        return filterLibusbLines(from: result)
+    }
+
+    static func filterLibusbLines(from result: InvocationResult) -> InvocationResult {
+        let libusbHeader = "[timestamp] [threadID] facility level [function call] <message>"
+        let libusbSeparator = String(repeating: "-", count: 80)
+        let lines = result.stdErr.components(separatedBy: "\n")
+        var normalLines: [String] = []
+        for line in lines {
+            if line.contains("] libusb: ") {
+                libusbLogger.notice("\(line, privacy: .public)")
+            } else if line == libusbHeader || line == libusbSeparator {
+                // libusb preamble — discard
+            } else {
+                normalLines.append(line)
+            }
+        }
+        return InvocationResult(
+            exitCode: result.exitCode,
+            stdOut: result.stdOut,
+            stdErr: normalLines.joined(separator: "\n")
         )
     }
 }

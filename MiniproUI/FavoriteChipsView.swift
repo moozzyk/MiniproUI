@@ -12,40 +12,37 @@ struct FavoriteChipsView: View {
     @State private var newItemText = ""
 
     var body: some View {
-        Form {
-            Section(
-                header: Text("Favorite chips")
-            ) {
-                List {
-                    ForEach(items.indices, id: \.self) { index in
-                        HStack {
-                            Text(items[index])
-                            Spacer()
-                            Button {
-                                items.remove(at: index)
-                                updateFavoriteChips()
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.red)
-                            }
-                            .buttonStyle(.borderless)
-                            .foregroundColor(.secondary)
-                        }
-                    }
+        Section(
+            header: Text("Favorite chips")
+        ) {
+            List {
+                ForEach(items.indices, id: \.self) { index in
                     HStack {
-                        TextField("Chip name pattern...", text: $newItemText)
-                            .onSubmit {
-                                addNewItem()
-                            }
-                            .textFieldStyle(.roundedBorder)
-                        Button("Add") {
+                        Text(items[index])
+                        Spacer()
+                        Button {
+                            items.remove(at: index)
+                            updateFavoriteChips()
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundColor(.secondary)
+                    }
+                }
+                HStack {
+                    TextField("Chip name pattern...", text: $newItemText)
+                        .onSubmit {
                             addNewItem()
                         }
+                        .textFieldStyle(.roundedBorder)
+                    Button("Add") {
+                        addNewItem()
                     }
                 }
             }
         }
-        .formStyle(.grouped)
     }
 
     private func addNewItem() {
