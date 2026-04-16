@@ -71,6 +71,14 @@ class XgproFirmwareUtils {
             ),
             checksum: "aad3cc7678676da2e1b2bb0505d7c58e0c74ca1612f805a994eebe6c11473ea8"
         ),
+        "xgpro_T76_V1317.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(
+                programmerModel: .t76,
+                firmwareVersion: 0x110,
+                fileName: t76FileName
+            ),
+            checksum: "15e6c0641c1db3f924608994bd2e21f7580e24fe8d7ab19098edb79b10919169"
+        ),
         "xgproV1304_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
                 programmerModel: .t56,
@@ -94,6 +102,14 @@ class XgproFirmwareUtils {
                 fileName: t56FileName
             ),
             checksum: "f3fb94d483c20e0e28d8a53ffd5e0930ef285cfeea008f23691ed097c8dcd0c9"
+        ),
+        "xgproV1316_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(
+                programmerModel: .t56,
+                firmwareVersion: 0x149,
+                fileName: t56FileName
+            ),
+            checksum: "0f2a94baa9d4a2170b07ecfca48e9f6ceb636526b1bb4860e8671d9c0dff2f03"
         ),
     ]
 
