@@ -71,12 +71,62 @@ struct XgproFirmwareUtilsTests {
         }
     }
 
+    @Test func createAlgorithmXmlReportsProgressForAlgFilesT56() async throws {
+        let tempDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: tempDirectory) }
+
+        let algorithmDirectory = tempDirectory.appendingPathComponent("algorithm", isDirectory: true)
+        try FileManager.default.createDirectory(at: algorithmDirectory, withIntermediateDirectories: true)
+        try makeTestAlgFileT56(name: "ROM40P82.alg", in: algorithmDirectory, description: "27C400")
+        try makeTestAlgFileT56(name: "SPI25F11.alg", in: algorithmDirectory, description: "SPI25F11")
+
+        var updates: [ProgressUpdate] = []
+        let xml = try await XgproFirmwareUtils.createAlgorithmXml(
+            in: tempDirectory,
+            programmerModel: .t56
+        ) {
+            updates.append($0)
+        }
+
+        #expect(updates.count == 2)
+        #expect(updates.map(\.percentage) == [50, 100])
+        #expect(updates.allSatisfy { $0.operation == "Preparing Algorithms" })
+        #expect(xml.contains("ROM40P82"))
+        #expect(xml.contains("SPI25F11"))
+        #expect(xml.contains("algorithms_T56"))
+    }
+
+    @Test func createAlgorithmXmlT56ContainsDescription() async throws {
+        let tempDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: tempDirectory) }
+
+        let algorithmDirectory = tempDirectory.appendingPathComponent("algorithm", isDirectory: true)
+        try FileManager.default.createDirectory(at: algorithmDirectory, withIntermediateDirectories: true)
+        try makeTestAlgFileT56(name: "ROM40P82.alg", in: algorithmDirectory, description: "27C400")
+
+        let xml = try await XgproFirmwareUtils.createAlgorithmXml(
+            in: tempDirectory,
+            programmerModel: .t56
+        )
+
+        #expect(xml.contains("27C400"))
+    }
+
     private func makeTestAlgFile(name: String, in directory: URL) throws {
         var data = Data(repeating: 0, count: 5000)
         data[4] = 0x41
         data[5] = 0x42
         data[6] = 0x43
         data[7] = 0x44
+        try data.write(to: directory.appendingPathComponent(name))
+    }
+
+    private func makeTestAlgFileT56(name: String, in directory: URL, description: String) throws {
+        var data = Data(repeating: 0, count: 0x220 + 100)
+        let descBytes = Array(description.utf8)
+        data.replaceSubrange(0..<descBytes.count, with: descBytes)
         try data.write(to: directory.appendingPathComponent(name))
     }
 }

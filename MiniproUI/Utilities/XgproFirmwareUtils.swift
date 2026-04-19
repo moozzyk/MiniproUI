@@ -207,6 +207,9 @@ class XgproFirmwareUtils {
             if programmerModel == .t76 {
                 let element = try await buildAlgorithmElementT76(path: entry)
                 algorithmElements.append(element)
+            } else if programmerModel == .t56 {
+                let element = try await buildAlgorithmElementT56(path: entry)
+                algorithmElements.append(element)
             }
             let percentage = Int((Double(index + 1) / Double(algorithmEntries.count)) * 100.0)
             progressUpdate?(ProgressUpdate(operation: "Preparing Algorithms", percentage: percentage))
@@ -240,6 +243,14 @@ class XgproFirmwareUtils {
         }
     }
 
+    private static func buildAlgorithmElement(name: String, description: String, bitstream: String) -> String {
+        return """
+            <algorithm name="\(name)"
+            description="\(description)"
+            bitstream="\(bitstream)" />
+            """
+    }
+
     private static func buildAlgorithmElementT76(path: URL) async throws -> String {
         logger.notice("Processing T76 algorithm file at \(path.path, privacy: .public)")
         let algorithmFile = try Data(contentsOf: path)
@@ -249,13 +260,9 @@ class XgproFirmwareUtils {
             throw XgproFirmwareUtilsError.fileTooSmall
         }
         let algorithmName = algorithmNameT76(for: path)
-        let algorithmDescriptionText = algorithmDescriptionT76(from: algorithmFile, fileURL: path)
+        let algorithmDescription = algorithmDescriptionT76(from: algorithmFile, fileURL: path)
         let bitstream = try await createAlgorithmBitstreamT76(algorithmFile)
-        return """
-            <algorithm name="\(algorithmName)"
-            description="\(algorithmDescriptionText)"
-            bitstream="\(bitstream)" />
-            """
+        return buildAlgorithmElement(name: algorithmName, description: algorithmDescription, bitstream: bitstream)
     }
 
     private static func algorithmNameT76(for path: URL) -> String {
@@ -303,6 +310,27 @@ class XgproFirmwareUtils {
         payload.append(data.subdata(in: headerOffset..<(headerOffset + headerLength)))
         payload.append(data.subdata(in: algorithmOffset..<data.count))
         return payload
+    }
+
+    private static func buildAlgorithmElementT56(path: URL) async throws -> String {
+        logger.notice("Processing T56 algorithm file at \(path.path, privacy: .public)")
+        let algorithmFile = try Data(contentsOf: path)
+        let algorithmDataOffset = 0x220
+        if algorithmFile.count <= algorithmDataOffset {
+            logger.notice("T56 algorithm file too small: \(path.path, privacy: .public)")
+            throw XgproFirmwareUtilsError.fileTooSmall
+        }
+        let algorithmName = path.deletingPathExtension().lastPathComponent
+        let algorithmDescription = descriptionT56(from: algorithmFile)
+        let algorithmData = algorithmFile.subdata(in: algorithmDataOffset..<algorithmFile.count)
+        let gzipData = try await gzipData(algorithmData)
+        let bitstream = gzipData.base64EncodedString()
+        return buildAlgorithmElement(name: algorithmName, description: algorithmDescription, bitstream: bitstream)
+    }
+
+    private static func descriptionT56(from data: Data) -> String {
+        let nullIndex = data.firstIndex(of: 0x00) ?? data.endIndex
+        return String(bytes: data[data.startIndex..<nullIndex], encoding: .ascii) ?? ""
     }
 
     private static func gzipData(_ data: Data) async throws -> Data {
