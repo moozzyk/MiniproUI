@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var libusbDebugLogging = UserDefaults.standard.libusbDebugLogging
+    @State private var useLegacyInfoIC = UserDefaults.standard.useLegacyInfoIC
 
     var body: some View {
         ZStack {
@@ -18,6 +19,13 @@ struct SettingsView: View {
                     systemImageName: "gearshape.fill")
                 Form {
                     FavoriteChipsView()
+                    Section(header: Text("Compatibility")) {
+                        Toggle("Use legacy InfoIC database", isOn: $useLegacyInfoIC)
+                            .toggleStyle(.switch)
+                            .onChange(of: useLegacyInfoIC) { _, enabled in
+                                UserDefaults.standard.useLegacyInfoIC = enabled
+                            }
+                    }
                     Section(header: Text("Diagnostics")) {
                         Toggle("Enable libusb debug logging", isOn: $libusbDebugLogging)
                             .toggleStyle(.switch)
