@@ -14,8 +14,8 @@ struct SupportedDevices {
 
 class SupportedDevicesProcessor {
     private static let logicICs: Set<String> = {
-        let infoicPath = Bundle.main.url(forResource: "logicic", withExtension: "xml")
-        return getICNames(from: infoicPath!)
+        let logicicPath = Bundle.main.url(forResource: "logicic", withExtension: "xml")
+        return getICNames(from: logicicPath!)
     }()
 
     private static let eepromICs: Set<String> = {
