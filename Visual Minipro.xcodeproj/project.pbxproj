@@ -11,6 +11,7 @@
 		5A559CA22D3F41A2000A364C /* infoic.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5A559CA12D3F41A2000A364C /* infoic.xml */; };
 		5A75B9B42D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; };
 		5A75B9B52D3CEAE900DF9FA7 /* libusb-1.0.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5ABFC8472F9DC7B8008F386D /* infoic_0.7.4.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5ABFC8462F9DC7B8008F386D /* infoic_0.7.4.xml */; };
 		5AE5AE372E18938E0034923D /* minipro in Embed minipro */ = {isa = PBXBuildFile; fileRef = 5AE5AE362E18938E0034923D /* minipro */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -63,6 +64,7 @@
 		5A559C9E2D3F3F60000A364C /* logicic.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = logicic.xml; sourceTree = "<group>"; };
 		5A559CA12D3F41A2000A364C /* infoic.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = infoic.xml; sourceTree = "<group>"; };
 		5A75B9B32D3CEAE800DF9FA7 /* libusb-1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libusb-1.0.0.dylib"; sourceTree = "<group>"; };
+		5ABFC8462F9DC7B8008F386D /* infoic_0.7.4.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = infoic_0.7.4.xml; sourceTree = "<group>"; };
 		5AE5AE362E18938E0034923D /* minipro */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = minipro; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -113,6 +115,7 @@
 		5A1378502D3A0900006F0165 = {
 			isa = PBXGroup;
 			children = (
+				5ABFC8462F9DC7B8008F386D /* infoic_0.7.4.xml */,
 				5AE5AE362E18938E0034923D /* minipro */,
 				5A559CA12D3F41A2000A364C /* infoic.xml */,
 				5A559C9E2D3F3F60000A364C /* logicic.xml */,
@@ -265,6 +268,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ABFC8472F9DC7B8008F386D /* infoic_0.7.4.xml in Resources */,
 				5A559CA22D3F41A2000A364C /* infoic.xml in Resources */,
 				5A559CA02D3F3FDB000A364C /* logicic.xml in Resources */,
 			);
