@@ -68,7 +68,7 @@ fastlane/test_output
 /minipro_rel
 /minipro_debug
 libusb-1.0.0.dylib
-infoic.xml
+infoic*.xml
 logicic.xml
 /misc
 
