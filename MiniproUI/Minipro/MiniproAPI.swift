@@ -23,14 +23,17 @@ class MiniproAPI {
     private static func ensureProgrammerConnected() async throws {
         let _ = try await getProgrammerInfo()
     }
+
     static func getProgrammerInfo() async throws -> ProgrammerInfo {
+        // No --infoic passed because we never use/show supported
+        // information returned based on Info IC database (supported chip count)
         let result = try await MiniproInvoker.invoke(arguments: ["--version"])
         return try ProgrammerInfoProcessor.run(result)
     }
 
-    static func getSupportedDevices() async throws -> SupportedDevices {
+    static func getSupportedDevices(infoicPath: URL) async throws -> SupportedDevices {
         try await ensureProgrammerConnected()
-        let result = try await MiniproInvoker.invoke(arguments: ["--list"])
+        let result = try await MiniproInvoker.invoke(arguments: ["--list", "--infoic", infoicPath.path])
         return try SupportedDevicesProcessor.run(result)
     }
 

@@ -36,8 +36,11 @@ struct ContentView: View {
             List(ViewType.allCases, id: \.self, selection: $selectedItem) { item in
                 Text(item.rawValue)
             }.task {
-                model.supportedDevices = try? await MiniproAPI.getSupportedDevices()
                 model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
+                if let programmerInfo = model.programmerInfo {
+                    let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
+                    model.supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
+                }
                 model.visualMiniproInfo = try? await MiniproAPI.getVisualMiniproInfo()
             }.navigationSplitViewColumnWidth(min: 160, ideal: 160)
         } detail: {

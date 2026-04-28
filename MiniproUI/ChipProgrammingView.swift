@@ -96,7 +96,10 @@ struct ChipProgrammingView: View {
         }
         .task {
             programmerInfo = try? await MiniproAPI.getProgrammerInfo()
-            supportedDevices = try? await MiniproAPI.getSupportedDevices()
+            if let programmerInfo {
+                let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
+                supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
+            }
         }
         .onAppear {
             selectedDevice = deviceDetails?.name

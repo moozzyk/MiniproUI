@@ -33,4 +33,5 @@ struct InfoICUtilsTests {
 
         #expect(InfoICUtils.resolveInfoICPath(for: .t48).lastPathComponent == "infoic.xml")
     }
+
 }

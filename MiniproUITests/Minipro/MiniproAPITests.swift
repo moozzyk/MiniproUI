@@ -36,7 +36,9 @@ struct MiniproAPITests {
     }
 
     @Test func testGetSupportedDevices() async throws {
-        let result = try await MiniproAPI.getSupportedDevices()
+        let programmerInfo = try await MiniproAPI.getProgrammerInfo()
+        let result = try await MiniproAPI.getSupportedDevices(
+            infoicPath: InfoICUtils.resolveInfoICPath(for: programmerInfo.model))
         #expect(result.logicICs.count > 100 && result.logicICs.count < 1000)
         #expect(result.logicICs.contains("7400"))
         #expect(result.logicICs.count == Set(result.logicICs).count)
