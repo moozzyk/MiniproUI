@@ -59,11 +59,13 @@ struct WriteChipView: View {
                                 let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
                                     programmerInfo: programmerInfo
                                 )
+                                let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo!.model)
                                 try await MiniproAPI.write(
                                     device: device.name,
                                     data: buffer,
                                     algorithmXmlPath: algorithmXmlPath,
-                                    writeOptions: writeOptions
+                                    writeOptions: writeOptions,
+                                    infoicPath: infoicPath
                                 ) {
                                     if $0.operation.contains("Reading") {
                                         progressMessage = "Verifying Data..."

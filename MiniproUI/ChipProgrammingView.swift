@@ -106,8 +106,9 @@ struct ChipProgrammingView: View {
         }
         .onChange(of: selectedDevice) {
             Task {
-                if let device = selectedDevice {
-                    deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device)
+                if let device = selectedDevice, let programmerInfo {
+                    let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
+                    deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device, infoicPath: infoicPath)
                 }
             }
         }

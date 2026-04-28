@@ -78,8 +78,9 @@ struct LogicICTestView: View {
             }
         }.onChange(of: selectedDevice) {
             Task {
-                if let device = selectedDevice {
-                    logicICDetails = try? await MiniproAPI.getDeviceDetails(device: device)
+                if let device = selectedDevice, let programmerInfo {
+                    let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
+                    logicICDetails = try? await MiniproAPI.getDeviceDetails(device: device, infoicPath: infoicPath)
                 }
                 logicICTestResult = nil
             }

@@ -37,9 +37,9 @@ class MiniproAPI {
         return try SupportedDevicesProcessor.run(result)
     }
 
-    static func getDeviceDetails(device: String) async throws -> DeviceDetails {
+    static func getDeviceDetails(device: String, infoicPath: URL) async throws -> DeviceDetails {
         try await ensureProgrammerConnected()
-        let result = try await MiniproInvoker.invoke(arguments: ["--get_info", device])
+        let result = try await MiniproInvoker.invoke(arguments: ["--get_info", device, "--infoic", infoicPath.path])
         return try DeviceDetailsProcessor.run(result)
     }
 
@@ -52,8 +52,8 @@ class MiniproAPI {
         return try LogicICTestProcessor.run(result, device: device)
     }
 
-    static func readDeviceId(device: String, algorithmXmlPath: URL?) async throws -> String {
-        var arguments = ["--device", device, "--read_id"]
+    static func readDeviceId(device: String, algorithmXmlPath: URL?, infoicPath: URL) async throws -> String {
+        var arguments = ["--device", device, "--read_id", "--infoic", infoicPath.path]
         if let algorithmXmlPath {
             arguments.append(contentsOf: ["--algorithms", algorithmXmlPath.path])
         }
@@ -62,10 +62,10 @@ class MiniproAPI {
     }
 
     static func read(
-        device: String, algorithmXmlPath: URL?, readOptions: ReadOptions,
+        device: String, algorithmXmlPath: URL?, readOptions: ReadOptions, infoicPath: URL,
         progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws -> Data {
-        var arguments = ["--device", device, "--read", "-"]
+        var arguments = ["--device", device, "--read", "-", "--infoic", infoicPath.path]
         if let algorithmXmlPath {
             arguments.append(contentsOf: ["--algorithms", algorithmXmlPath.path])
         }
@@ -81,10 +81,10 @@ class MiniproAPI {
     }
 
     static func write(
-        device: String, data: Data, algorithmXmlPath: URL?, writeOptions: WriteOptions,
+        device: String, data: Data, algorithmXmlPath: URL?, writeOptions: WriteOptions, infoicPath: URL,
         progressUpdate: @escaping ((ProgressUpdate) -> Void)
     ) async throws {
-        var arguments = ["--device", device, "--write", "-"]
+        var arguments = ["--device", device, "--write", "-", "--infoic", infoicPath.path]
         if let algorithmXmlPath {
             arguments.append(contentsOf: ["--algorithms", algorithmXmlPath.path])
         }

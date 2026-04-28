@@ -59,10 +59,12 @@ struct ReadChipView: View {
                                 let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
                                     programmerInfo: programmerInfo
                                 )
+                                let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo!.model)
                                 buffer = try await MiniproAPI.read(
                                     device: device.name,
                                     algorithmXmlPath: algorithmXmlPath,
-                                    readOptions: readOptions
+                                    readOptions: readOptions,
+                                    infoicPath: infoicPath
                                 ) {
                                     progressUpdate = $0
                                 }

@@ -20,7 +20,13 @@ struct MiniproAPITests {
 
     @Sendable static func isW27C512Present() async throws -> Bool {
         let algorithmXmlPath = try Self.getAlgorithmXmlPath()
-        return (try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: algorithmXmlPath))
+        let infoicPath = InfoICUtils.resolveInfoICPath(for: .t76)
+        return
+            (try? await MiniproAPI.readDeviceId(
+                device: "W27C512@DIP28",
+                algorithmXmlPath: algorithmXmlPath,
+                infoicPath: infoicPath
+            ))
             == "0xDA08"
     }
 
@@ -38,7 +44,8 @@ struct MiniproAPITests {
     @Test func testGetSupportedDevices() async throws {
         let programmerInfo = try await MiniproAPI.getProgrammerInfo()
         let result = try await MiniproAPI.getSupportedDevices(
-            infoicPath: InfoICUtils.resolveInfoICPath(for: programmerInfo.model))
+            infoicPath: InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
+        )
         #expect(result.logicICs.count > 100 && result.logicICs.count < 1000)
         #expect(result.logicICs.contains("7400"))
         #expect(result.logicICs.count == Set(result.logicICs).count)
@@ -48,7 +55,9 @@ struct MiniproAPITests {
     }
 
     @Test func testGetDevicesDetails() async throws {
-        let deviceDetails = try await MiniproAPI.getDeviceDetails(device: "SMJ27C010A@TSOP32")
+        let programmerInfo = try await MiniproAPI.getProgrammerInfo()
+        let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
+        let deviceDetails = try await MiniproAPI.getDeviceDetails(device: "SMJ27C010A@TSOP32", infoicPath: infoicPath)
         #expect(deviceDetails.deviceInfo.count >= 4)
         #expect(deviceDetails.programmingInfo.count > 0)
     }
@@ -67,23 +76,34 @@ struct MiniproAPITests {
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdReturnsDeviceId() async throws {
         let algorithmXmlPath = try Self.getAlgorithmXmlPath()
-        let deviceId = try? await MiniproAPI.readDeviceId(device: "W27C512@DIP28", algorithmXmlPath: algorithmXmlPath)
+        let infoicPath = InfoICUtils.resolveInfoICPath(for: .t76)
+        let deviceId = try? await MiniproAPI.readDeviceId(
+            device: "W27C512@DIP28",
+            algorithmXmlPath: algorithmXmlPath,
+            infoicPath: infoicPath
+        )
         #expect(deviceId == "0xDA08")
     }
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testReadDeviceIdThrowsForChipMismatch() async throws {
         let algorithmXmlPath = try Self.getAlgorithmXmlPath()
+        let infoicPath = InfoICUtils.resolveInfoICPath(for: .t76)
         await #expect(
             throws: MiniproAPIError.chipIdMismatch("0x97D6", "0x0000")
         ) {
-            try await MiniproAPI.readDeviceId(device: "SMJ27C010A@TSOP32", algorithmXmlPath: algorithmXmlPath)
+            try await MiniproAPI.readDeviceId(
+                device: "SMJ27C010A@TSOP32",
+                algorithmXmlPath: algorithmXmlPath,
+                infoicPath: infoicPath
+            )
         }
     }
 
     @Test(.enabled("W27512 not present", isW27C512Present))
     func testWriteReadRoundTrip() async throws {
         let algorithmXmlPath = try Self.getAlgorithmXmlPath()
+        let infoicPath = InfoICUtils.resolveInfoICPath(for: .t76)
         let data = Data((0..<1024).map { UInt8($0 & 0xff) })
         var writeProgressUpdates = 0
         await #expect(throws: Never.self) {
@@ -91,7 +111,8 @@ struct MiniproAPITests {
                 device: "W27C512@DIP28",
                 data: data,
                 algorithmXmlPath: algorithmXmlPath,
-                writeOptions: WriteOptions(ignoreFileSizeMismatch: true)
+                writeOptions: WriteOptions(ignoreFileSizeMismatch: true),
+                infoicPath: infoicPath
             ) { _ in
                 writeProgressUpdates += 1
             }
@@ -102,7 +123,8 @@ struct MiniproAPITests {
         let readData = try await MiniproAPI.read(
             device: "W27C512@DIP28",
             algorithmXmlPath: algorithmXmlPath,
-            readOptions: ReadOptions()
+            readOptions: ReadOptions(),
+            infoicPath: infoicPath
         ) {
             _ in readProgressUpdates += 1
         }
