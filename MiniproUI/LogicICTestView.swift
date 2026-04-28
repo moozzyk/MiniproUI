@@ -36,8 +36,7 @@ struct LogicICTestView: View {
                     SearchableListView(
                         items: supportedLogicICs,
                         selectedItem: $selectedDevice,
-                        isCollapsible: false,
-                        additionalFilter: nil
+                        isCollapsible: false
                     )
                     .frame(maxWidth: 300)
                     .padding(20)

@@ -14,6 +14,7 @@ struct ChipProgrammingView: View {
     @Binding var readOptions: ReadOptions
     @Binding var writeOptions: WriteOptions
     @Binding var programmerInfo: ProgrammerInfo?
+    @Binding var applyFavoriteFilter: Bool
     @State private var selectedDevice: String?
 
     var body: some View {
@@ -81,6 +82,7 @@ struct ChipProgrammingView: View {
                             VStack {
                                 SearchableListView(
                                     items: supportedEEPROMs, selectedItem: $selectedDevice,
+                                    applyAdditionalFilter: $applyFavoriteFilter,
                                     isCollapsible: true, additionalFilter: filterFavoriteChips
                                 )
                                 .frame(maxWidth: 658, maxHeight: 600)
@@ -187,5 +189,5 @@ struct WriteChipButton: View {
     ChipProgrammingView(
         supportedDevices: .constant(nil), deviceDetails: .constant(nil), buffer: .constant(nil),
         readOptions: .constant(ReadOptions()), writeOptions: .constant(WriteOptions()),
-        programmerInfo: .constant(nil))
+        programmerInfo: .constant(nil), applyFavoriteFilter: .constant(true))
 }

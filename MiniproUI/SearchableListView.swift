@@ -10,13 +10,32 @@ import SwiftUI
 struct SearchableListView: View {
     let items: [String]
     @Binding var selectedItem: String?
+    @Binding var applyAdditionalFilter: Bool
     @State var selectedListItem: String?
     @State var searchText: String = ""
     @State var shouldShowList = true
-    @State var applyAdditionalFilter = true
     let isCollapsible: Bool
     let additionalFilter: (([String]) -> [String])?
     @Environment(\.colorScheme) private var colorScheme
+
+    init(items: [String], selectedItem: Binding<String?>, isCollapsible: Bool) {
+        self.items = items
+        self._selectedItem = selectedItem
+        self._applyAdditionalFilter = .constant(false)
+        self.isCollapsible = isCollapsible
+        self.additionalFilter = nil
+    }
+
+    init(
+        items: [String], selectedItem: Binding<String?>, applyAdditionalFilter: Binding<Bool>,
+        isCollapsible: Bool, additionalFilter: @escaping ([String]) -> [String]
+    ) {
+        self.items = items
+        self._selectedItem = selectedItem
+        self._applyAdditionalFilter = applyAdditionalFilter
+        self.isCollapsible = isCollapsible
+        self.additionalFilter = additionalFilter
+    }
 
     func prefilterItems() -> [String] {
         if additionalFilter != nil && applyAdditionalFilter {
@@ -130,7 +149,6 @@ struct SearchBar: View {
     SearchableListView(
         items: ["apple", "orange", "banana"],
         selectedItem: .constant(nil),
-        isCollapsible: false,
-        additionalFilter: nil
+        isCollapsible: false
     )
 }

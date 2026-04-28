@@ -25,6 +25,7 @@ class MiniproModel: ObservableObject {
     @Published var buffer: Data?
     @Published var readOptions = ReadOptions()
     @Published var writeOptions = WriteOptions()
+    @Published var applyFavoriteFilter = true
 }
 
 struct ContentView: View {
@@ -59,7 +60,8 @@ struct ContentView: View {
                     buffer: $model.buffer,
                     readOptions: $model.readOptions,
                     writeOptions: $model.writeOptions,
-                    programmerInfo: $model.programmerInfo
+                    programmerInfo: $model.programmerInfo,
+                    applyFavoriteFilter: $model.applyFavoriteFilter
                 )
                 .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {
