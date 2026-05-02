@@ -24,6 +24,8 @@ struct SearchableListView: View {
         self._applyAdditionalFilter = .constant(false)
         self.isCollapsible = isCollapsible
         self.additionalFilter = nil
+        self._searchText = State(initialValue: selectedItem.wrappedValue ?? "")
+        self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil || !isCollapsible)
     }
 
     init(
@@ -35,6 +37,8 @@ struct SearchableListView: View {
         self._applyAdditionalFilter = applyAdditionalFilter
         self.isCollapsible = isCollapsible
         self.additionalFilter = additionalFilter
+        self._searchText = State(initialValue: selectedItem.wrappedValue ?? "")
+        self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil || !isCollapsible)
     }
 
     func prefilterItems() -> [String] {

@@ -17,6 +17,21 @@ struct ChipProgrammingView: View {
     @Binding var applyFavoriteFilter: Bool
     @State private var selectedDevice: String?
 
+    init(
+        supportedDevices: Binding<SupportedDevices?>, deviceDetails: Binding<DeviceDetails?>,
+        buffer: Binding<Data?>, readOptions: Binding<ReadOptions>, writeOptions: Binding<WriteOptions>,
+        programmerInfo: Binding<ProgrammerInfo?>, applyFavoriteFilter: Binding<Bool>
+    ) {
+        self._supportedDevices = supportedDevices
+        self._deviceDetails = deviceDetails
+        self._buffer = buffer
+        self._readOptions = readOptions
+        self._writeOptions = writeOptions
+        self._programmerInfo = programmerInfo
+        self._applyFavoriteFilter = applyFavoriteFilter
+        self._selectedDevice = State(initialValue: deviceDetails.wrappedValue?.name)
+    }
+
     var body: some View {
         let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: programmerInfo)
         ZStack {
@@ -102,9 +117,6 @@ struct ChipProgrammingView: View {
                 let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
                 supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
             }
-        }
-        .onAppear {
-            selectedDevice = deviceDetails?.name
         }
         .onChange(of: selectedDevice) {
             Task {
