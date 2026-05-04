@@ -13,16 +13,6 @@ struct SupportedDevices {
 }
 
 class SupportedDevicesProcessor {
-    private static let logicICs: Set<String> = {
-        let logicicPath = Bundle.main.url(forResource: "logicic", withExtension: "xml")
-        return getICNames(from: logicicPath!)
-    }()
-
-    private static let eepromICs: Set<String> = {
-        let infoicPath = Bundle.main.url(forResource: "infoic", withExtension: "xml")
-        return getICNames(from: infoicPath!)
-    }()
-
     private static func getICNames(from path: URL) -> Set<String> {
         var icNames = Set<String>()
         let xmlDoc = try? XMLDocument(contentsOf: path)
@@ -41,8 +31,12 @@ class SupportedDevicesProcessor {
         return icNames
     }
 
-    public static func run(_ result: InvocationResult) throws -> SupportedDevices {
+    public static func run(_ result: InvocationResult, infoicPath: URL) throws -> SupportedDevices {
         try ensureNoError(invocationResult: result)
+
+        let logicICsPath = Bundle.main.url(forResource: "logicic", withExtension: "xml")!
+        let logicICs = getICNames(from: logicICsPath)
+        let eepromICs = getICNames(from: infoicPath)
 
         // Custom chips have "(custom)" appended to their names:
         // https://gitlab.com/DavidGriffith/minipro/-/blob/master/src/database.c#L516
@@ -51,11 +45,11 @@ class SupportedDevicesProcessor {
         }.filter { !$0.isEmpty }
 
         return SupportedDevices(
-            logicICs: getLogicICs(lines),
-            eepromICs: getEepromICs(lines))
+            logicICs: getLogicICs(lines, logicICs: logicICs, eepromICs: eepromICs),
+            eepromICs: getEepromICs(lines, logicICs: logicICs, eepromICs: eepromICs))
     }
 
-    private static func getLogicICs(_ lines: [String]) -> [String] {
+    private static func getLogicICs(_ lines: [String], logicICs: Set<String>, eepromICs: Set<String>) -> [String] {
         var seen: Set<String> = []
         return
             lines
@@ -63,7 +57,7 @@ class SupportedDevicesProcessor {
             .filter { logicICs.contains($0) || !eepromICs.contains($0) }
     }
 
-    private static func getEepromICs(_ lines: [String]) -> [String] {
+    private static func getEepromICs(_ lines: [String], logicICs: Set<String>, eepromICs: Set<String>) -> [String] {
         var seen: Set<String> = []
         return
             lines
