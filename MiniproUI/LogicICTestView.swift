@@ -8,19 +8,16 @@
 import SwiftUI
 
 struct LogicICTestView: View {
-    @Binding var supportedDevices: SupportedDevices?
-    @Binding var logicICDetails: DeviceDetails?
-    @Binding var logicICTestResult: LogicICTestResult?
-    @Binding var programmerInfo: ProgrammerInfo?
+    @ObservedObject var model: MiniproModel
     @State private var selectedDevice: String? = nil
     @State private var errorMessage: DialogErrorMessage? = nil
 
     var body: some View {
-        let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: programmerInfo)
-        let supportedLogicICs = supportedDevices?.logicICs ?? []
+        let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: model.programmerInfo)
+        let supportedLogicICs = model.supportedDevices?.logicICs ?? []
         VStack(alignment: .leading, spacing: 16) {
             TabHeaderView(
-                caption: "Selected Logic IC: " + (logicICDetails?.name ?? "None"),
+                caption: "Selected Logic IC: " + (model.logicICDetails?.name ?? "None"),
                 systemImageName: "flask.fill"
             )
             if needsAlgorithms {
@@ -41,47 +38,50 @@ struct LogicICTestView: View {
                     .frame(maxWidth: 300)
                     .padding(20)
                     VStack {
-                        if logicICDetails != nil {
-                            DeviceDetailsView(expectLogicChip: true, deviceDetails: $logicICDetails)
+                        if let logicICDetails = model.logicICDetails {
+                            DeviceDetailsView(expectLogicChip: true, deviceDetails: $model.logicICDetails)
                             Button("Test") {
                                 Task {
                                     do {
                                         let algorithmXmlPath = try AlgorithmXmlUtils.resolveAlgorithmXmlPath(
-                                            programmerInfo: programmerInfo
+                                            programmerInfo: model.programmerInfo
                                         )
-                                        logicICTestResult = try await MiniproAPI.testLogicIC(
-                                            device: logicICDetails!.name,
+                                        model.logicICTestResult = try await MiniproAPI.testLogicIC(
+                                            device: logicICDetails.name,
                                             algorithmXmlPath: algorithmXmlPath
                                         )
                                     } catch {
                                         errorMessage = .init(message: error.localizedDescription)
-                                        logicICTestResult = nil
+                                        model.logicICTestResult = nil
                                     }
                                 }
                             }
-                            .disabled(!(logicICDetails?.isLogicChip ?? true))
-                            if logicICTestResult == nil {
+                            .disabled(!(model.logicICDetails?.isLogicChip ?? true))
+                            if model.logicICTestResult == nil {
                                 Spacer()
                             }
                         }
-                        LogicICTestResultView(logicICTestResult: $logicICTestResult)
+                        LogicICTestResultView(logicICTestResult: $model.logicICTestResult)
                         Spacer()
                     }
                 }
             }
         }.task {
-            programmerInfo = try? await MiniproAPI.getProgrammerInfo()
-            if let programmerInfo {
+            model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
+            if let programmerInfo = model.programmerInfo {
                 let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
+                model.supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
             }
         }.onChange(of: selectedDevice) {
             Task {
-                if let device = selectedDevice, let programmerInfo {
+                if let device = selectedDevice, let programmerInfo = model.programmerInfo {
                     let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                    logicICDetails = try? await MiniproAPI.getDeviceDetails(device: device, infoicPath: infoicPath)
+                    model.logicICDetails = try? await MiniproAPI.getDeviceDetails(
+                        device: device,
+                        infoicPath: infoicPath
+                    )
                 }
-                logicICTestResult = nil
+                model.logicICTestResult = nil
             }
         }.alert(item: $errorMessage) {
             Alert(
@@ -94,10 +94,5 @@ struct LogicICTestView: View {
 }
 
 #Preview {
-    LogicICTestView(
-        supportedDevices: .constant(nil),
-        logicICDetails: .constant(nil),
-        logicICTestResult: .constant(nil),
-        programmerInfo: .constant(nil)
-    )
+    LogicICTestView(model: MiniproModel())
 }

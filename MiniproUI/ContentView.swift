@@ -49,21 +49,11 @@ struct ContentView: View {
                 ProgrammerInfoView(programmerInfo: $model.programmerInfo)
                     .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .logicIcTest {
-                LogicICTestView(
-                    supportedDevices: $model.supportedDevices, logicICDetails: $model.logicICDetails,
-                    logicICTestResult: $model.logicICTestResult, programmerInfo: $model.programmerInfo
-                )
-                .navigationTitle(selectedItem.rawValue)
+                LogicICTestView(model: model)
+                    .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .epromProgramming {
-                ChipProgrammingView(
-                    supportedDevices: $model.supportedDevices, deviceDetails: $model.deviceDetails,
-                    buffer: $model.buffer,
-                    readOptions: $model.readOptions,
-                    writeOptions: $model.writeOptions,
-                    programmerInfo: $model.programmerInfo,
-                    applyFavoriteFilter: $model.applyFavoriteFilter
-                )
-                .navigationTitle(selectedItem.rawValue)
+                ChipProgrammingView(model: model)
+                    .navigationTitle(selectedItem.rawValue)
             } else if selectedItem == .visualMiniproInfo {
                 VisualMiniproInfoView(visualMiniproInfo: $model.visualMiniproInfo)
                     .navigationTitle(selectedItem.rawValue)

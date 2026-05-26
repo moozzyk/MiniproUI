@@ -8,67 +8,52 @@
 import SwiftUI
 
 struct ChipProgrammingView: View {
-    @Binding var supportedDevices: SupportedDevices?
-    @Binding var deviceDetails: DeviceDetails?
-    @Binding var buffer: Data?
-    @Binding var readOptions: ReadOptions
-    @Binding var writeOptions: WriteOptions
-    @Binding var programmerInfo: ProgrammerInfo?
-    @Binding var applyFavoriteFilter: Bool
+    @ObservedObject var model: MiniproModel
     @State private var selectedDevice: String?
 
-    init(
-        supportedDevices: Binding<SupportedDevices?>, deviceDetails: Binding<DeviceDetails?>,
-        buffer: Binding<Data?>, readOptions: Binding<ReadOptions>, writeOptions: Binding<WriteOptions>,
-        programmerInfo: Binding<ProgrammerInfo?>, applyFavoriteFilter: Binding<Bool>
-    ) {
-        self._supportedDevices = supportedDevices
-        self._deviceDetails = deviceDetails
-        self._buffer = buffer
-        self._readOptions = readOptions
-        self._writeOptions = writeOptions
-        self._programmerInfo = programmerInfo
-        self._applyFavoriteFilter = applyFavoriteFilter
-        self._selectedDevice = State(initialValue: deviceDetails.wrappedValue?.name)
+    init(model: MiniproModel) {
+        self.model = model
+        self._selectedDevice = State(initialValue: model.deviceDetails?.name)
     }
 
     var body: some View {
-        let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: programmerInfo)
+        let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: model.programmerInfo)
         ZStack {
             VStack(alignment: .leading, spacing: 16) {
                 TabHeaderView(
                     caption: "Selected Chip: " + (selectedDevice ?? "None"),
-                    systemImageName: "memorychip.fill")
+                    systemImageName: "memorychip.fill"
+                )
                 HStack {
                     VStack {
-                        BinaryDataView(data: $buffer)
+                        BinaryDataView(data: $model.buffer)
                             .frame(minWidth: 678)
                         HStack {
                             OpenFileButton(caption: "Open File") { url in
-                                buffer = try Data(contentsOf: url)
+                                model.buffer = try Data(contentsOf: url)
                             }
                             SaveFileButton { url in
-                                try buffer?.write(to: url)
+                                try model.buffer?.write(to: url)
                             }
-                            .disabled(buffer == nil)
+                            .disabled(model.buffer == nil)
                         }
                         Spacer()
                     }
                     VStack {
                         ReadChipButton(
-                            device: deviceDetails,
-                            buffer: $buffer,
-                            readOptions: $readOptions,
-                            programmerInfo: $programmerInfo
+                            device: model.deviceDetails,
+                            buffer: $model.buffer,
+                            readOptions: $model.readOptions,
+                            programmerInfo: $model.programmerInfo
                         )
                         WriteChipButton(
-                            device: deviceDetails,
-                            buffer: buffer,
-                            writeOptions: $writeOptions,
-                            programmerInfo: $programmerInfo
+                            device: model.deviceDetails,
+                            buffer: model.buffer,
+                            writeOptions: $model.writeOptions,
+                            programmerInfo: $model.programmerInfo
                         )
                     }
-                    let supportedEEPROMs = supportedDevices?.eepromICs ?? []
+                    let supportedEEPROMs = model.supportedDevices?.eepromICs ?? []
                     if needsAlgorithms {
                         VStack {
                             Form {
@@ -88,17 +73,19 @@ struct ChipProgrammingView: View {
                     } else {
                         ZStack {
                             VStack {
-                                if deviceDetails != nil {
-                                    DeviceDetailsView(expectLogicChip: false, deviceDetails: $deviceDetails)
+                                if model.deviceDetails != nil {
+                                    DeviceDetailsView(expectLogicChip: false, deviceDetails: $model.deviceDetails)
                                         .padding(.top, 32)
                                     Spacer()
                                 }
                             }
                             VStack {
                                 SearchableListView(
-                                    items: supportedEEPROMs, selectedItem: $selectedDevice,
-                                    applyAdditionalFilter: $applyFavoriteFilter,
-                                    isCollapsible: true, additionalFilter: filterFavoriteChips
+                                    items: supportedEEPROMs,
+                                    selectedItem: $selectedDevice,
+                                    applyAdditionalFilter: $model.applyFavoriteFilter,
+                                    isCollapsible: true,
+                                    additionalFilter: filterFavoriteChips
                                 )
                                 .frame(maxWidth: 658, maxHeight: 600)
                                 .padding([.trailing])
@@ -112,17 +99,17 @@ struct ChipProgrammingView: View {
             }
         }
         .task {
-            programmerInfo = try? await MiniproAPI.getProgrammerInfo()
-            if let programmerInfo {
+            model.programmerInfo = try? await MiniproAPI.getProgrammerInfo()
+            if let programmerInfo = model.programmerInfo {
                 let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
+                model.supportedDevices = try? await MiniproAPI.getSupportedDevices(infoicPath: infoicPath)
             }
         }
         .onChange(of: selectedDevice) {
             Task {
-                if let device = selectedDevice, let programmerInfo {
+                if let device = selectedDevice, let programmerInfo = model.programmerInfo {
                     let infoicPath = InfoICUtils.resolveInfoICPath(for: programmerInfo.model)
-                    deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device, infoicPath: infoicPath)
+                    model.deviceDetails = try? await MiniproAPI.getDeviceDetails(device: device, infoicPath: infoicPath)
                 }
             }
         }
@@ -153,8 +140,12 @@ struct ReadChipButton: View {
         .sheet(isPresented: $isPresented) {
             ModalDialogView {
                 ReadChipView(
-                    device: device!, buffer: $buffer, isPresented: $isPresented, readOptions: $readOptions,
-                    programmerInfo: $programmerInfo, errorMessage: $errorMessage
+                    device: device!,
+                    buffer: $buffer,
+                    isPresented: $isPresented,
+                    readOptions: $readOptions,
+                    programmerInfo: $programmerInfo,
+                    errorMessage: $errorMessage
                 )
             }
         }
@@ -162,7 +153,8 @@ struct ReadChipButton: View {
             Alert(
                 title: Text("Reading Chip Contents Failed"),
                 message: Text($0.message),
-                dismissButton: .default(Text("OK")))
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
@@ -183,8 +175,12 @@ struct WriteChipButton: View {
         .sheet(isPresented: $isPresented) {
             ModalDialogView {
                 WriteChipView(
-                    device: device!, buffer: buffer!, isPresented: $isPresented, writeOptions: $writeOptions,
-                    programmerInfo: $programmerInfo, errorMessage: $errorMessage
+                    device: device!,
+                    buffer: buffer!,
+                    isPresented: $isPresented,
+                    writeOptions: $writeOptions,
+                    programmerInfo: $programmerInfo,
+                    errorMessage: $errorMessage
                 )
             }
         }
@@ -192,14 +188,12 @@ struct WriteChipButton: View {
             Alert(
                 title: Text("Write Failure"),
                 message: Text($0.message),
-                dismissButton: .default(Text("OK")))
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
 
 #Preview {
-    ChipProgrammingView(
-        supportedDevices: .constant(nil), deviceDetails: .constant(nil), buffer: .constant(nil),
-        readOptions: .constant(ReadOptions()), writeOptions: .constant(WriteOptions()),
-        programmerInfo: .constant(nil), applyFavoriteFilter: .constant(true))
+    ChipProgrammingView(model: MiniproModel())
 }
