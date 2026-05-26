@@ -62,7 +62,7 @@ struct ChipProgrammingView: View {
                             .formStyle(.grouped)
                             .padding(.top, 32)
                         }
-                    } else if supportedEEPROMs.isEmpty {
+                    } else if model.programmerInfo == nil {
                         VStack {
                             Form {
                                 ProgrammerNotConnected()

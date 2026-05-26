@@ -24,7 +24,7 @@ struct LogicICTestView: View {
                 Form {
                     MissingAlgorithms()
                 }.formStyle(.grouped)
-            } else if supportedLogicICs.isEmpty {
+            } else if model.programmerInfo == nil {
                 Form {
                     ProgrammerNotConnected()
                 }.formStyle(.grouped)
