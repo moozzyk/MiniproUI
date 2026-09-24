@@ -40,7 +40,7 @@ struct DeviceDetailsView: View {
     private func computeHeight() -> CGFloat {
         if let deviceDetails = deviceDetails {
             if !deviceDetails.isLogicChip {
-                return 400
+                return 300
             }
             return 220 + (expectLogicChip ? 0 : 30) // account for the additional warning row
         }

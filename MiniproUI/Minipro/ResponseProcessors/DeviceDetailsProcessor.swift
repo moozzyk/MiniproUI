@@ -12,6 +12,15 @@ struct DeviceDetails: Equatable, Hashable {
     let deviceInfo: [KeyValuePair]
     let programmingInfo: [KeyValuePair]
     let isLogicChip: Bool
+
+    /// Pin count if this chip's package is DIP (e.g. "DIP32" -> 32), otherwise nil.
+    var dipPinCount: Int? {
+        guard let package = deviceInfo.first(where: { $0.key == "Package" })?.value,
+              package.uppercased().hasPrefix("DIP") else {
+            return nil
+        }
+        return Int(package.dropFirst(3))
+    }
 }
 
 class DeviceDetailsProcessor {

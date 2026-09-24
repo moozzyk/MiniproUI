@@ -73,9 +73,18 @@ struct ChipProgrammingView: View {
                     } else {
                         ZStack {
                             VStack {
-                                if model.deviceDetails != nil {
+                                if let deviceDetails = model.deviceDetails {
                                     DeviceDetailsView(expectLogicChip: false, deviceDetails: $model.deviceDetails)
                                         .padding(.top, 32)
+                                    if let pins = deviceDetails.dipPinCount, let programmerModel = model.programmerInfo?.model {
+                                        ZIFSocketView(
+                                            device: programmerModel,
+                                            pins: pins,
+                                            chipID: String(deviceDetails.name.prefix { $0 != "@" })
+                                        )
+                                        .frame(maxWidth: .infinity, maxHeight: 400, alignment: .top)
+                                        .padding(.top, 8)
+                                    }
                                     Spacer()
                                 }
                             }
