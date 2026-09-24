@@ -132,17 +132,23 @@ struct ZIFSocketView: View {
 
     private var wide: Bool { pins > 24 }   // true = 600 mil DIP, false = 300 mil DIP
 
-    // Palette
-    private let bg        = Color(white: 240 / 255)
-    private let bodyColor = Color(white: 120 / 255)
-    private let slot      = Color(white:  80 / 255)
-    private let channel   = Color(white: 200 / 255)
-    private let hole      = Color(white: 210 / 255)
-    private let chipFill  = Color(white: 110 / 255)
-    private let chipEdge  = Color(white: 150 / 255)
-    private let chipDot   = Color(white: 190 / 255)
-    private let chipText  = Color(white: 0.92)
-    private let guideText = Color(white:  80 / 255)
+    @Environment(\.colorScheme) private var colorScheme
+
+    // Palette (light-mode value, dark-mode value)
+    private var bg: Color        { adaptive(240, 70) }
+    private var bodyColor: Color { adaptive(120, 165) }
+    private var slot: Color      { adaptive(80, 140) }
+    private var channel: Color   { adaptive(200, 100) }
+    private var hole: Color      { adaptive(210, 130) }
+    private var chipFill: Color  { adaptive(110, 60) }
+    private var chipEdge: Color  { adaptive(150, 110) }
+    private var chipDot: Color   { adaptive(190, 150) }
+    private var chipText: Color  { Color(white: 0.92) }
+    private var guideText: Color { adaptive(80, 170) }
+
+    private func adaptive(_ light: Double, _ dark: Double) -> Color {
+        Color(white: (colorScheme == .dark ? dark : light) / 255)
+    }
 
     private var bodyHeight: CGFloat { 2 * SocketMetrics.rowMargin + CGFloat(device.slotsPerSide - 1) * SocketMetrics.pitch }
     private var bodyLeft: CGFloat { SocketMetrics.centerX - SocketMetrics.bodyWidth / 2 }
