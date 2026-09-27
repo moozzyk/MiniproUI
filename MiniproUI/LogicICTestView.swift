@@ -54,8 +54,7 @@ struct LogicICTestView: View {
                         VStack {
                             SearchableListView(
                                 items: supportedLogicICs,
-                                selectedItem: $selectedDevice,
-                                isCollapsible: true
+                                selectedItem: $selectedDevice
                             )
                             Spacer()
                         }

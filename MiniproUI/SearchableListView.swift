@@ -14,31 +14,28 @@ struct SearchableListView: View {
     @State var selectedListItem: String?
     @State var searchText: String = ""
     @State var shouldShowList = true
-    let isCollapsible: Bool
     let additionalFilter: (([String]) -> [String])?
     @Environment(\.colorScheme) private var colorScheme
 
-    init(items: [String], selectedItem: Binding<String?>, isCollapsible: Bool) {
+    init(items: [String], selectedItem: Binding<String?>) {
         self.items = items
         self._selectedItem = selectedItem
         self._applyAdditionalFilter = .constant(false)
-        self.isCollapsible = isCollapsible
         self.additionalFilter = nil
         self._searchText = State(initialValue: selectedItem.wrappedValue ?? "")
-        self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil || !isCollapsible)
+        self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil)
     }
 
     init(
         items: [String], selectedItem: Binding<String?>, applyAdditionalFilter: Binding<Bool>,
-        isCollapsible: Bool, additionalFilter: @escaping ([String]) -> [String]
+        additionalFilter: @escaping ([String]) -> [String]
     ) {
         self.items = items
         self._selectedItem = selectedItem
         self._applyAdditionalFilter = applyAdditionalFilter
-        self.isCollapsible = isCollapsible
         self.additionalFilter = additionalFilter
         self._searchText = State(initialValue: selectedItem.wrappedValue ?? "")
-        self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil || !isCollapsible)
+        self._shouldShowList = State(initialValue: selectedItem.wrappedValue == nil)
     }
 
     func prefilterItems() -> [String] {
@@ -102,16 +99,12 @@ struct SearchableListView: View {
         }.onChange(of: selectedListItem) {
             if selectedListItem != nil {
                 selectedItem = selectedListItem
-                if isCollapsible {
-                    searchText = selectedListItem ?? ""
-                    shouldShowList = false
-                    selectedListItem = nil
-                }
+                searchText = selectedListItem ?? ""
+                shouldShowList = false
+                selectedListItem = nil
             }
         }.onChange(of: searchText) {
-            if isCollapsible {
-                shouldShowList = shouldShowList || searchText != selectedItem
-            }
+            shouldShowList = shouldShowList || searchText != selectedItem
         }
     }
 }
@@ -152,7 +145,6 @@ struct SearchBar: View {
 #Preview {
     SearchableListView(
         items: ["apple", "orange", "banana"],
-        selectedItem: .constant(nil),
-        isCollapsible: false
+        selectedItem: .constant(nil)
     )
 }

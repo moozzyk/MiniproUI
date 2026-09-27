@@ -93,7 +93,6 @@ struct ChipProgrammingView: View {
                                     items: supportedEEPROMs,
                                     selectedItem: $selectedDevice,
                                     applyAdditionalFilter: $model.applyFavoriteFilter,
-                                    isCollapsible: true,
                                     additionalFilter: filterFavoriteChips
                                 )
                                 .frame(maxWidth: 658, maxHeight: 600)
