@@ -9,8 +9,13 @@ import SwiftUI
 
 struct LogicICTestView: View {
     @ObservedObject var model: MiniproModel
-    @State private var selectedDevice: String? = nil
+    @State private var selectedDevice: String?
     @State private var errorMessage: DialogErrorMessage? = nil
+
+    init(model: MiniproModel) {
+        self.model = model
+        self._selectedDevice = State(initialValue: model.logicICDetails?.name)
+    }
 
     var body: some View {
         let needsAlgorithms = AlgorithmXmlUtils.needsAlgorithmInstallation(programmerInfo: model.programmerInfo)
@@ -30,11 +35,31 @@ struct LogicICTestView: View {
                 }.formStyle(.grouped)
             } else {
                 HStack {
-                    SearchableListView(
-                        items: supportedLogicICs,
-                        selectedItem: $selectedDevice,
-                        isCollapsible: false
-                    )
+                    ZStack {
+                        VStack {
+                            if let logicICDetails = model.logicICDetails,
+                                let pins = logicICDetails.dipPinCount,
+                                let programmerModel = model.programmerInfo?.model
+                            {
+                                Spacer()
+                                ZIFSocketView(
+                                    device: programmerModel,
+                                    pins: pins,
+                                    chipID: String(logicICDetails.name.prefix { $0 != "@" })
+                                )
+                                .frame(maxWidth: .infinity, maxHeight: 400)
+                            }
+                            Spacer()
+                        }
+                        VStack {
+                            SearchableListView(
+                                items: supportedLogicICs,
+                                selectedItem: $selectedDevice,
+                                isCollapsible: true
+                            )
+                            Spacer()
+                        }
+                    }
                     .frame(maxWidth: 300)
                     .padding(20)
                     VStack {

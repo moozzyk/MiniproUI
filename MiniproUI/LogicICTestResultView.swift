@@ -39,7 +39,6 @@ struct LogicICTestResultView: View {
                 }
                 .formStyle(.grouped)
                 .frame(maxHeight: 76)
-                .background(.red)
 
                 Table(rows) {
                     TableColumnForEach(0..<numColumns, id: \.self) { idx in
