@@ -45,16 +45,16 @@ class SupportedDevicesProcessor {
         }.filter { !$0.isEmpty }
 
         return SupportedDevices(
-            logicICs: getLogicICs(lines, logicICs: logicICs, eepromICs: eepromICs),
+            logicICs: getLogicICs(lines, logicICs: logicICs),
             eepromICs: getEepromICs(lines, logicICs: logicICs, eepromICs: eepromICs))
     }
 
-    private static func getLogicICs(_ lines: [String], logicICs: Set<String>, eepromICs: Set<String>) -> [String] {
+    private static func getLogicICs(_ lines: [String], logicICs: Set<String>) -> [String] {
         var seen: Set<String> = []
         return
             lines
             .filter { seen.insert($0).inserted }
-            .filter { logicICs.contains($0) || !eepromICs.contains($0) }
+            .filter { logicICs.contains($0) }
     }
 
     private static func getEepromICs(_ lines: [String], logicICs: Set<String>, eepromICs: Set<String>) -> [String] {

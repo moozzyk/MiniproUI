@@ -116,7 +116,7 @@ struct SupportedDevicesTests {
         #expect(supportedDevices.eepromICs == ["MT28FW512ABA1LPC-0AAT&#9;(RB159)@BGA64"])
     }
 
-    @Test func testThatUnrecognizedChipsEndInBothCategories() async throws {
+    @Test func testThatUnrecognizedChipsAreNotLogicICs() async throws {
         let miniproResult = InvocationResult(
             exitCode: 0,
             stdOut: Data("ABC\n123".utf8),
@@ -124,7 +124,7 @@ struct SupportedDevicesTests {
         )
 
         let supportedDevices = try SupportedDevicesProcessor.run(miniproResult, infoicPath: infoicPath)
-        #expect(supportedDevices.logicICs == ["ABC", "123"])
+        #expect(supportedDevices.logicICs == [])
         #expect(supportedDevices.eepromICs == ["ABC", "123"])
     }
 
