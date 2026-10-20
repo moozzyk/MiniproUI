@@ -95,6 +95,14 @@ class XgproFirmwareUtils {
             ),
             checksum: "b0c2e0afaea1c2680c0aa8a24f1cb68fd88dc227d08ccc697121948e612e5c8e"
         ),
+        "xgpro_T76_V1325.rar": SoftwareBundleInfo(
+            firmwareInfo: FirmwareInfo(
+                programmerModel: .t76,
+                firmwareVersion: 0x113,
+                fileName: t76FileName
+            ),
+            checksum: "e36fa884fa3bfc47f2c0c617b4ba3136eca002e2b17c760818c447e2c72411ae"
+        ),
         "xgproV1304_T48_T56_T866II_Setup.rar": SoftwareBundleInfo(
             firmwareInfo: FirmwareInfo(
                 programmerModel: .t56,
