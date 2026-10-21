@@ -51,9 +51,27 @@ struct ProgrammerInfoProcessorTests {
         #expect(result.supplyVoltage == "5.11 V")
         #expect(
             result.warnings == [
-                "T48 support is not yet complete!",
                 "Firmware is out of date. Expected 01.1.34 (0x122), Found 00.1.30 (0x11e)",
             ])
+    }
+
+    @Test func testProgrammerInfoProcessorIgnoresWarnings() throws {
+        let miniproResult = InvocationResult(
+            exitCode: 0, stdOut: Data(),
+            stdErr:
+                """
+                Found T48 01.1.35 (0x123)
+                Warning: T48 support is not yet complete!
+                Warning: T76 support is experimental!
+                Warning: Firmware is newer than expected.
+                  Expected  01.1.34 (0x122)
+                  Found     01.1.35 (0x123)
+                Device code: 46A16257
+                Serial code: HSSCVO9LARFMOYKYOMVE5123
+
+                """)
+        let result = try ProgrammerInfoProcessor.run(miniproResult)
+        #expect(result.warnings.isEmpty)
     }
 
     @Test func testProgrammerInfoProcessorCannotParseResponse() {

@@ -35,12 +35,19 @@ class ProgrammerInfoProcessor {
     private static let usbSpeed = /USB speed: (.+)\n/
     private static let supplyVoltage = /Supply voltage: (.+)\n/
 
+    private static let ignoredWarnings = [
+        "T48 support is not yet complete!", "T76 support is experimental!", "Firmware is newer than expected",
+    ]
+
     private static func findWarnings(stdErr: String) -> [String] {
         var warnings: [String] = []
         let lines = stdErr.split(separator: "\n")
         for (index, line) in lines.enumerated() {
             if let range = line.range(of: "Warning: ") {
                 let warning = line[range.upperBound...]
+                if ignoredWarnings.contains(where: { warning.starts(with: $0) }) {
+                    continue
+                }
                 if warning.starts(with: "Firmware is") {
                     warnings.append("\(warning)\(sanitizeVersionWarningLine(line: String(lines[index + 1]))),\(sanitizeVersionWarningLine(line: String(lines[index + 2])))"
                     )
