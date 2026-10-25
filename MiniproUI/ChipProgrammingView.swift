@@ -29,8 +29,9 @@ struct ChipProgrammingView: View {
                         BinaryDataView(data: $model.buffer)
                             .frame(minWidth: 678)
                         HStack {
-                            OpenFileButton(caption: "Open File") { url in
-                                model.buffer = try Data(contentsOf: url)
+                            OpenFileButton(caption: "Open File", showsOpenMode: true) { url, mode in
+                                let data = try Data(contentsOf: url)
+                                model.buffer = mode == .append ? (model.buffer ?? Data()) + data : data
                             }
                             SaveFileButton { url in
                                 try model.buffer?.write(to: url)

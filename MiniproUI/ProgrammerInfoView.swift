@@ -110,7 +110,7 @@ struct FirmwareUpdateSection: View {
             HStack {
                 Text("Firmware")
                 Spacer()
-                OpenFileButton(caption: "Select Firmware...", fileTypes: ["dat"]) { url in
+                OpenFileButton(caption: "Select Firmware...", fileTypes: ["dat"]) { url, _ in
                     firmwareUrl = url
                 }
             }
@@ -249,7 +249,7 @@ struct SoftwareUpdateSection: View {
             HStack {
                 Text("Software Bundle")
                 Spacer()
-                OpenFileButton(caption: "Select Bundle...", fileTypes: ["rar"]) { url in
+                OpenFileButton(caption: "Select Bundle...", fileTypes: ["rar"]) { url, _ in
                     firmwareUrl = url
                     softwareChecksumStatus = XgproFirmwareUtils.verifySoftwareBundle(
                         fileURL: url,
