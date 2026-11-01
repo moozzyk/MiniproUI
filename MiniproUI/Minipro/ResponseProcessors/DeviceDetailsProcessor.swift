@@ -25,7 +25,7 @@ struct DeviceDetails: Equatable, Hashable {
 
 class DeviceDetailsProcessor {
     private static let deviceInfoKeys = [
-        "Name", "Available on", "Memory", "Package", "Default VCC voltage", "Vector count", "Protocol",
+        "Name", "Manufacturer", "Memory", "Package", "Default VCC voltage", "Vector count", "Protocol",
         "Read buffer size", "Write buffer size",
     ]
     private static let programmingInfoKeys = [

@@ -54,6 +54,7 @@ struct DeviceDetailsProcessorTest {
 
             ---------------Chip Info----------------
             Name: AM29F040B@DIP32
+            Manufacturer: AMD
             Available on: TL866II, T48, T56
             Memory: 524288 Bytes
             Package: DIP32
@@ -66,7 +67,7 @@ struct DeviceDetailsProcessorTest {
                 name: "AM29F040B@DIP32",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "AM29F040B@DIP32"),
-                    KeyValuePair(key: "Available on", value: "TL866II, T48, T56"),
+                    KeyValuePair(key: "Manufacturer", value: "AMD"),
                     KeyValuePair(key: "Memory", value: "524288 Bytes"),
                     KeyValuePair(key: "Package", value: "DIP32"),
                     KeyValuePair(key: "Protocol", value: "0x06"),
@@ -98,7 +99,6 @@ struct DeviceDetailsProcessorTest {
                 name: "JS28F640P30TF@TSOP56",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "JS28F640P30TF@TSOP56"),
-                    KeyValuePair(key: "Available on", value: "T48, T56"),
                     KeyValuePair(key: "Memory", value: "4194304 Words + 272 Bytes"),
                     KeyValuePair(key: "Package", value: "Adapter011.JPG"),
                     KeyValuePair(key: "Read buffer size", value: "32768 Bytes"),
@@ -148,7 +148,6 @@ struct DeviceDetailsProcessorTest {
                 name: "AT27LV512R@PLCC32",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "AT27LV512R@PLCC32"),
-                    KeyValuePair(key: "Available on", value: "TL866II, T48, T56"),
                     KeyValuePair(key: "Memory", value: "65536 Bytes"),
                     KeyValuePair(key: "Package", value: "PLCC32"),
                     KeyValuePair(key: "Protocol", value: "0x0a"),
