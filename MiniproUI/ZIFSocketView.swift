@@ -122,6 +122,32 @@ fileprivate enum GuideMetrics {
     static let heightRatio: CGFloat = 0.33    // guide height relative to socket height
 }
 
+/// Converts between design units and device pixels.
+fileprivate struct PixelGrid {
+    let scale: CGFloat          // device pixels per design unit
+    let origin: CGPoint         // view position (points) of design point (0, 0)
+    let displayScale: CGFloat   // device pixels per point
+
+    /// Moves the rect's edges to the nearest pixel boundaries.
+    func snap(_ r: CGRect) -> CGRect {
+        let minX = snapX(r.minX), minY = snapY(r.minY)
+        return CGRect(x: minX, y: minY, width: snapX(r.maxX) - minX, height: snapY(r.maxY) - minY)
+    }
+
+    /// The design length rounded to a whole number of pixels (at least one).
+    func wholePixels(_ length: CGFloat) -> CGFloat {
+        max(1, (length * scale).rounded()) / scale
+    }
+
+    private func snapX(_ x: CGFloat) -> CGFloat { snap(x, origin.x) }
+    private func snapY(_ y: CGFloat) -> CGFloat { snap(y, origin.y) }
+
+    private func snap(_ v: CGFloat, _ originPoints: CGFloat) -> CGFloat {
+        let originPx = originPoints * displayScale
+        return ((originPx + v * scale).rounded() - originPx) / scale
+    }
+}
+
 /// Draws a ZIF programmer socket with a DIP chip inserted as the device requires,
 /// plus the device's chip-insertion diagram to the right of the socket.
 /// All drawing uses fixed "design units"; the view scales them uniformly to its size.
@@ -133,6 +159,7 @@ struct ZIFSocketView: View {
     private var wide: Bool { pins > 24 }   // true = 600 mil DIP, false = 300 mil DIP
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.displayScale) private var displayScale
 
     // Palette (light-mode value, dark-mode value)
     private var bg: Color        { adaptive(240, 70) }
@@ -183,12 +210,15 @@ struct ZIFSocketView: View {
             // Fit the viewBox into the view, keep aspect ratio, center it.
             let vb = viewBox
             let s = min(size.width / vb.width, size.height / vb.height)
-            ctx.translateBy(x: (size.width  - vb.width  * s) / 2,
-                            y: (size.height - vb.height * s) / 2)
+            let offset = CGPoint(x: (size.width - vb.width * s) / 2, y: (size.height - vb.height * s) / 2)
+            ctx.translateBy(x: offset.x, y: offset.y)
             ctx.scaleBy(x: s, y: s)
             ctx.translateBy(x: -vb.minX, y: -vb.minY)
 
-            drawSocket(ctx)
+            let grid = PixelGrid(scale: s * displayScale,
+                                 origin: CGPoint(x: offset.x - vb.minX * s, y: offset.y - vb.minY * s),
+                                 displayScale: displayScale)
+            drawSocket(ctx, grid)
             drawChip(ctx)
 
             // Guide diagram: its own coordinate space, scaled down next to the socket.
@@ -207,7 +237,7 @@ struct ZIFSocketView: View {
         .aspectRatio(viewBox.size, contentMode: .fit)
     }
 
-    private func drawSocket(_ ctx: GraphicsContext) {
+    private func drawSocket(_ ctx: GraphicsContext, _ grid: PixelGrid) {
         // Lever (ring + stem above the body's top-left corner)
         let leverX = bodyLeft + SocketMetrics.leverInset
         let stemTop = SocketMetrics.bodyTop - SocketMetrics.leverStemLength
@@ -239,13 +269,15 @@ struct ZIFSocketView: View {
         ctx.fill(holePath, with: .color(hole))
         ctx.stroke(holePath, with: .color(bodyColor), lineWidth: SocketMetrics.slotStroke)
 
-        // Contact slots
+        // Contact slots, snapped to the pixel grid so their thin outlines stay sharp
+        let border = grid.wholePixels(SocketMetrics.slotStroke)
         for k in 0..<device.slotsPerSide {
             let y = rowY(k) - SocketMetrics.slotHeight / 2
             for x in [SocketMetrics.centerX - SocketMetrics.slotGap - SocketMetrics.slotLength, SocketMetrics.centerX + SocketMetrics.slotGap] {
-                let r = rect(x, y, SocketMetrics.slotLength, SocketMetrics.slotHeight)
-                ctx.fill(r, with: .color(bg))
-                ctx.stroke(r, with: .color(slot), lineWidth: SocketMetrics.slotStroke)
+                let r = CGRect(x: x, y: y, width: SocketMetrics.slotLength, height: SocketMetrics.slotHeight)
+                let outer = grid.snap(r.insetBy(dx: -SocketMetrics.slotStroke / 2, dy: -SocketMetrics.slotStroke / 2))
+                ctx.fill(Path(outer), with: .color(slot))
+                ctx.fill(Path(outer.insetBy(dx: border, dy: border)), with: .color(bg))
             }
         }
     }
