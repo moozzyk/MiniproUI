@@ -68,11 +68,11 @@ struct DeviceDetailsProcessorTest {
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "AM29F040B@DIP32"),
                     KeyValuePair(key: "Manufacturer", value: "AMD"),
-                    KeyValuePair(key: "Memory", value: "524288 Bytes"),
                     KeyValuePair(key: "Package", value: "DIP32"),
-                    KeyValuePair(key: "Protocol", value: "0x06"),
+                    KeyValuePair(key: "Memory", value: "524288 Bytes"),
                     KeyValuePair(key: "Read buffer size", value: "4096 Bytes"),
                     KeyValuePair(key: "Write buffer size", value: "256 Bytes"),
+                    KeyValuePair(key: "Protocol", value: "0x06"),
                 ], programmingInfo: [], isLogicChip: false)
         ),
         (
@@ -99,8 +99,8 @@ struct DeviceDetailsProcessorTest {
                 name: "JS28F640P30TF@TSOP56",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "JS28F640P30TF@TSOP56"),
-                    KeyValuePair(key: "Memory", value: "4194304 Words + 272 Bytes"),
                     KeyValuePair(key: "Package", value: "Adapter011.JPG"),
+                    KeyValuePair(key: "Memory", value: "4194304 Words + 272 Bytes"),
                     KeyValuePair(key: "Read buffer size", value: "32768 Bytes"),
                     KeyValuePair(key: "Write buffer size", value: "2048 Bytes"),
                 ], programmingInfo: [], isLogicChip: false)
@@ -148,11 +148,11 @@ struct DeviceDetailsProcessorTest {
                 name: "AT27LV512R@PLCC32",
                 deviceInfo: [
                     KeyValuePair(key: "Name", value: "AT27LV512R@PLCC32"),
-                    KeyValuePair(key: "Memory", value: "65536 Bytes"),
                     KeyValuePair(key: "Package", value: "PLCC32"),
-                    KeyValuePair(key: "Protocol", value: "0x0a"),
+                    KeyValuePair(key: "Memory", value: "65536 Bytes"),
                     KeyValuePair(key: "Read buffer size", value: "1024 Bytes"),
                     KeyValuePair(key: "Write buffer size", value: "128 Bytes"),
+                    KeyValuePair(key: "Protocol", value: "0x0a"),
                 ],
                 programmingInfo: [
                     KeyValuePair(key: "Default VPP programming voltage", value: "12 V"),
