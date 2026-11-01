@@ -31,12 +31,11 @@ class SupportedDevicesProcessor {
         return icNames
     }
 
-    public static func run(_ result: InvocationResult, infoicPath: URL) throws -> SupportedDevices {
+    public static func run(_ result: InvocationResult) throws -> SupportedDevices {
         try ensureNoError(invocationResult: result)
 
         let logicICsPath = Bundle.main.url(forResource: "logicic", withExtension: "xml")!
         let logicICs = getICNames(from: logicICsPath)
-        let eepromICs = getICNames(from: infoicPath)
 
         // Custom chips have "(custom)" appended to their names:
         // https://gitlab.com/DavidGriffith/minipro/-/blob/master/src/database.c#L516
@@ -46,7 +45,7 @@ class SupportedDevicesProcessor {
 
         return SupportedDevices(
             logicICs: getLogicICs(lines, logicICs: logicICs),
-            eepromICs: getEepromICs(lines, logicICs: logicICs, eepromICs: eepromICs))
+            eepromICs: getEepromICs(lines, logicICs: logicICs))
     }
 
     private static func getLogicICs(_ lines: [String], logicICs: Set<String>) -> [String] {
@@ -57,11 +56,11 @@ class SupportedDevicesProcessor {
             .filter { logicICs.contains($0) }
     }
 
-    private static func getEepromICs(_ lines: [String], logicICs: Set<String>, eepromICs: Set<String>) -> [String] {
+    private static func getEepromICs(_ lines: [String], logicICs: Set<String>) -> [String] {
         var seen: Set<String> = []
         return
             lines
             .filter { seen.insert($0).inserted }
-            .filter { eepromICs.contains($0) || !logicICs.contains($0) }
+            .filter { !logicICs.contains($0) }
     }
 }
