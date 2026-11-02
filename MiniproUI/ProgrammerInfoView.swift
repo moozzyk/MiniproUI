@@ -194,7 +194,7 @@ struct SoftwareUpdateSection: View {
     private func verificationDetails(for status: SoftwareBundleVerificationStatus) -> String? {
         switch status {
         case .checksumMatch:
-            return nil
+            return "Bundle checksum verification succeeded."
         case .checksumNotAvailable:
             return "Checksum verification was not possible for this bundle."
         case .checksumMismatch:
@@ -260,16 +260,17 @@ struct SoftwareUpdateSection: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 4) {
-                        Text("Software Bundle file:")
+                        Text("Selected Software Bundle File:")
                         if let fileName = firmwareUrl?.lastPathComponent {
                             Text(fileName)
                                 .font(.system(.body, design: .monospaced))
                         } else {
-                            Text("N/A")
+                            Text("(none)")
                         }
                     }
                     .help(firmwareUrl?.path ?? "")
                     if let softwareChecksumStatus,
+                        softwareChecksumStatus != .checksumMatch,
                         let verificationDetails = verificationDetails(for: softwareChecksumStatus)
                     {
                         Text(verificationDetails)
@@ -289,6 +290,11 @@ struct SoftwareUpdateSection: View {
                     buttonCaption: "Install..."
                 )
             }.disabled(firmwareUrl == nil)
+            .onChange(of: firmwareUrl) {
+                if firmwareUrl == nil {
+                    softwareChecksumStatus = nil
+                }
+            }
             Link(
                 "Learn more about Software Bundles for T56 and T76 programmers",
                 destination: URL(string: softwareBundleHelpUrl)!
