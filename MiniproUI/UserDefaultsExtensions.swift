@@ -26,4 +26,12 @@ extension UserDefaults {
         get { bool(forKey: UserDefaults.useLegacyInfoICKey) }
         set { set(newValue, forKey: UserDefaults.useLegacyInfoICKey) }
     }
+
+    func getInstalledSoftwareBundle(for programmerModel: ProgrammerModel) -> String? {
+        string(forKey: "\(programmerModel.rawValue)_bundle")
+    }
+
+    func setInstalledSoftwareBundle(_ bundleName: String, for programmerModel: ProgrammerModel) {
+        set(bundleName, forKey: "\(programmerModel.rawValue)_bundle")
+    }
 }

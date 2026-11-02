@@ -50,6 +50,12 @@ struct ProgrammerInfoView: View {
                         Section {
                             PropertyRow(label: "Model ", value: programmerInfo?.model.rawValue ?? "Unknown")
                             PropertyRow(label: "Firmware Version ", value: programmerInfo?.firmwareVersion ?? "Unknown")
+                            if let model = programmerInfo?.model,
+                                let bundleName = UserDefaults.standard.getInstalledSoftwareBundle(for: model),
+                                !bundleName.isEmpty
+                            {
+                                PropertyRow(label: "Installed Software Bundle", value: bundleName)
+                            }
                             PropertyRow(label: "Device Code ", value: programmerInfo?.deviceCode ?? "Unknown")
                             PropertyRow(label: "Serial Number ", value: programmerInfo?.serialNumber ?? "Unknown")
                             PropertyRow(
@@ -415,6 +421,7 @@ struct UpdateFirmwareButton: View {
                 let firmwareFile = outputDirectory.appendingPathComponent(firmwareInfo.fileName)
                 try await installFirmware(using: firmwareFile)
             }
+            UserDefaults.standard.setInstalledSoftwareBundle(url.lastPathComponent, for: programmerInfo.model)
             // Trigger re-render to hide missing algorithms banner
             firmwareUrl = nil
         } catch {
