@@ -15,6 +15,10 @@ struct DeviceDetails: Equatable, Hashable {
 
     /// Pin count if this chip's package is DIP (e.g. "DIP32" -> 32), otherwise nil.
     var dipPinCount: Int? {
+        // minipro reports most non-DIP chips (e.g. W25Q32JV@SOIC8) as DIP, so trust the package in the name if present.
+        if let atIndex = name.firstIndex(of: "@"), !name[atIndex...].uppercased().contains("DIP") {
+            return nil
+        }
         guard let package = deviceInfo.first(where: { $0.key == "Package" })?.value,
               package.uppercased().hasPrefix("DIP") else {
             return nil

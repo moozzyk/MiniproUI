@@ -172,6 +172,21 @@ struct DeviceDetailsProcessorTest {
         #expect(deviceDetails == expectedDeviceDetails)
     }
 
+    @Test(arguments: [
+        ("7404", "DIP14", 14),
+        ("AM29F040B@DIP32", "DIP32", 32),
+        ("PIC10F200@PDIP8", "DIP8", 8),
+        ("W25Q32JV@SOIC8", "DIP8", nil),
+        ("ACE25AC512G@SON8", "DIP8", nil),
+        ("AT27LV512R@PLCC32", "PLCC32", nil),
+    ] as [(String, String, Int?)])
+    func testDipPinCount(name: String, package: String, expectedPinCount: Int?) {
+        let deviceDetails = DeviceDetails(
+            name: name, deviceInfo: [KeyValuePair(key: "Package", value: package)], programmingInfo: [],
+            isLogicChip: false)
+        #expect(deviceDetails.dipPinCount == expectedPinCount)
+    }
+
     @Test func testDeviceDetailsProcessorThrowsForUnknownDevice() {
         // command: minipro --get_info 'AT45DB161D[Page512]'
         #expect(throws: MiniproAPIError.deviceNotFound("AT45DB161D[Page512]")) {
