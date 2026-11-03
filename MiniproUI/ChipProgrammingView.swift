@@ -174,7 +174,7 @@ struct WriteChipButton: View {
     @Binding var writeOptions: WriteOptions
     @Binding var programmerInfo: ProgrammerInfo?
     @State private var isPresented = false
-    @State private var errorMessage: DialogErrorMessage?
+    @State private var operationResult: OperationResult?
 
     var body: some View {
         Button(" >> ") {
@@ -189,16 +189,25 @@ struct WriteChipButton: View {
                     isPresented: $isPresented,
                     writeOptions: $writeOptions,
                     programmerInfo: $programmerInfo,
-                    errorMessage: $errorMessage
+                    operationResult: $operationResult
                 )
             }
         }
-        .alert(item: $errorMessage) {
-            Alert(
-                title: Text("Write Failure"),
-                message: Text($0.message),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert(item: $operationResult) {
+            switch $0 {
+            case .success:
+                Alert(
+                    title: Text("Write Completed"),
+                    message: Text("Chip programmed successfully."),
+                    dismissButton: .default(Text("OK"))
+                )
+            case .failure(let message):
+                Alert(
+                    title: Text("Write Failure"),
+                    message: Text(message),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
         }
     }
 }

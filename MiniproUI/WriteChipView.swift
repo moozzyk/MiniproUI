@@ -18,7 +18,7 @@ struct WriteChipView: View {
     @Binding var isPresented: Bool
     @Binding var writeOptions: WriteOptions
     @Binding var programmerInfo: ProgrammerInfo?
-    @Binding var errorMessage: DialogErrorMessage?
+    @Binding var operationResult: OperationResult?
     @State private var writeChipState = WriteChipState.writeOptions
     @State private var progressUpdate: ProgressUpdate?
     @State private var progressMessage: String?
@@ -30,14 +30,14 @@ struct WriteChipView: View {
         isPresented: Binding<Bool>,
         writeOptions: Binding<WriteOptions>,
         programmerInfo: Binding<ProgrammerInfo?>,
-        errorMessage: Binding<DialogErrorMessage?>
+        operationResult: Binding<OperationResult?>
     ) {
         self.device = device
         self.buffer = buffer
         self._isPresented = isPresented
         self._writeOptions = writeOptions
         self._programmerInfo = programmerInfo
-        self._errorMessage = errorMessage
+        self._operationResult = operationResult
         newWriteOptions = writeOptions.wrappedValue
     }
 
@@ -72,8 +72,9 @@ struct WriteChipView: View {
                                     }
                                     progressUpdate = $0
                                 }
+                                operationResult = .success
                             } catch {
-                                errorMessage = .init(message: error.localizedDescription)
+                                operationResult = .failure(error.localizedDescription)
                             }
                             progressUpdate = ProgressUpdate(operation: "", percentage: 100)
                             await Task.yield()
