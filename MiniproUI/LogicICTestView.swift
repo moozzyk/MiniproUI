@@ -10,7 +10,7 @@ import SwiftUI
 struct LogicICTestView: View {
     @ObservedObject var model: MiniproModel
     @State private var selectedDevice: String?
-    @State private var errorMessage: DialogErrorMessage? = nil
+    @State private var alertContent: AlertContent?
 
     init(model: MiniproModel) {
         self.model = model
@@ -75,7 +75,10 @@ struct LogicICTestView: View {
                                             algorithmXmlPath: algorithmXmlPath
                                         )
                                     } catch {
-                                        errorMessage = .init(message: error.localizedDescription)
+                                        alertContent = .init(
+                                            title: "Logic IC Test Error",
+                                            message: error.localizedDescription
+                                        )
                                         model.logicICTestResult = nil
                                     }
                                 }
@@ -107,12 +110,8 @@ struct LogicICTestView: View {
                 }
                 model.logicICTestResult = nil
             }
-        }.alert(item: $errorMessage) {
-            Alert(
-                title: Text("Logic IC Test Error"),
-                message: Text($0.message),
-                dismissButton: .default(Text("OK"))
-            )
+        }.alert(item: $alertContent) {
+            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
         }
     }
 }

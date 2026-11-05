@@ -43,7 +43,7 @@ private class OpenFileModeSelection: NSObject {
 }
 
 struct OpenFileButton: View {
-    @State private var errorMessage: DialogErrorMessage?
+    @State private var alertContent: AlertContent?
     private let caption: String
     private let fileTypes: [String]?
     private let showsOpenMode: Bool
@@ -80,21 +80,17 @@ struct OpenFileButton: View {
                 do {
                     try action(openPanel.url!, modeSelection.mode)
                 } catch {
-                    errorMessage = .init(message: error.localizedDescription)
+                    alertContent = .init(title: "Error opening file", message: error.localizedDescription)
                 }
             }
-        }.alert(item: $errorMessage) {
-            Alert(
-                title: Text("Error opening file"),
-                message: Text($0.message),
-                dismissButton: .default(Text("OK"))
-            )
+        }.alert(item: $alertContent) {
+            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
         }
     }
 }
 
 struct SaveFileButton: View {
-    @State private var errorMessage: DialogErrorMessage?
+    @State private var alertContent: AlertContent?
     private let action: (URL) throws -> Void
 
     init(_ action: @escaping (URL) throws -> Void) {
@@ -110,16 +106,12 @@ struct SaveFileButton: View {
                 do {
                     try action(savePanel.url!)
                 } catch {
-                    errorMessage = .init(message: error.localizedDescription)
+                    alertContent = .init(title: "Error saving file", message: error.localizedDescription)
                 }
             }
         }
-        .alert(item: $errorMessage) {
-            Alert(
-                title: Text("Error saving file"),
-                message: Text($0.message),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert(item: $alertContent) {
+            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
         }
     }
 }

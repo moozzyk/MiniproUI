@@ -329,8 +329,7 @@ struct UpdateFirmwareButton: View {
     @Binding var programmerInfo: ProgrammerInfo?
     let buttonCaption: String
     @State private var progressUpdate: ProgressUpdate?
-    @State private var errorAlertTitle = "Firmware Update Failed"
-    @State private var errorMessage: DialogErrorMessage?
+    @State private var alertContent: AlertContent?
     @State private var isPresented = false
     @State private var progressMessage: String?
     private let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "UpdateFirmwareButton")
@@ -351,7 +350,7 @@ struct UpdateFirmwareButton: View {
         do {
             try await installFirmware(using: firmwareUrl)
         } catch {
-            errorMessage = .init(message: error.localizedDescription)
+            alertContent = .init(title: "Firmware Update Failed", message: error.localizedDescription)
         }
     }
 
@@ -425,7 +424,7 @@ struct UpdateFirmwareButton: View {
             // Trigger re-render to hide missing algorithms banner
             firmwareUrl = nil
         } catch {
-            errorMessage = .init(message: error.localizedDescription)
+            alertContent = .init(title: "Software Install Failed", message: error.localizedDescription)
         }
     }
 
@@ -459,11 +458,9 @@ struct UpdateFirmwareButton: View {
                         progressMessage = nil
                     }
                     if firmwareUrl.pathExtension.lowercased() == "rar" {
-                        errorAlertTitle = "Software Install Failed"
                         progressMessage = "Extracting firmware..."
                         await processRarFirmware(at: firmwareUrl)
                     } else {
-                        errorAlertTitle = "Firmware Update Failed"
                         await updateFirmware(using: firmwareUrl)
                     }
                 }
@@ -475,12 +472,8 @@ struct UpdateFirmwareButton: View {
                 ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
-        .alert(item: $errorMessage) {
-            Alert(
-                title: Text(errorAlertTitle),
-                message: Text($0.message),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert(item: $alertContent) {
+            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
         }
     }
 }
