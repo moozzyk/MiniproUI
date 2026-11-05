@@ -138,7 +138,7 @@ struct ReadChipButton: View {
     @Binding var buffer: Data?
     @Binding var readOptions: ReadOptions
     @Binding var programmerInfo: ProgrammerInfo?
-    @State private var errorMessage: DialogErrorMessage?
+    @State private var alertContent: AlertContent?
     @State private var isPresented = false
 
     var body: some View {
@@ -154,16 +154,19 @@ struct ReadChipButton: View {
                     isPresented: $isPresented,
                     readOptions: $readOptions,
                     programmerInfo: $programmerInfo,
-                    errorMessage: $errorMessage
+                    onCompletion: {
+                        if let error = $0 {
+                            alertContent = .init(
+                                title: "Reading Chip Contents Failed",
+                                message: error.localizedDescription
+                            )
+                        }
+                    }
                 )
             }
         }
-        .alert(item: $errorMessage) {
-            Alert(
-                title: Text("Reading Chip Contents Failed"),
-                message: Text($0.message),
-                dismissButton: .default(Text("OK"))
-            )
+        .alert(item: $alertContent) {
+            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
         }
     }
 }
@@ -174,7 +177,7 @@ struct WriteChipButton: View {
     @Binding var writeOptions: WriteOptions
     @Binding var programmerInfo: ProgrammerInfo?
     @State private var isPresented = false
-    @State private var operationResult: OperationResult?
+    @State private var alertContent: AlertContent?
 
     var body: some View {
         Button(" >> ") {
@@ -189,25 +192,18 @@ struct WriteChipButton: View {
                     isPresented: $isPresented,
                     writeOptions: $writeOptions,
                     programmerInfo: $programmerInfo,
-                    operationResult: $operationResult
+                    onCompletion: {
+                        if let error = $0 {
+                            alertContent = .init(title: "Write Failure", message: error.localizedDescription)
+                        } else {
+                            alertContent = .init(title: "Write Completed", message: "Chip programmed successfully.")
+                        }
+                    }
                 )
             }
         }
-        .alert(item: $operationResult) {
-            switch $0 {
-            case .success:
-                Alert(
-                    title: Text("Write Completed"),
-                    message: Text("Chip programmed successfully."),
-                    dismissButton: .default(Text("OK"))
-                )
-            case .failure(let message):
-                Alert(
-                    title: Text("Write Failure"),
-                    message: Text(message),
-                    dismissButton: .default(Text("OK"))
-                )
-            }
+        .alert(item: $alertContent) {
+            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
         }
     }
 }

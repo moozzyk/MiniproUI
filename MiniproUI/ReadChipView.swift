@@ -18,7 +18,7 @@ struct ReadChipView: View {
     @Binding var isPresented: Bool
     @Binding var readOptions: ReadOptions
     @Binding var programmerInfo: ProgrammerInfo?
-    @Binding var errorMessage: DialogErrorMessage?
+    let onCompletion: (Error?) -> Void
     @State private var readChipState = ReadChipState.readOptions
     @State private var progressUpdate: ProgressUpdate?
     @State private var progressMessage: String?
@@ -30,14 +30,14 @@ struct ReadChipView: View {
         isPresented: Binding<Bool>,
         readOptions: Binding<ReadOptions>,
         programmerInfo: Binding<ProgrammerInfo?>,
-        errorMessage: Binding<DialogErrorMessage?>
+        onCompletion: @escaping (Error?) -> Void
     ) {
         self.device = device
         self._buffer = buffer
         self._isPresented = isPresented
         self._readOptions = readOptions
         self._programmerInfo = programmerInfo
-        self._errorMessage = errorMessage
+        self.onCompletion = onCompletion
         newReadOptions = readOptions.wrappedValue
     }
 
@@ -68,8 +68,9 @@ struct ReadChipView: View {
                                 ) {
                                     progressUpdate = $0
                                 }
+                                onCompletion(nil)
                             } catch {
-                                errorMessage = .init(message: error.localizedDescription)
+                                onCompletion(error)
                             }
                             progressUpdate = ProgressUpdate(operation: "", percentage: 100)
                             await Task.yield()
