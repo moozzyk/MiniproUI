@@ -110,9 +110,7 @@ struct LogicICTestView: View {
                 }
                 model.logicICTestResult = nil
             }
-        }.alert(item: $alertContent) {
-            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
-        }
+        }.alert($alertContent)
     }
 }
 

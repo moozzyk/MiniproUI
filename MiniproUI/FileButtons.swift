@@ -83,9 +83,7 @@ struct OpenFileButton: View {
                     alertContent = .init(title: "Error opening file", message: error.localizedDescription)
                 }
             }
-        }.alert(item: $alertContent) {
-            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
-        }
+        }.alert($alertContent)
     }
 }
 
@@ -110,8 +108,6 @@ struct SaveFileButton: View {
                 }
             }
         }
-        .alert(item: $alertContent) {
-            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
-        }
+        .alert($alertContent)
     }
 }

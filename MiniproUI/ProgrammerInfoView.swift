@@ -472,9 +472,7 @@ struct UpdateFirmwareButton: View {
                 ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
-        .alert(item: $alertContent) {
-            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
-        }
+        .alert($alertContent)
     }
 }
 

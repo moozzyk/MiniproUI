@@ -165,9 +165,7 @@ struct ReadChipButton: View {
                 )
             }
         }
-        .alert(item: $alertContent) {
-            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
-        }
+        .alert($alertContent)
     }
 }
 
@@ -202,9 +200,7 @@ struct WriteChipButton: View {
                 )
             }
         }
-        .alert(item: $alertContent) {
-            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
-        }
+        .alert($alertContent)
     }
 }
 
