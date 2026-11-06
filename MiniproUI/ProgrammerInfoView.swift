@@ -349,6 +349,7 @@ struct UpdateFirmwareButton: View {
     private func updateFirmware(using firmwareUrl: URL) async {
         do {
             try await installFirmware(using: firmwareUrl)
+            alertContent = .init(title: "Firmware Update Completed", message: "Firmware updated successfully.")
         } catch {
             alertContent = .init(title: "Firmware Update Failed", message: error.localizedDescription)
         }
