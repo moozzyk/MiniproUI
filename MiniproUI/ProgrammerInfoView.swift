@@ -424,6 +424,10 @@ struct UpdateFirmwareButton: View {
             UserDefaults.standard.setInstalledSoftwareBundle(url.lastPathComponent, for: programmerInfo.model)
             // Trigger re-render to hide missing algorithms banner
             firmwareUrl = nil
+            alertContent = .init(
+                title: "Software Install Completed",
+                message: "Software bundle installed successfully."
+            )
         } catch {
             alertContent = .init(title: "Software Install Failed", message: error.localizedDescription)
         }
