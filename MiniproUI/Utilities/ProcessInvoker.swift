@@ -27,19 +27,10 @@ class ProcessInvoker {
             queue.async {
                 do {
                     logger.notice("invoking \(executableName, privacy: .public) with arguments: \(arguments, privacy: .public)")
-                    var stdout = Data()
-                    var stderr = Data()
                     let stdoutPipe = Pipe()
                     let stderrPipe = Pipe()
                     let stdInPipe = Pipe()
-                    stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
-                        stdout.append(handle.availableData)
-                    }
-                    stderrPipe.fileHandleForReading.readabilityHandler = { handle in
-                        let data = handle.availableData
-                        stderr.append(data)
-                        onProgress(data)
-                    }
+                    _ = fcntl(stdInPipe.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
 
                     let process = Process()
                     process.executableURL = executableURL
@@ -49,19 +40,62 @@ class ProcessInvoker {
                     process.standardError = stderrPipe
                     process.standardInput = stdInPipe
                     try process.run()
-                    if let stdinData = stdinData {
-                        try stdInPipe.fileHandleForWriting.write(contentsOf: stdinData)
-                        stdInPipe.fileHandleForWriting.closeFile()
+
+                    let group = DispatchGroup()
+
+                    logger.debug("stdout group enter")
+                    group.enter()
+                    var stdout = Data()
+                    stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
+                        let data = handle.availableData
+                        if data.isEmpty {
+                            handle.readabilityHandler = nil
+                            logger.debug("stdout group leave")
+                            group.leave()
+                        } else {
+                            stdout.append(data)
+                        }
                     }
+
+                    logger.debug("stderr group enter")
+                    group.enter()
+                    var stderr = Data()
+                    stderrPipe.fileHandleForReading.readabilityHandler = { handle in
+                        let data = handle.availableData
+                        if data.isEmpty {
+                            handle.readabilityHandler = nil
+                            logger.debug("stderr group leave")
+                            group.leave()
+                        } else {
+                            stderr.append(data)
+                            onProgress(data)
+                        }
+                    }
+
+                    if let stdinData = stdinData {
+                        let stdinHandle = stdInPipe.fileHandleForWriting
+                        do {
+                            try stdinHandle.write(contentsOf: stdinData)
+                        } catch {
+                            logger.notice("stdin write failed: \(error, privacy: .public)")
+                        }
+                        try? stdinHandle.close()
+                    }
+
                     process.waitUntilExit()
-                    let invocationResult = InvocationResult(
-                        exitCode: process.terminationStatus,
-                        stdOut: stdout,
-                        stdErr: String(data: stderr, encoding: .utf8) ?? ""
-                    )
-                    logger.notice("invocation completed \(String(describing: invocationResult), privacy: .public)")
-                    continuation.resume(returning: invocationResult)
+                    logger.debug("process exited")
+                    group.notify(queue: queue) {
+                        logger.debug("group resume")
+                        let invocationResult = InvocationResult(
+                            exitCode: process.terminationStatus,
+                            stdOut: stdout,
+                            stdErr: String(data: stderr, encoding: .utf8) ?? ""
+                        )
+                        logger.notice("invocation completed \(String(describing: invocationResult), privacy: .public)")
+                        continuation.resume(returning: invocationResult)
+                    }
                 } catch {
+                    logger.error("Exception: \(error, privacy: .public)")
                     continuation.resume(throwing: error)
                 }
             }
