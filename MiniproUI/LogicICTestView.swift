@@ -5,12 +5,14 @@
 //  Created by Pawel Kadluczka on 2/7/25.
 //
 
+import StoreKit
 import SwiftUI
 
 struct LogicICTestView: View {
     @ObservedObject var model: MiniproModel
     @State private var selectedDevice: String?
     @State private var alertContent: AlertContent?
+    @Environment(\.requestReview) private var requestReview
 
     init(model: MiniproModel) {
         self.model = model
@@ -74,6 +76,11 @@ struct LogicICTestView: View {
                                             device: logicICDetails.name,
                                             algorithmXmlPath: algorithmXmlPath
                                         )
+                                        ReviewPrompt.recordSuccessfulOperation()
+                                        if ReviewPrompt.isReviewDue {
+                                            ReviewPrompt.markReviewRequested()
+                                            requestReview()
+                                        }
                                     } catch {
                                         alertContent = .init(
                                             title: "Logic IC Test Error",

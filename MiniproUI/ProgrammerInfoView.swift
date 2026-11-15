@@ -5,6 +5,7 @@
 //  Created by Pawel Kadluczka on 2/2/25.
 //
 
+import StoreKit
 import SwiftUI
 import os
 
@@ -332,6 +333,8 @@ struct UpdateFirmwareButton: View {
     @State private var alertContent: AlertContent?
     @State private var isPresented = false
     @State private var progressMessage: String?
+    @State private var shouldRequestReview = false
+    @Environment(\.requestReview) private var requestReview
     private let logger = Logger(subsystem: "com.3d-logic.visualminipro", category: "UpdateFirmwareButton")
 
     private func installFirmware(using firmwareUrl: URL) async throws {
@@ -349,7 +352,12 @@ struct UpdateFirmwareButton: View {
     private func updateFirmware(using firmwareUrl: URL) async {
         do {
             try await installFirmware(using: firmwareUrl)
-            alertContent = .init(title: "Firmware Update Completed", message: "Firmware updated successfully.")
+            alertContent = .init(
+                title: "Firmware Update Completed",
+                message: "Firmware updated successfully."
+            )
+            ReviewPrompt.recordSuccessfulOperation()
+            shouldRequestReview = ReviewPrompt.isReviewDue
         } catch {
             alertContent = .init(title: "Firmware Update Failed", message: error.localizedDescription)
         }
@@ -428,6 +436,8 @@ struct UpdateFirmwareButton: View {
                 title: "Software Install Completed",
                 message: "Software bundle installed successfully."
             )
+            ReviewPrompt.recordSuccessfulOperation()
+            shouldRequestReview = ReviewPrompt.isReviewDue
         } catch {
             alertContent = .init(title: "Software Install Failed", message: error.localizedDescription)
         }
@@ -477,7 +487,13 @@ struct UpdateFirmwareButton: View {
                 ProgressBarView(label: $progressMessage, progressUpdate: $progressUpdate)
             }
         }
-        .alert($alertContent)
+        .alert($alertContent) {
+            if shouldRequestReview {
+                shouldRequestReview = false
+                ReviewPrompt.markReviewRequested()
+                requestReview()
+            }
+        }
     }
 }
 

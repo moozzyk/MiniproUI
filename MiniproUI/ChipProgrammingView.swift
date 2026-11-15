@@ -5,6 +5,7 @@
 //  Created by Pawel Kadluczka on 3/27/25.
 //
 
+import StoreKit
 import SwiftUI
 
 struct ChipProgrammingView: View {
@@ -160,6 +161,8 @@ struct ReadChipButton: View {
                                 title: "Reading Chip Contents Failed",
                                 message: error.localizedDescription
                             )
+                        } else {
+                            ReviewPrompt.recordSuccessfulOperation()
                         }
                     }
                 )
@@ -176,6 +179,8 @@ struct WriteChipButton: View {
     @Binding var programmerInfo: ProgrammerInfo?
     @State private var isPresented = false
     @State private var alertContent: AlertContent?
+    @State private var shouldRequestReview = false
+    @Environment(\.requestReview) private var requestReview
 
     var body: some View {
         Button(" >> ") {
@@ -194,13 +199,24 @@ struct WriteChipButton: View {
                         if let error = $0 {
                             alertContent = .init(title: "Write Failure", message: error.localizedDescription)
                         } else {
-                            alertContent = .init(title: "Write Completed", message: "Chip programmed successfully.")
+                            alertContent = .init(
+                                title: "Write Completed",
+                                message: "Chip programmed successfully."
+                            )
+                            ReviewPrompt.recordSuccessfulOperation()
+                            shouldRequestReview = ReviewPrompt.isReviewDue
                         }
                     }
                 )
             }
         }
-        .alert($alertContent)
+        .alert($alertContent) {
+            if shouldRequestReview {
+                shouldRequestReview = false
+                ReviewPrompt.markReviewRequested()
+                requestReview()
+            }
+        }
     }
 }
 

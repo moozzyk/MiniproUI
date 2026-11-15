@@ -13,6 +13,8 @@ struct MiniproUIApp: App {
         if UserDefaults.standard.libusbDebugLogging {
             setenv("LIBUSB_DEBUG", "4", 1)
         }
+        
+        ReviewPrompt.startIfNeeded()
     }
 
     var body: some Scene {

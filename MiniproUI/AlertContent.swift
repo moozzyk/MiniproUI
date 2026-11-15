@@ -13,9 +13,13 @@ struct AlertContent: Hashable, Identifiable {
 }
 
 extension View {
-    func alert(_ content: Binding<AlertContent?>) -> some View {
+    func alert(_ content: Binding<AlertContent?>, onDismiss: (() -> Void)? = nil) -> some View {
         alert(item: content) {
-            Alert(title: Text($0.title), message: Text($0.message), dismissButton: .default(Text("OK")))
+            Alert(
+                title: Text($0.title),
+                message: Text($0.message),
+                dismissButton: .default(Text("OK")) { onDismiss?() }
+            )
         }
     }
 }
