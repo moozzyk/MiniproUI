@@ -345,7 +345,6 @@ struct UpdateFirmwareButton: View {
         }
         progressUpdate = ProgressUpdate(operation: "", percentage: 100)
         await Task.yield()
-        programmerInfo = try await MiniproAPI.getProgrammerInfo()
         try await Task.sleep(nanoseconds: 500 * 1_000_000)
     }
 
@@ -488,6 +487,10 @@ struct UpdateFirmwareButton: View {
             }
         }
         .alert($alertContent) {
+            // Refreshing programmer info rebuilds this view, so wait until the alert is dismissed
+            Task {
+                programmerInfo = try? await MiniproAPI.getProgrammerInfo()
+            }
             if shouldRequestReview {
                 shouldRequestReview = false
                 ReviewPrompt.markReviewRequested()
